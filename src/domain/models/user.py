@@ -5,16 +5,16 @@ from datetime import datetime
 
 class Users:
     def __init__(self,
-            id: int,
-            first_name: str,
-            last_name: str,
-            password_hash: str,
-            age: int,
-            phone: str,
-            email: str,
-            is_active: bool,
-            created_at: datetime,
-            updated_at: datetime
+        id: int,
+        first_name: str,
+        last_name: str,
+        password_hash: str,
+        age: int,
+        phone: str,
+        email: str,
+        is_active: bool,
+        created_at: datetime,
+        updated_at: datetime
     ) -> None:
         self.id = id
         self.first_name = first_name
