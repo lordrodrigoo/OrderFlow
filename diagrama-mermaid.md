@@ -1,6 +1,6 @@
 erDiagram
     User {
-        UUID id
+        int id
         string first_name
         string last_name
         string password_hash
@@ -13,8 +13,8 @@ erDiagram
     }
 
     Address {
-        UUID id
-        UUID user_id
+        int id
+        int user_id
         string street
         string number
         string complement
@@ -27,9 +27,9 @@ erDiagram
     }
 
     Order {
-        UUID id
-        UUID user_id
-        UUID address_id
+        int id
+        int user_id
+        int address_id
         enum status
         decimal total_amount
         decimal delivery_fee
@@ -40,9 +40,9 @@ erDiagram
     }
 
     OrderItem {
-        UUID id
-        UUID order_id
-        UUID product_id
+        int id
+        int order_id
+        int product_id
         int quantity
         decimal unit_price
         decimal subtotal
@@ -50,10 +50,10 @@ erDiagram
     }
 
     Product {
-        UUID id
+        int id
         string name
         string description
-        UUID category_id
+        int category_id
         decimal price
         string image_url
         bool is_available
@@ -63,15 +63,15 @@ erDiagram
     }
 
     Category {
-        UUID id
+        int id
         string name
         string description
     }
 
     Review {
-        UUID id
-        UUID order_id
-        UUID user_id
+        int id
+        int order_id
+        int user_id
         int rating
         string comment
         datetime created_at

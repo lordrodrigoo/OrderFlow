@@ -9,7 +9,7 @@ disable=
     C0209, # Consider using f-string
     C0321, # Multiple statements
     W0221, # Arguments-differ
-    
+    C0301, # Line too long
     R0801, # Duplicate code
     R0903, # Too few public methods
     R0913, # Too many arguments
