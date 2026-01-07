@@ -2,6 +2,7 @@ astroid==4.0.2
 cfgv==3.5.0
 dill==0.4.0
 distlib==0.4.0
+dotenv==0.9.9
 filelock==3.20.1
 greenlet==3.3.0
 identify==2.6.15
@@ -16,6 +17,7 @@ pre_commit==4.5.1
 Pygments==2.19.2
 pylint==4.0.4
 pytest==9.0.2
+python-dotenv==1.2.1
 PyYAML==6.0.3
 SQLAlchemy==2.0.45
 tomlkit==0.13.3
