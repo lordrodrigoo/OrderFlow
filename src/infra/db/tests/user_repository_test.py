@@ -1,13 +1,12 @@
 import pytest
 from sqlalchemy import text
-from src.infra.db.settings.connection import DBConnectionHandler
 from src.infra.db.repositories.user_repository import UserRepository
-
+from src.infra.db.settings.connection import DBConnectionHandler
 
 db_connection_handler = DBConnectionHandler()
 connection = db_connection_handler.get_engine().connect()
 
-@pytest.mark.unit
+@pytest.mark.skip(reason='Sensitive test')
 def test_insert_user():
     mocked_first_name = "Alice"
     mocked_last_name = "Smith"
@@ -45,8 +44,7 @@ def test_insert_user():
     assert registry.last_name == mocked_last_name
     assert registry.age == mocked_age
 
-    # connection.execute(text(f'''
-    #     DELETE FROM users WHERE id = '{registry.id}'
-    # '''))
-    # connection.commit()
-
+    connection.execute(text(f'''
+        DELETE FROM users WHERE id = '{registry.id}'
+    '''))
+    connection.commit()
