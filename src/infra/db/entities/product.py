@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Numeric
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Numeric, DateTime
 from sqlalchemy.orm import relationship
 from src.infra.db.settings.base import Base
 from src.infra.db.entities.category import Category  #pylint: disable=unused-import
@@ -14,8 +14,8 @@ class Product(Base):
     image_url = Column(String, nullable=True)
     is_available = Column(Boolean, default=True)
     preparation_time_minutes = Column(Integer, nullable=True)
-    created_at = Column(String(30), nullable=False)
-    updated_at = Column(String(30), nullable=True)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=True)
 
     category_id = Column(Integer, ForeignKey('categories.id'), nullable=False)
     category = relationship('Category', backref='products')

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from src.infra.db.settings.base import Base
 
 class User(Base):
@@ -12,8 +12,8 @@ class User(Base):
     password_hash = Column(String(128), nullable=False)
     phone = Column(String(20), nullable=True)
     is_active = Column(Boolean, default=True)
-    created_at = Column(String(30), nullable=False)
-    updated_at = Column(String(30), nullable=True)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=True)
 
     def __repr__(self):
         return f"Users [id = {self.id}, first_name = {self.first_name}, last_name = {self.last_name}, age = {self.age}, phone = {self.phone}, email = {self.email}]"
