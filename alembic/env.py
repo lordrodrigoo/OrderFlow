@@ -6,7 +6,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
 
-from src.infra.db.entities import user # pylint: disable=unused-import
+from src.infra.db.entities import user, product, category # pylint: disable=unused-import
 from src.infra.db.settings.base import Base # noqa: F401
 
 from dotenv import load_dotenv # pylint: disable=wrong-import-order

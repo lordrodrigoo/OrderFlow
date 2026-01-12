@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Numeric
 from sqlalchemy.orm import relationship
 from src.infra.db.settings.base import Base
+from src.infra.db.entities.category import Category  #pylint: disable=unused-import
 
 
 class Product(Base):
@@ -9,7 +10,7 @@ class Product(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(100), nullable=False)
     description = Column(String(255), nullable=True)
-    price = Column(Integer, nullable=False)
+    price = Column(Numeric(10, 2), nullable=False)
     image_url = Column(String, nullable=True)
     is_available = Column(Boolean, default=True)
     preparation_time_minutes = Column(Integer, nullable=True)
