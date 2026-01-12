@@ -1,5 +1,5 @@
 from typing import List
-from sqlalchemy import Numeric
+from decimal import Decimal
 from src.infra.db.settings.connection import DBConnectionHandler
 from src.infra.db.entities.product import Product as ProductEntity
 from src.data.interfaces.product_repository import ProductRepositoryInterface
@@ -13,7 +13,7 @@ class ProductRepository(ProductRepositoryInterface):
         name: str,
         description: str,
         category_id: int,
-        price: Numeric,
+        price: Decimal,
         image_url: str,
         is_available: bool,
         preparation_time_minutes: int,

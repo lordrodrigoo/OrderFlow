@@ -1,6 +1,6 @@
 #pylint: disable=redefined-builtin
 from datetime import datetime
-from sqlalchemy import Numeric
+from decimal import Decimal
 
 class Product:
     def __init__(
@@ -9,7 +9,7 @@ class Product:
         name: str,
         description: str,
         category_id: int,
-        price: Numeric,
+        price: Decimal,
         image_url: str,
         is_available: bool,
         preparation_time_minutes: int,
