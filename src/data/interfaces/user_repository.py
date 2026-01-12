@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List
+from datetime import datetime
 from src.domain.models.user import Users
 
 class UserRepositoryInterface(ABC):
@@ -13,8 +14,8 @@ class UserRepositoryInterface(ABC):
         phone: str,
         email: str,
         is_active: bool,
-        created_at: str,
-        updated_at: str
+        created_at: datetime,
+        updated_at: datetime
     ) -> Users:
         pass
 

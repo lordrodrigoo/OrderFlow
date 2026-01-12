@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 from decimal import Decimal
+from datetime import datetime
 from src.domain.models.product import Product
 
 class ProductRepositoryInterface(ABC):
@@ -14,8 +15,8 @@ class ProductRepositoryInterface(ABC):
         image_url: str,
         is_available: bool,
         preparation_time_minutes: int,
-        created_at: str,
-        updated_at: str
+        created_at: datetime,
+        updated_at: datetime
     ) -> Product:
         pass
 

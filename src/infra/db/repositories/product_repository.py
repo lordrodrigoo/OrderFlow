@@ -1,5 +1,6 @@
 from typing import List
 from decimal import Decimal
+from datetime import datetime
 from src.infra.db.settings.connection import DBConnectionHandler
 from src.infra.db.entities.product import Product as ProductEntity
 from src.data.interfaces.product_repository import ProductRepositoryInterface
@@ -17,8 +18,8 @@ class ProductRepository(ProductRepositoryInterface):
         image_url: str,
         is_available: bool,
         preparation_time_minutes: int,
-        created_at: str,
-        updated_at: str
+        created_at: datetime,
+        updated_at: datetime
     ) -> Product:
         with DBConnectionHandler() as db_connection:
             try:

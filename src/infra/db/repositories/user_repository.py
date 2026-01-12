@@ -1,4 +1,5 @@
 from typing import List
+from datetime import datetime
 from src.infra.db.settings.connection import DBConnectionHandler
 from src.infra.db.entities.user import User as UserEntity
 from src.data.interfaces.user_repository import UserRepositoryInterface
@@ -17,8 +18,8 @@ class UserRepository(UserRepositoryInterface):
         phone: str,
         email: str,
         is_active: bool,
-        created_at: str,
-        updated_at: str
+        created_at: datetime,
+        updated_at: datetime
     ) -> Users:
         with DBConnectionHandler() as db_connection:
             try:
