@@ -15,6 +15,7 @@ class Address:
         zip_code: str,
         is_default: bool,
         created_at: datetime,
+        updated_at: datetime = None
     ) -> None:
         self.id = id
         self.user_id = user_id
@@ -27,3 +28,4 @@ class Address:
         self.zip_code = zip_code
         self.is_default = is_default
         self.created_at = created_at
+        self.updated_at = updated_at
