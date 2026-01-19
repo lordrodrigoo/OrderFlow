@@ -1,10 +1,9 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Numeric, DateTime
 from sqlalchemy.orm import relationship
 from src.infra.db.settings.base import Base
-from src.infra.db.entities.category import Category  #pylint: disable=unused-import
 
 
-class Product(Base):
+class ProductEntity(Base):
     __tablename__ = 'products'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -19,6 +18,7 @@ class Product(Base):
 
     category_id = Column(Integer, ForeignKey('categories.id'), nullable=False)
     category = relationship('Category', backref='products')
+    order_items = relationship('OrderItem', backref='product')
 
     def __repr__(self):
         return f"Product [id = {self.id}, name = {self.name}, price = {self.price}, category_id = {self.category_id}]"

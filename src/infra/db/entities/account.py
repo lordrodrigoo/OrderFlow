@@ -1,5 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy.orm import relationship
 from src.infra.db.settings.base import Base
+
 
 class AccountEntity(Base):
     """Entity class representing the accounts table in the database."""
@@ -12,6 +14,8 @@ class AccountEntity(Base):
     status = Column(Boolean, default=True)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=True)
+
+    user = relationship("Users", back_populates="accounts")
 
     def __repr__(self):
         return (

@@ -1,11 +1,9 @@
-import logging
 from typing import Optional, List
-from sqlalchemy.exc import SQLAlchemyError
 from src.infra.db.settings.connection import DBConnectionHandler
 from src.infra.db.entities.address import AddressEntity
 from src.domain.repositories.address_repository import AddressRepositoryInterface
 from src.domain.models.address import Address
-from src.utils.base_repository import BaseRepository
+from src.infra.db.repositories.base_repository import BaseRepository
 
 
 
@@ -28,10 +26,11 @@ class AddressRepository(AddressRepositoryInterface, BaseRepository[AddressEntity
             updated_at=address.updated_at
         )
         self.add(entity)
+        self.save()
         return Address.from_entity(entity)
 
     def update_address(self, address: Address) -> Address:
-        entity = self.session.query(self.model).get(address.id)
+        entity = self.get_by_id(address.id)
 
         if entity:
             entity.user_id = address.user_id
@@ -44,7 +43,7 @@ class AddressRepository(AddressRepositoryInterface, BaseRepository[AddressEntity
             entity.zip_code = address.zip_code
             entity.is_default = address.is_default
             entity.updated_at = address.updated_at
-            self.update(entity)
+            self.save()
 
         return Address.from_entity(entity)
 
@@ -64,15 +63,11 @@ class AddressRepository(AddressRepositoryInterface, BaseRepository[AddressEntity
 
         if entity:
             self.delete(entity)
+            self.save()
             return True
         return False
 
     def find_addresses_by_user_id(self, user_id: int) -> List[Address]:
-        logger = logging.getLogger(__name__)
-
-        try:
-            entities = self.session.query(self.model).filter(self.model.user_id == user_id).all()
-            return [Address.from_entity(address) for address in entities]
-        except SQLAlchemyError as e:
-            logger.error("Error fetching addresses for user_id %s: %s", user_id, e)
-            return []
+        entities = self.session.query(
+            self.model).filter(self.model.user_id == user_id).all()
+        return [Address.from_entity(address) for address in entities]

@@ -1,5 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy.orm import relationship
 from src.infra.db.settings.base import Base
+
 
 class UserEntity(Base):
     """Entity class representing the users table in the database."""
@@ -15,6 +17,10 @@ class UserEntity(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=True)
+
+    accounts = relationship('AccountEntity', backref='user')
+    addresses = relationship('AddressEntity', backref='user')
+    orders = relationship('OrderEntity', backref='user')
 
     def __repr__(self):
         return (
