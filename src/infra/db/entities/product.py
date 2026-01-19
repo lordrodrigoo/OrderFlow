@@ -16,6 +16,7 @@ class ProductEntity(Base):
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=True)
 
+    "Bellow are foreign keys and relationships"
     category_id = Column(Integer, ForeignKey('categories.id'), nullable=False)
     category = relationship('Category', backref='products')
     order_items = relationship('OrderItem', backref='product')
