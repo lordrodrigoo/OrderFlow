@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from src.infra.db.settings.base import Base
 
@@ -8,15 +8,15 @@ class AccountEntity(Base):
     __tablename__ = 'accounts'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     username = Column(String(50), nullable=False)
     password_hash = Column(String(128), nullable=False)
     status = Column(String(20), default='active')
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=True)
 
-    user = relationship("Users", back_populates="accounts")
-    user_id = relationship("Users", back_populates="accounts")
+    user = relationship("User", back_populates="accounts")
+
 
     def __repr__(self):
         return (
