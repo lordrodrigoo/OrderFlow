@@ -16,6 +16,7 @@ class AccountEntity(Base):
     updated_at = Column(DateTime, nullable=True)
 
     user = relationship("Users", back_populates="accounts")
+    user_id = relationship("Users", back_populates="accounts")
 
     def __repr__(self):
         return (
