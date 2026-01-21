@@ -10,7 +10,7 @@ class CategoryEntity(Base):
     name = Column(String(100), nullable=False)
     description = Column(String(255), nullable=True)
 
-    products = relationship("Product", back_populates="category")
+    products = relationship("ProductEntity", back_populates="category")
 
     def __repr__(self):
         return f"CategoryEntity [id = {self.id}, name = {self.name}]"

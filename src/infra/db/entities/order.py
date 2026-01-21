@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from src.infra.db.settings.base import Base
 
 
+
 class OrderEntity(Base):
     __tablename__ = 'orders'
 
@@ -15,8 +16,6 @@ class OrderEntity(Base):
     "Bellow are foreign keys and relationships"
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     user = relationship('UserEntity', back_populates='orders')
-    address_id = Column(Integer, ForeignKey('addresses.id'), nullable=False)
-    address = relationship('AddressEntity', back_populates='orders')
     order_items = relationship('OrderItemEntity', back_populates='order')
     review = relationship('ReviewEntity', back_populates='order', uselist=False)
 
