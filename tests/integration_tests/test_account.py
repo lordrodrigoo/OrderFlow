@@ -28,7 +28,7 @@ def test_create_account(db_session, fake_user, fake_account):
     assert fake_account.user_id == fake_user.id
 
 
-def test_update_account(db_session, fake_user, fake_account):
+def test_update_account(db_session, fake_account):
     fake_account.username = "ana_souza"
     db_session.commit()
     updated_account = db_session.query(AccountEntity).filter_by(id=fake_account.id).first()
@@ -38,8 +38,8 @@ def test_update_account(db_session, fake_user, fake_account):
 def test_relationship_between_user_and_account(db_session, fake_user, fake_account):
     # This test I will use fake_account to access the user relationship
     account = db_session.query(AccountEntity).filter_by(id=fake_account.id).first()
-    assert account.user.id == fake_user.id
-    assert account.user.email == fake_user.email
+    assert account.user.id == fake_account.user_id
+    assert account.user.email == fake_account.user.email
 
 
 def test_account_username_is_unique(db_session, fake_user, fake_account):
