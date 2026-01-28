@@ -46,6 +46,10 @@ class UserRepository(UserRepositoryInterface, BaseRepository[UserEntity]):
         entity = self.get_by_id(user_id)
         return Users.from_entity(entity) if entity else None
 
+    def find_by_email(self, email: str) -> Optional[Users]:
+        entity = self.session.query(self.model).filter(self.model.email == email).first()
+        return Users.from_entity(entity) if entity else None
+
     def find_by_name(self, name: str) -> List[Users]:
         entities = self.session.query(self.model).filter(self.model.first_name == name).all()
         return [Users.from_entity(user) for user in entities]
