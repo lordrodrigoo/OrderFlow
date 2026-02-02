@@ -14,6 +14,7 @@ distlib==0.4.0
 dnspython==2.8.0
 docker==7.1.0
 dotenv==0.9.9
+email-validator==2.3.0
 fastapi==0.128.0
 filelock==3.20.1
 greenlet==3.3.0
