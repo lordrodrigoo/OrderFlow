@@ -1,0 +1,28 @@
+@baseUrl =http://localhost:8000/api/v1/users
+
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+    "first_name": "Jo",
+    "last_name": "Silva",
+    "age": 15,
+    "email": "invalid-email",
+    "phone": "12345",
+    "password": "weakpass"
+}
+
+
+### CREATING A VALID USER
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+    "first_name": "João",
+    "last_name": "Silva",
+    "age": 25,
+    "email": "joao.silva@example.com",
+    "phone": "11999999999",
+    "username": "joaosilva",
+    "password": "StrongP@ssw0rd!"
+}   

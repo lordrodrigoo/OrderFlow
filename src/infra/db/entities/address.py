@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from src.infra.db.settings.base import Base
@@ -18,8 +19,8 @@ class AddressEntity(Base):
     state = Column(String(2), nullable=False)
     zip_code = Column(String(10), nullable=False)
     is_default = Column(Boolean, default=False)
-    created_at = Column(DateTime, nullable=False)
-    updated_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.now())
+    updated_at = Column(DateTime, nullable=True, default=None, onupdate=datetime.now())
 
     user = relationship('UserEntity', back_populates='addresses')
 

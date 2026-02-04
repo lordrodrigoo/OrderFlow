@@ -32,6 +32,13 @@ class CreateUserRequest(BaseModel):
         max_length=15,
         description="phone number must be between 10 and 15 characters",
     )
+    username: str = Field(
+        ...,
+        min_length=3,
+        max_length=50,
+        description="username must be between 3 and 50 characters",
+    )
+
     password: str = Field(
         ...,
         min_length=8,

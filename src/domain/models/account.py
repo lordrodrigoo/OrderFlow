@@ -3,6 +3,7 @@ from datetime import datetime
 from dataclasses import dataclass
 from typing import Optional
 from enum import Enum
+import bcrypt
 
 
 class AccountStatus(Enum):
@@ -55,4 +56,11 @@ class Account:
             status=AccountStatus(entity.status),
             created_at=entity.created_at,
             updated_at=entity.updated_at
+        )
+
+    @staticmethod
+    def hash_password(password: str) -> str:
+        return bcrypt.hashpw(
+            password.encode('utf-8'),
+            bcrypt.gensalt()).decode('utf-8'
         )

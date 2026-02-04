@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from sqlalchemy.orm import relationship
 from src.infra.db.settings.base import Base
@@ -13,11 +14,10 @@ class UserEntity(Base):
     last_name = Column(String(50), nullable=False)
     age = Column(Integer, nullable=True)
     email = Column(String(100), nullable=False, unique=True)
-    password_hash = Column(String(128), nullable=False)
     phone = Column(String(20), nullable=True)
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, nullable=False)
-    updated_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.now())
+    updated_at = Column(DateTime, nullable=True, default=None, onupdate=datetime.now())
 
     accounts = relationship('AccountEntity', back_populates='user')
     addresses = relationship('AddressEntity', back_populates='user')

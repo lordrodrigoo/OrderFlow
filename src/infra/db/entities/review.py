@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy import Column, Integer, String, ForeignKey, Numeric, DateTime
 from sqlalchemy.orm import relationship
 from src.infra.db.settings.base import Base
@@ -9,7 +10,7 @@ class ReviewEntity(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     rating = Column(Numeric(2, 1), nullable=False)
     comment = Column(String(500), nullable=True)
-    created_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.now())
 
 
     "Bellow are foreign keys and relationships"
