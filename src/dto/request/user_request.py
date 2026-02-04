@@ -23,7 +23,8 @@ class CreateUserRequest(BaseModel):
         ge=16,
         description="age must be at least 16 years old",
     )
-    email: EmailStr = Field(...,
+    email: EmailStr = Field(
+        ...,
         description="email address must be valid"
     )
     phone: str = Field(
@@ -73,3 +74,4 @@ class CreateUserRequest(BaseModel):
                 "and one special character"
             )
         return password
+

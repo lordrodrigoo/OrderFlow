@@ -9,6 +9,7 @@ Content-Type: application/json
     "age": 15,
     "email": "invalid-email",
     "phone": "12345",
+    "username": "js",
     "password": "weakpass"
 }
 

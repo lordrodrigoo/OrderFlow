@@ -13,31 +13,26 @@ async def email_exception_handler(request: Request, exc: EmailAlreadyExistsExcep
     return JSONResponse(
         status_code=status.HTTP_409_CONFLICT,
         content=jsonable_encoder({
-            "success": False,
-            "error": {
-                "type": "EmailAlreadyExists",
-                "message": f"The email {exc.email} already exists."
+            "errors": {
+                "email": f"The email '{exc.email}' is already registered."
             }
         }),
     )
 
 
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    details = [
-        {
-            "field": ".".join(str(loc) for loc in error["loc"] if loc != "body"),
-            "message": error["msg"],
+    details = []
+    for error in exc.errors():
+        field = ".".join(str(loc) for loc in error["loc"] if loc != "body")
+        message = error["msg"]
+        if field == "email":
+            message = "invalid email address"
+        details.append({
+            "field": field,
+            "message": message,
             "type": error["type"],
-        }
-        for error in exc.errors()
-    ]
+        })
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-        content=jsonable_encoder({
-            "success": False,
-            "error": {
-                "type": "ValidationError",
-                "details": details
-            }
-        }),
+        content=jsonable_encoder({"errors": details}),
     )
