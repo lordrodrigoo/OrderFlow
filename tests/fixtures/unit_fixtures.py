@@ -16,7 +16,8 @@ def valid_user_data():
         "email": "rodrigo.souza@example.com",
         "phone": "11999999999",
         "password": "@1234StrongPass",
-        "username": "rodrigo.souza"
+        "username": "rodrigo.souza",
+        "role": "user"
     }
 
 
@@ -31,6 +32,7 @@ def user_repository_mock():
     user_mock.phone = "11999999999"
     user_mock.email = "rodrigo.souza@example.com"
     user_mock.is_active = True
+    user_mock.role = "user"
     user_mock.created_at = datetime.now()
     repo.create_user.return_value = user_mock
 
@@ -71,5 +73,6 @@ def make_valid_request():
         last_name="Lennon",
         email="john.lennon@example.com",
         phone="1191234-5678",
-        password="StrongPass@123"
+        password="StrongPass@123",
+        role="user"
     )

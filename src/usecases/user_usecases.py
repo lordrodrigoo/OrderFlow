@@ -1,5 +1,5 @@
 from src.exceptions.exception_handlers import EmailAlreadyExistsException
-from src.domain.models.user import Users
+from src.domain.models.user import Users, UserRole
 from src.dto.request.user_request import CreateUserRequest
 from src.dto.response.user_response import UserResponse
 from src.domain.repositories.user_repository import UserRepositoryInterface
@@ -26,7 +26,8 @@ class CreateUserUsecase:
             age=user_request.age,
             phone=user_request.phone,
             email=user_request.email,
-            is_active=True
+            is_active=True,
+            role=getattr(user_request, "role", UserRole.USER)
         )
         created_user = self.user_repository.create_user(user_entity)
 

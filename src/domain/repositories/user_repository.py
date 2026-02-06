@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
-from src.domain.models.user import Users
+from src.domain.models.user import Users, UserRole
 
 class UserRepositoryInterface(ABC):
     """This interface defines the contract for user repository."""
@@ -25,3 +25,9 @@ class UserRepositoryInterface(ABC):
 
     @abstractmethod
     def delete_user(self, user_id: int) -> bool: pass
+
+    @abstractmethod
+    def get_user_by_role(self,role: UserRole) -> List[Users]: pass
+
+    @abstractmethod
+    def is_admin(self, user_id: int) -> bool: pass

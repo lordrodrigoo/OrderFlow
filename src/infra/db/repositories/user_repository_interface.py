@@ -2,7 +2,7 @@ from typing import List, Optional
 from src.infra.db.settings.connection import DBConnectionHandler
 from src.infra.db.entities.user import UserEntity
 from src.domain.repositories.user_repository import UserRepositoryInterface
-from src.domain.models.user import Users
+from src.domain.models.user import Users, UserRole
 from src.infra.db.repositories.base_repository import BaseRepository
 
 
@@ -18,6 +18,7 @@ class UserRepository(UserRepositoryInterface, BaseRepository[UserEntity]):
             email=user.email,
             phone=user.phone,
             is_active=user.is_active,
+            role=user.role,
             created_at=user.created_at,
             updated_at=user.updated_at
         )
@@ -34,10 +35,19 @@ class UserRepository(UserRepositoryInterface, BaseRepository[UserEntity]):
             entity.email = user.email
             entity.phone = user.phone
             entity.is_active = user.is_active
+            entity.role = user.role.value
             entity.updated_at = user.updated_at
             self.save()
         return Users.from_entity(entity)
 
+
+    def get_user_by_role(self, role: UserRole) -> List[Users]:
+        entities = self.session.query(self.model).filter(self.model.role == role.value).all()
+        return [Users.from_entity(user) for user in entities]
+
+    def is_admin(self, user_id: int) -> bool:
+        entity = self.get_by_id(user_id)
+        return entity.role == UserRole.ADMIN.value if entity else False
 
     def find_all_users(self) -> List[Users]:
         return [Users.from_entity(user) for user in self.get_all()]

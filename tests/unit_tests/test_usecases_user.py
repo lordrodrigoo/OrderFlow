@@ -18,6 +18,7 @@ def test_create_user_success(
     assert isinstance(response, UserResponse)
     assert response.first_name == valid_user_data["first_name"]
     assert response.email == valid_user_data["email"]
+    assert response.role.value == valid_user_data["role"]
 
 
 def test_create_user_email_exists(usecase, user_repository_mock, valid_user_data):
@@ -36,6 +37,6 @@ def test_create_user_invalid_request():
             email="emailinvalido",
             phone="abc",
             username="js",
-            password="fraca"
+            password="fraca",
+            role="user"
         )
-

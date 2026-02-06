@@ -1,3 +1,4 @@
+alembic==1.18.3
 annotated-doc==0.0.4
 annotated-types==0.7.0
 anyio==4.12.1
@@ -22,6 +23,8 @@ identify==2.6.16
 idna==3.11
 iniconfig==2.3.0
 isort==7.0.0
+Mako==1.3.10
+MarkupSafe==3.0.3
 mccabe==0.7.0
 nodeenv==1.10.0
 packaging==26.0
@@ -35,6 +38,8 @@ pydantic==2.12.5
 pydantic_core==2.41.5
 Pygments==2.19.2
 pylint==4.0.4
+pylint-django==2.7.0
+pylint-plugin-utils==0.9.0
 pytest==9.0.2
 python-dotenv==1.2.1
 python-jose==3.5.0

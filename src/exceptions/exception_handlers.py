@@ -12,6 +12,24 @@ class EmailAlreadyExistsException(Exception):
 class InvalidCredentialsException(Exception):
     pass
 
+class UsernameAlreadyExistsException(Exception):
+    def __init__(self, username: str):
+        self.username = username
+
+
+async def username_exception_handler(
+        request: Request, exc: UsernameAlreadyExistsException
+    ):
+    return JSONResponse(
+        status_code=status.HTTP_409_CONFLICT,
+        content=jsonable_encoder({
+            "errors": {
+                "username": f"The username '{exc.username}' is already registered."
+            }
+        }),
+    )
+
+
 async def email_exception_handler(request: Request, exc: EmailAlreadyExistsException):
     return JSONResponse(
         status_code=status.HTTP_409_CONFLICT,

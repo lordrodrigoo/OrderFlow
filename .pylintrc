@@ -1,24 +1,19 @@
 [MAIN]
+    disable= 
+            C0114,  # missing-module-docstring
+            C0115,  # missing-class-docstring
+            C0116,  # missing-function-docstring
+            C0301,  # line-too-long
+            C0321,  # multiple-statements
+            C0103,  # invalid-name
+            R0903,  # too-few-public-methods
+            R0902,  # too-many-instance-attributes
+            R0904,  # too-many-public-methods
+            R0917,  # too-many-positional-arguments
+            R0913,  # too-many-arguments
+            W0404,  # reimported
 
-disable=
-    C0116, # Missing function or method docstring
-    E0015, # Unrecognized option
-    C0114, # Missing module docstring
-    C0305, # Trailing newlines
-    W0703, # Catching too general exception
-    C0209, # Consider using f-string
-    C0321, # Multiple statements
-    W0221, # Arguments-differ
-    C0301, # Line too long
-    R0801, # Duplicate code
-    R0903, # Too few public methods
-    R0913, # Too many arguments
-    C0115, # Missing class docstring
-    R0917, # Too many positional arguments
-    R0902, # Too many instance attributes
-    R0914, # Upper case variable name   
-    invalid-name, # Variable name doesn't conform to snake_case
-    
+
 # Analyse import fallback blocks. This can be used to support both Python 2 and
 # 3 compatible code, which means that the block might have code that exists
 # only in one or another interpreter, leading to false positives when analysed.

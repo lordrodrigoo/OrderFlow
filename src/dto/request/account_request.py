@@ -1,4 +1,5 @@
-from pydantic import BaseModel, Field
+import re
+from pydantic import BaseModel, Field, field_validator
 
 
 class CreateAccountRequest(BaseModel):
@@ -10,6 +11,20 @@ class CreateAccountRequest(BaseModel):
     )
     password: str = Field(
         ...,
-        min_length=6,
-        description="password must be at least 6 characters long"
+        min_length=8,
+        description="password must be at least 8 characters long"
     )
+
+
+    @field_validator("password")
+    @classmethod
+    # Minimum eight characters, at least one uppercase letter, and one special character
+    def validate_password(cls, password: str) -> str:
+        pattern = r'^(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+
+        if not re.match(pattern, password):
+            raise ValueError(
+                "Password must contain at least one uppercase letter "
+                "and one special character"
+            )
+        return password

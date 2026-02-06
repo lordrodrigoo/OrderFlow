@@ -40,6 +40,7 @@ def fake_user(db_session):
         email="ana.silva@example.com",
         phone="123456789",
         is_active=True,
+        role="user",
         created_at=datetime.now(),
         updated_at=None
     )

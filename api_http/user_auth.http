@@ -1,0 +1,11 @@
+@baseurl = http://localhost:8000/api/v1/auth
+
+
+### LOGIN WITH VALID CREDENTIALS
+POST {{baseurl}}/login
+Content-Type: application/json
+
+{
+    "username": "joaosilva",
+    "password": "StrongP@ssw0rd!"
+}

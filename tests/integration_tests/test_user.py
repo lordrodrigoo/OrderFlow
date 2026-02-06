@@ -47,6 +47,7 @@ def test_uniq_email(db_session, fake_user):
         email="ana.silva@example.com",  # Duplicate email
         phone="192837465",
         is_active=True,
+        role="user",
         created_at=datetime.now(),
         updated_at=None
     )
@@ -60,3 +61,7 @@ def test_inactive_user(db_session, fake_user):
     db_session.commit()
     inactive_user = db_session.query(UserEntity).filter_by(id=fake_user.id).first()
     assert inactive_user.is_active is False
+
+
+def test_user_role(db_session, fake_user):
+    assert fake_user.role == "user"

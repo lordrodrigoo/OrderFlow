@@ -1,0 +1,25 @@
+
+### Create User with account
+POST http://localhost:8000/api/v1/users
+Content-Type: application/json
+
+{
+  "first_name": "João",
+  "last_name": "Silva",
+  "age": 25,
+  "email": "joao.silva@gmail.com",
+  "phone": "11999999999",
+  "username": "joaosilva",
+  "password": "StrongP@ssw0rd!"
+}
+
+### Login to generate JWT
+POST http://localhost:8000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "joaosilva",
+  "password": "StrongP@ssw0rd!"
+}
+
+# The response should contain the access_token (JWT) to be used in protected routes.

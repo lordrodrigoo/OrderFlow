@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from src.auth.dependencies import get_current_user
 from src.usecases.user_usecases import CreateUserUsecase
 from src.infra.db.repositories.user_repository_interface import UserRepository
@@ -21,12 +21,14 @@ create_user_usecase = CreateUserUsecase(user_repository, account_repository)
 
 
 @router.post("/", response_model=UserResponse, status_code=201)
-def create_user(user_request: CreateUserRequest):
+def create_user(user_request: CreateUserRequest, response: Response):
     """Endpoint to create a new user."""
-    return create_user_usecase.create_user(user_request)
+    user = create_user_usecase.create_user(user_request)
+    response.headers['Location'] = f"{API_PREFIX}/{user.id}"
+    return user
 
 
-@router.get("/me")
+@router.get("/me", response_model=UserResponse)
 def read_users_me(current_user=Depends(get_current_user)):
     """Endpoint to get the current logged-in user."""
-    return current_user
+    return UserResponse.model_validate(current_user)

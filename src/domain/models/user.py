@@ -1,6 +1,12 @@
 from datetime import datetime
 from dataclasses import dataclass
 from typing import Optional
+from enum import Enum
+
+
+class UserRole(Enum):
+    ADMIN = "admin"
+    USER = "user"
 
 
 @dataclass
@@ -13,6 +19,7 @@ class Users:
     email: str
     is_active: bool
     id : Optional[int] = None
+    role: UserRole = UserRole.USER  #Default role is USER
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
@@ -28,7 +35,8 @@ class Users:
         age: int,
         phone: str,
         email: str,
-        is_active: bool
+        is_active: bool,
+        role: UserRole = UserRole.USER
     ) -> 'Users':
         """Factory method to create a new user instance."""
         return Users(
@@ -37,7 +45,8 @@ class Users:
             age=age,
             phone=phone,
             email=email,
-            is_active=is_active
+            is_active=is_active,
+            role=role
         )
     @staticmethod
     def from_entity(entity) -> 'Users':
@@ -50,6 +59,7 @@ class Users:
             phone=entity.phone,
             email=entity.email,
             is_active=entity.is_active,
+            role=UserRole(entity.role),
             created_at=entity.created_at,
             updated_at=entity.updated_at
         )

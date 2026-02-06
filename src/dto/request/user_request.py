@@ -1,5 +1,6 @@
 import re
 from pydantic import BaseModel, EmailStr, Field, field_validator
+from src.domain.models.user import UserRole
 
 
 class CreateUserRequest(BaseModel):
@@ -39,7 +40,10 @@ class CreateUserRequest(BaseModel):
         max_length=50,
         description="username must be between 3 and 50 characters",
     )
-
+    role: UserRole = Field(
+        UserRole.USER,
+        description="role of the user, default is USER"
+    )
     password: str = Field(
         ...,
         min_length=8,
