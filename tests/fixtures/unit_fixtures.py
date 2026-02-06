@@ -3,7 +3,7 @@ from datetime import datetime
 from unittest.mock import MagicMock
 import pytest
 from passlib.context import CryptContext
-from src.usecases.user_usecases import CreateUserUsecase
+from src.usecases.user_usecases import UserUsecase
 from src.usecases.auth_user_usecases import AuthUserUsecase
 from src.dto.request.user_request import CreateUserRequest
 
@@ -38,6 +38,20 @@ def user_repository_mock():
 
     return repo
 
+@pytest.fixture
+def user_response_mock():
+    return MagicMock(
+        id=1,
+        first_name="Rodrigo",
+        last_name="Souza",
+        age=30,
+        phone="11999999999",
+        email="rodrigo.souza@example.com",
+        role="user",
+        is_active=True,
+        created_at=datetime.now()
+    )
+
 
 @pytest.fixture
 def account_repository_mock():
@@ -45,7 +59,7 @@ def account_repository_mock():
 
 @pytest.fixture
 def usecase(user_repository_mock, account_repository_mock):
-    return CreateUserUsecase(user_repository_mock, account_repository_mock)
+    return UserUsecase(user_repository_mock, account_repository_mock)
 
 
 @pytest.fixture

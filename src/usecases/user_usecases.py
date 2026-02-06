@@ -7,7 +7,7 @@ from src.domain.repositories.account_repository import AccountRepositoryInterfac
 from src.domain.models.account import Account, AccountStatus
 
 
-class CreateUserUsecase:
+class UserUsecase:
     def __init__(
             self, user_repository: UserRepositoryInterface,
             account_repository: AccountRepositoryInterface
@@ -20,6 +20,10 @@ class CreateUserUsecase:
         if self.user_repository.find_by_email(user_request.email):
             raise EmailAlreadyExistsException(email=user_request.email)
 
+        role = getattr(user_request, "role", UserRole.USER)
+        if isinstance(role, str):
+            role = UserRole(role)
+
         user_entity = Users(
             first_name=user_request.first_name,
             last_name=user_request.last_name,
@@ -27,7 +31,7 @@ class CreateUserUsecase:
             phone=user_request.phone,
             email=user_request.email,
             is_active=True,
-            role=getattr(user_request, "role", UserRole.USER)
+            role=role
         )
         created_user = self.user_repository.create_user(user_entity)
 
@@ -39,5 +43,45 @@ class CreateUserUsecase:
             status=AccountStatus.ACTIVE
         )
         self.account_repository.create_account(account_entity)
-
         return UserResponse(**created_user.__dict__)
+
+
+    def get_user_by_id(self, user_id: int) -> UserResponse:
+        user = self.user_repository.find_user_by_id(user_id)
+        if not user:
+            return None
+        return UserResponse(**user.__dict__)
+
+
+    def list_users(self, skip: int = 0, limit: int = 10) -> list[UserResponse]:
+        users = self.user_repository.list_users(skip=skip, limit=limit)
+        return [UserResponse(**user.__dict__) for user in users]
+
+
+    def update_user(self, user_id: int, user_request: CreateUserRequest) -> UserResponse:
+        user = self.user_repository.find_user_by_id(user_id)
+        if not user:
+            return None
+
+        user.first_name = user_request.first_name
+        user.last_name = user_request.last_name
+        user.age = user_request.age
+        user.phone = user_request.phone
+        user.email = user_request.email
+        user.is_active = getattr(user_request, "is_active", user.is_active)
+
+        role = getattr(user_request, "role", user.role)
+        if isinstance(role, str):
+            role = UserRole(role)
+        user.role = role
+
+        updated_user = self.user_repository.update_user(user)
+        return UserResponse(**updated_user.__dict__)
+
+
+    def delete_user(self, user_id: int) -> bool:
+        user = self.user_repository.find_user_by_id(user_id)
+        if not user:
+            return False
+        self.user_repository.delete_user(user_id)
+        return True
