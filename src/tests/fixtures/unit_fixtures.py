@@ -7,18 +7,6 @@ from src.usecases.user_usecases import UserUsecase
 from src.usecases.auth_user_usecases import AuthUserUsecase
 from src.dto.request.user_request import CreateUserRequest
 
-@pytest.fixture
-def valid_user_data():
-    return {
-        "first_name": "Rodrigo",
-        "last_name": "Souza",
-        "age": 30,
-        "email": "rodrigo.souza@example.com",
-        "phone": "11999999999",
-        "password": "@1234StrongPass",
-        "username": "rodrigo.souza",
-        "role": "user"
-    }
 
 
 @pytest.fixture
