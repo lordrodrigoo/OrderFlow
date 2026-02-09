@@ -58,6 +58,7 @@ class CreateUserRequest(BaseModel):
             raise ValueError("must contain only alphabetic characters")
         return field
 
+
     @field_validator("phone")
     @classmethod
     def phone_must_be_numeric(cls, phone: str) -> str:

@@ -53,12 +53,44 @@ class UserUsecase:
         return UserResponse(**user.__dict__)
 
 
-    def list_users(self, skip: int = 0, limit: int = 10) -> list[UserResponse]:
-        users = self.user_repository.list_users(skip=skip, limit=limit)
+    def list_users(
+        self,
+        name: str = None,
+        email: str = None,
+        active: bool = None,
+        skip: int = 0,
+        limit: int = 10,
+    ) -> list[UserResponse]:
+        users = []
+
+        if email:
+            user = self.user_repository.find_by_email(email)
+            if user:
+                users = [user]
+        elif name:
+            users = self.user_repository.find_by_name(name)
+        else:
+            users = self.user_repository.find_all_users()
+
+        # Additional filtering
+        if active is not None:
+            users = [user for user in users if getattr(user, 'is_active', None) == active]
+
+        # Pagination
+        users = users[skip: skip + limit] if users else []
         return [UserResponse(**user.__dict__) for user in users]
 
 
-    def update_user(self, user_id: int, user_request: CreateUserRequest) -> UserResponse:
+    def update_user(
+            self,
+            user_id: int,
+            user_request: CreateUserRequest,
+            current_user: Users
+    ) -> UserResponse:
+
+        if current_user.id != user_id and current_user.role != UserRole.ADMIN:
+            raise PermissionError("You do not have permission to update this user.")
+
         user = self.user_repository.find_user_by_id(user_id)
         if not user:
             return None
