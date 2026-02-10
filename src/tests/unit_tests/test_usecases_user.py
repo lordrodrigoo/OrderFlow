@@ -1,6 +1,7 @@
 #pylint: disable=unused-argument
 from datetime import datetime
 import pytest
+from fastapi import HTTPException
 from pydantic import ValidationError
 from src.domain.models.user import UserRole
 from src.dto.request.user_request import CreateUserRequest
@@ -25,7 +26,13 @@ def test_create_user_success(
     assert response.role.value == valid_user_data["role"]
 
 
-def test_update_user(usecase, user_repository_mock, user_response_mock):
+def test_update_user(
+        usecase,
+        user_repository_mock,
+        user_response_mock,
+        valid_user_data,
+        fake_admin_user
+    ):
 
     user_repository_mock.find_user_by_id.return_value = user_response_mock
 
@@ -51,7 +58,7 @@ def test_update_user(usecase, user_repository_mock, user_response_mock):
     user_response_mock.role = UserRole(update_data["role"])
 
     user_repository_mock.update_user.return_value = user_response_mock
-    response = usecase.update_user(1, request)
+    response = usecase.update_user(1, request, fake_admin_user)
 
     assert response.first_name == update_data["first_name"]
     assert response.email == update_data["email"]
@@ -109,17 +116,82 @@ def test_list_user_pagination_and_filters(usecase, user_repository_mock):
 
 def test_get_user_by_id_not_found(usecase, user_repository_mock):
     user_repository_mock.find_user_by_id.return_value = None
-    response = usecase.get_user_by_id(999)
-    assert response is None
+    with pytest.raises(HTTPException) as exc_info:
+        usecase.get_user_by_id(999)
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.detail == "User not found"
 
 
-def test_delete_user_not_found(usecase, user_repository_mock):
+def test_delete_user_raises_404_when_not_found(usecase, user_repository_mock):
     user_repository_mock.find_user_by_id.return_value = None
-    result = usecase.delete_user(999)
-    assert result is False
+    with pytest.raises(HTTPException) as exc_info:
+        usecase.delete_user(999)
+    assert exc_info.value.status_code == 404
+    assert exc_info.value.detail == "User not found"
+
 
 
 def test_delete_user(usecase, user_repository_mock, user_response_mock):
     user_repository_mock.find_user_by_id.return_value = user_response_mock
     result = usecase.delete_user(1)
     assert result is True
+
+
+
+def test_create_user_invalid_data_unexpected_status_404(client):
+    response = client.post("/users/", json={
+        "first_name": "J0ao",
+        "last_name": "Silva",
+        "age": 15,
+        "email": "emailinvalido",
+        "phone": "abc",
+        "username": "js",
+        "password": "fraca",
+        "role": "user"
+    })
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Not Found"}
+
+
+def test_update_user_invalid_data_unexpected_status_404(usecase):
+    with pytest.raises(ValidationError) as exc_info:
+        usecase.update_user(
+            user_id=999,
+            user_request=CreateUserRequest(
+                first_name="J0ao",
+                last_name="Silva",
+                age=15,
+                email="emailinvalido",
+                phone="abc",
+                username="js",
+                password="fraca",
+                role="user"
+            ),
+            current_user=None
+        )
+    errors = str(exc_info.value)
+    assert "first_name" in errors
+    assert "age" in errors
+    assert "email" in errors
+    assert "phone" in errors
+    assert "username" in errors
+    assert "password" in errors
+
+
+def test_update_user_permission_denied_unexpected_status_403(
+        usecase, user_repository_mock, valid_user_data, fake_admin_user):
+
+    # Simulate a user trying to update another user's data without being an admin
+    other_user_id = 999
+    # fake_admin_user.id != other_user_id and fake_admin_user.role != ADMIN
+    fake_admin_user.role = UserRole.USER
+    fake_admin_user.id = 1
+    request = CreateUserRequest(**valid_user_data)
+    with pytest.raises(HTTPException) as exc_info:
+        usecase.update_user(
+            user_id=other_user_id,
+            user_request=request,
+            current_user=fake_admin_user
+        )
+    assert exc_info.value.status_code == 403
+    assert exc_info.value.detail == "You do not have permission to update this user."
