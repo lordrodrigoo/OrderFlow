@@ -1,5 +1,6 @@
 from typing import TypeVar, Generic, List, Optional
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 
 T = TypeVar('T')  # Generic type for models
 
@@ -12,7 +13,7 @@ class BaseRepository(Generic[T]):
         return self.session.get(self.model, entity_id)
 
     def get_all(self) -> List[T]:
-        return self.session.get(self.model).all()
+        return self.session.scalars(select(self.model)).all()
 
     def add(self, entity: T) -> None:
         self.session.add(entity)
