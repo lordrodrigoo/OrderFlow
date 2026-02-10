@@ -9,7 +9,7 @@ class AccountEntity(Base):
     __tablename__ = 'accounts'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     username = Column(String(50), nullable=False, unique=True)
     password_hash = Column(String(128), nullable=False)
     status = Column(String(20), default='active')

@@ -9,10 +9,10 @@ class BaseRepository(Generic[T]):
         self.model = model
 
     def get_by_id(self, entity_id: int) -> Optional[T]:
-        return self.session.query(self.model).get(entity_id)
+        return self.session.get(self.model, entity_id)
 
     def get_all(self) -> List[T]:
-        return self.session.query(self.model).all()
+        return self.session.get(self.model).all()
 
     def add(self, entity: T) -> None:
         self.session.add(entity)

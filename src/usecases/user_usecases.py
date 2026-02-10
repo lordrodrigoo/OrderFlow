@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from src.exceptions.exception_handlers import EmailAlreadyExistsException
 from src.domain.models.user import Users, UserRole
 from src.dto.request.user_request import CreateUserRequest
@@ -21,8 +22,10 @@ class UserUsecase:
             raise EmailAlreadyExistsException(email=user_request.email)
 
         role = getattr(user_request, "role", UserRole.USER)
-        if isinstance(role, str):
-            role = UserRole(role)
+        if isinstance(role, UserRole):
+            role_value = role.value
+        else:
+            role_value = str(role)
 
         user_entity = Users(
             first_name=user_request.first_name,
@@ -31,7 +34,7 @@ class UserUsecase:
             phone=user_request.phone,
             email=user_request.email,
             is_active=True,
-            role=role
+            role=role_value
         )
         created_user = self.user_repository.create_user(user_entity)
 
@@ -49,7 +52,7 @@ class UserUsecase:
     def get_user_by_id(self, user_id: int) -> UserResponse:
         user = self.user_repository.find_user_by_id(user_id)
         if not user:
-            return None
+            raise HTTPException(status_code=404, detail="User not found")
         return UserResponse(**user.__dict__)
 
 
@@ -89,11 +92,11 @@ class UserUsecase:
     ) -> UserResponse:
 
         if current_user.id != user_id and current_user.role != UserRole.ADMIN:
-            raise PermissionError("You do not have permission to update this user.")
+            raise HTTPException(status_code=403, detail="You do not have permission to update this user.")
 
         user = self.user_repository.find_user_by_id(user_id)
         if not user:
-            return None
+            raise HTTPException(status_code=404, detail="User not found")
 
         user.first_name = user_request.first_name
         user.last_name = user_request.last_name
@@ -114,6 +117,6 @@ class UserUsecase:
     def delete_user(self, user_id: int) -> bool:
         user = self.user_repository.find_user_by_id(user_id)
         if not user:
-            return False
+            raise HTTPException(status_code=404, detail="User not found")
         self.user_repository.delete_user(user_id)
         return True

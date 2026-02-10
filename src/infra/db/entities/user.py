@@ -21,7 +21,7 @@ class UserEntity(Base):
     created_at = Column(DateTime, nullable=False, default=datetime.now())
     updated_at = Column(DateTime, nullable=True, default=None, onupdate=datetime.now())
 
-    accounts = relationship('AccountEntity', back_populates='user')
+    accounts = relationship('AccountEntity', back_populates='user', cascade='all, delete-orphan')
     addresses = relationship('AddressEntity', back_populates='user')
     orders = relationship('OrderEntity', back_populates='user')
     reviews = relationship('ReviewEntity', back_populates='user')
