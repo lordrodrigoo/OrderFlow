@@ -66,3 +66,33 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         content=jsonable_encoder({"errors": details}),
     )
+
+
+class AddressException(Exception):
+    pass
+
+async def address_not_found_exception_handler(
+        request: Request,
+        exc: AddressException
+    ):
+    return JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND,
+        content=jsonable_encoder({
+            "errors": {
+                "address": "Address not found."
+            }
+        }),
+    )
+
+async def address_already_exists_exception_handler(
+        request: Request,
+        exc: AddressException
+    ):
+    return JSONResponse(
+        status_code=status.HTTP_409_CONFLICT,
+        content=jsonable_encoder({
+            "errors": {
+                "address": "Address already exists for this user."
+            }
+        }),
+    )
