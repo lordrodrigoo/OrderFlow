@@ -1,3 +1,4 @@
+# pylint: disable=duplicate-code
 from datetime import datetime
 from pydantic import BaseModel
 
@@ -14,6 +15,5 @@ class AddressResponse(BaseModel):
     zip_code: str
     is_default: bool
     created_at: datetime
-    is_default: bool
 
     model_config = {"from_attributes": True}

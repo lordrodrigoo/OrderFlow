@@ -114,6 +114,20 @@ def test_list_user_pagination_and_filters(usecase, user_repository_mock):
     ]
 
 
+def test_get_user_by_id(
+        usecase,
+        user_repository_mock,
+        user_response_mock
+    ):
+    user_repository_mock.find_user_by_id.return_value = user_response_mock
+    response = usecase.get_user_by_id(1)
+    assert isinstance(response, UserResponse)
+    assert response.id == user_response_mock.id
+    assert response.first_name == user_response_mock.first_name
+    assert response.email == user_response_mock.email
+
+
+
 def test_get_user_by_id_not_found(usecase, user_repository_mock):
     user_repository_mock.find_user_by_id.return_value = None
     with pytest.raises(HTTPException) as exc_info:

@@ -6,8 +6,9 @@ from passlib.context import CryptContext
 from src.usecases.user_usecases import UserUsecase
 from src.usecases.auth_user_usecases import AuthUserUsecase
 from src.dto.request.user_request import CreateUserRequest
-
-
+from src.dto.request.address_request import AddressRequest
+from src.usecases.address_usecase import AddressUsecase
+from src.dto.response.address_response import AddressResponse
 
 @pytest.fixture
 def user_repository_mock():
@@ -78,3 +79,65 @@ def make_valid_request():
         password="StrongPass@123",
         role="user"
     )
+
+
+@pytest.fixture
+def address_usecase(fake_address_repository_mock):
+    return AddressUsecase(fake_address_repository_mock)
+
+
+@pytest.fixture
+def valid_address_data():
+    return {
+        "user_id": 1,
+        "street": "rua Ipiranga",
+        "number": "456",
+        "neighborhood": "Centro",
+        "city": "São Paulo",
+        "state": "SP",
+        "zip_code": "03433023",
+        "is_default": True,
+        "complement": "casa 2 fundos"
+    }
+
+
+@pytest.fixture
+def valid_address_request(valid_address_data):
+    return AddressRequest(**valid_address_data)
+
+
+@pytest.fixture
+def fake_address_response_mock():
+    return AddressResponse(
+        id=1,
+        user_id=1,
+        street="rua Ipiranga",
+        number="456",
+        neighborhood="Centro",
+        city="São Paulo",
+        state="SP",
+        zip_code="03433023",
+        is_default=True,
+        complement="casa 2 fundos",
+        created_at=datetime.now()
+    )
+
+
+@pytest.fixture
+def fake_address_repository_mock():
+    repository_mock = MagicMock()
+    repository_mock.create_address.return_value = MagicMock(
+        id=1,
+        user_id=1,
+        street="rua Ipiranga",
+        number="456",
+        neighborhood="Centro",
+        city="São Paulo",
+        state="SP",
+        zip_code="03433023",
+        is_default=True,
+        complement="casa 2 fundos",
+        created_at=datetime.now()
+    )
+    repository_mock.find_address_by_id.return_value = None
+    return repository_mock

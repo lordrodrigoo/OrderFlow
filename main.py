@@ -32,7 +32,7 @@ app.include_router(auth_router)
 def health_check():
     return {"status": "ok"}
 
-# Endpoint para testar compressão GZip
+# Endpoint to test compression GZip
 @app.get("/test-gzip")
 def test_gzip():
     big_content = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " * 50

@@ -5,16 +5,16 @@ from typing import Optional
 @dataclass
 class Address:
     """Entity od domain - it represents an address in the system."""
-    id: Optional[int] = None
     user_id: int
     street: str
     number: str
-    complement: Optional[str] = None
     neighborhood: str
     city: str
     state: str
     zip_code: str
     is_default: bool
+    id: Optional[int] = None
+    complement: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 

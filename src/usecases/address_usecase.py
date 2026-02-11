@@ -12,16 +12,19 @@ class AddressUsecase:
 
 
     def create_address(self, address_request: AddressRequest) -> AddressResponse:
-        if self.address_repository.find_address_by_id(address_request.id):
-            raise HTTPException(status_code=409, detail="Address already exists")
-
         address_entity = Address(
             user_id=address_request.user_id,
             street=address_request.street,
+            number=address_request.number,
+            neighborhood=address_request.neighborhood,
             city=address_request.city,
             state=address_request.state,
             zip_code=address_request.zip_code,
-            is_default=address_request.is_default
+            is_default=address_request.is_default,
+            complement=address_request.complement,
+            id=None,
+            created_at=None,
+            updated_at=None
         )
         created_address = self.address_repository.create_address(address_entity)
         return AddressResponse(**created_address.__dict__)
@@ -45,6 +48,8 @@ class AddressUsecase:
             id=address_id,
             user_id=address_request.user_id,
             street=address_request.street,
+            number=address_request.number,
+            neighborhood=address_request.neighborhood,
             city=address_request.city,
             state=address_request.state,
             zip_code=address_request.zip_code,
