@@ -14,5 +14,6 @@ class AddressResponse(BaseModel):
     zip_code: str
     is_default: bool
     created_at: datetime
+    is_default: bool
 
     model_config = {"from_attributes": True}

@@ -1,7 +1,7 @@
 import os
 from typing import List, Optional
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, Response, Query
+from fastapi import APIRouter, Depends, Response, Query, status
 from src.auth.dependencies import get_current_user
 from src.usecases.user_usecases import UserUsecase
 from src.infra.db.repositories.user_repository_interface import UserRepository
@@ -21,7 +21,7 @@ account_repository = AccountRepository(db_handler)
 user_usecase = UserUsecase(user_repository, account_repository)
 
 
-@router.post("/", response_model=UserResponse, status_code=201)
+@router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def create_user(user_request: CreateUserRequest, response: Response):
     """Endpoint to create a new user."""
     user = user_usecase.create_user(user_request)
@@ -29,7 +29,7 @@ def create_user(user_request: CreateUserRequest, response: Response):
     return user
 
 
-@router.get("/{user_id}", response_model=UserResponse)
+@router.get("/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
 def get_user_by_id(user_id: int, response: Response):
     """Endpoint to get a user by user_id."""
     user = user_usecase.get_user_by_id(user_id)
@@ -37,7 +37,7 @@ def get_user_by_id(user_id: int, response: Response):
     return user
 
 
-@router.get("/", response_model=List[UserResponse])
+@router.get("/", response_model=List[UserResponse], status_code=status.HTTP_200_OK)
 def list_users(
     name: Optional[str] = Query(None, description="Filter users by name"),
     email: Optional[str] = Query(None, description="Filter users by email"),
@@ -51,7 +51,7 @@ def list_users(
     return users
 
 
-@router.put("/{user_id}", response_model=UserResponse)
+@router.put("/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
 def update_user(
     user_id: int,
     user_request: CreateUserRequest,
@@ -62,15 +62,14 @@ def update_user(
     return updated_user
 
 
-@router.delete("/{user_id}", status_code=204)
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(user_id: int):
     """Endpoint to delete a user."""
     user_usecase.delete_user(user_id)
-    return Response(status_code=204)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-
-@router.get("/me", response_model=UserResponse)
+@router.get("/me", response_model=UserResponse, status_code=status.HTTP_200_OK)
 def read_users_me(current_user=Depends(get_current_user)):
     """Endpoint to get the current logged-in user."""
     return UserResponse.model_validate(current_user)

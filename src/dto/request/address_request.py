@@ -8,6 +8,12 @@ VALID_UF ={
 }
 
 class AddressRequest(BaseModel):
+    user_id: int = Field(
+        ...,
+        description="ID of the user to whom the address belongs"
+    )
+
+
     street: str = Field(
         ...,
         min_length=3,
@@ -56,6 +62,7 @@ class AddressRequest(BaseModel):
         description="zip code must be between 5 and 10 characters",
     )
 
+    is_default: bool = True
 
     @field_validator("number")
     @classmethod
