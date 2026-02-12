@@ -1,4 +1,5 @@
 import re
+from typing import Optional
 from pydantic import BaseModel, Field, field_validator
 
 VALID_UF ={
@@ -28,7 +29,7 @@ class AddressRequest(BaseModel):
         description="number must be between 1 and 10 characters",
     )
 
-    complement: str = Field(
+    complement: Optional[str] = Field(
         None,
         max_length=50,
         description="complement must be up to 50 characters",
@@ -66,14 +67,10 @@ class AddressRequest(BaseModel):
 
     @field_validator("number")
     @classmethod
-    def validate_number(cls, number: str) -> str:
-        try:
-            num = int(number)
-            if num < 0:
-                raise ValueError("number must be a positive integer")
-        except ValueError:
-            pass
-        return number
+    def validate_number(cls, value: str) -> str:
+        if not re.match(r'^[\w\s\-]+$', value) or value.strip() == "":
+            raise ValueError("number must contain letters or numbers")
+        return value
 
 
     @field_validator("zip_code")
@@ -95,14 +92,16 @@ class AddressRequest(BaseModel):
 
 
     @field_validator(
-            "street",
-            "neighborhood",
-            "city",
-            "complement",
-            "state"
-        )
+        "street",
+        "neighborhood",
+        "city",
+        "complement",
+        "state"
+    )
     @classmethod
     def validate_text_fields(cls, v: str) -> str:
+        if v is None:
+            return v
         if not re.match(r'^[A-Za-zÀ-ÿ0-9\s]+$', v):
             raise ValueError('Fields contains invalid characters.')
         return v
