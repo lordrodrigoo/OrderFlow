@@ -1,8 +1,7 @@
 import os
 from typing import List, Optional
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, Response, Query, status
-from src.auth.dependencies import get_current_user
+from fastapi import APIRouter, Response, Query, status
 from src.usecases.user_usecases import UserUsecase
 from src.infra.db.repositories.user_repository_interface import UserRepository
 from src.infra.db.repositories.account_user_repository_interface import AccountRepository
@@ -13,8 +12,8 @@ from src.dto.response.user_response import UserResponse
 load_dotenv()
 API_PREFIX = os.getenv("API_V1_USER")
 TAG = os.getenv("TAG_USER")
-router = APIRouter(prefix=API_PREFIX, tags=[TAG])
 
+router = APIRouter(prefix=API_PREFIX, tags=[TAG])
 db_handler = DBConnectionHandler()
 user_repository = UserRepository(db_handler)
 account_repository = AccountRepository(db_handler)
@@ -55,7 +54,7 @@ def list_users(
 def update_user(
     user_id: int,
     user_request: CreateUserRequest,
-    current_user = Depends(get_current_user)
+    current_user: None = None
 ):
     """Endpoint to update an existing user."""
     updated_user = user_usecase.update_user(user_id, user_request, current_user)
@@ -67,9 +66,3 @@ def delete_user(user_id: int):
     """Endpoint to delete a user."""
     user_usecase.delete_user(user_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-@router.get("/me", response_model=UserResponse, status_code=status.HTTP_200_OK)
-def read_users_me(current_user=Depends(get_current_user)):
-    """Endpoint to get the current logged-in user."""
-    return UserResponse.model_validate(current_user)

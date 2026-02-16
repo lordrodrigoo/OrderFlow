@@ -1,8 +1,7 @@
 import os
 from typing import List
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, Response, status
-from src.auth.dependencies import get_current_user
+from fastapi import APIRouter, Response, status
 from src.usecases.address_usecase import AddressUsecase
 from src.infra.db.repositories.address_repository_interface import AddressRepository
 from src.infra.db.settings.connection import DBConnectionHandler
@@ -51,7 +50,7 @@ def find_all_addresses() -> List[AddressResponse]:
 def update_address(
         address_id: int,
         address_request: AddressRequest,
-        current_user = Depends(get_current_user)
+        current_user = None
 ):
     """Endpoint to update an existing address."""
     updated_address = address_usecase.update_address(

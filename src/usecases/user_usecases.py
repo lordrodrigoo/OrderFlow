@@ -93,7 +93,7 @@ class UserUsecase:
             self,
             user_id: int,
             user_request: CreateUserRequest,
-            current_user: Users
+            current_user: None
     ) -> UserResponse:
 
         if current_user.id != user_id and current_user.role != UserRole.ADMIN:

@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from main import app
+from src.main import app
 from src.infra.db.settings.connection import DBConnectionHandler
 from src.infra.db.entities.user import UserEntity
 from src.infra.db.entities.account import AccountEntity
