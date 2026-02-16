@@ -1,9 +1,13 @@
-from fastapi import HTTPException
 from src.dto.request.address_request import AddressRequest
 from src.dto.response.address_response import AddressResponse
 from src.domain.models.address import Address
 from src.domain.repositories.address_repository import AddressRepositoryInterface
 from src.domain.models.user import Users
+from src.exceptions.exception_handlers_address import (
+    AddressNotFoundException,
+    AddressAlreadyExistsException,
+    AddressPermissionDeniedException
+)
 
 
 class AddressUsecase:
@@ -12,6 +16,9 @@ class AddressUsecase:
 
 
     def create_address(self, address_request: AddressRequest) -> AddressResponse:
+        if self.address_repository.find_address_by_id(address_request.id):
+            raise AddressAlreadyExistsException(address=address_request.street)
+
         address_entity = Address(
             user_id=address_request.user_id,
             street=address_request.street,
@@ -39,10 +46,10 @@ class AddressUsecase:
 
         address = self.address_repository.find_address_by_id(address_id)
         if not address:
-            raise HTTPException(status_code=404, detail="Address not found")
+            raise AddressNotFoundException(address_id=address_id)
 
         if address.user_id != current_user.id:
-            raise HTTPException(status_code=403, detail="Not authorized to update this address")
+            raise AddressPermissionDeniedException(address_id=address_id)
 
         address_entity = Address(
             id=address_id,
@@ -53,7 +60,8 @@ class AddressUsecase:
             city=address_request.city,
             state=address_request.state,
             zip_code=address_request.zip_code,
-            is_default=address_request.is_default
+            is_default=address_request.is_default,
+            complement=address_request.complement,
         )
         updated_address = self.address_repository.update_address(address_entity)
         return AddressResponse(**updated_address.__dict__)
@@ -68,16 +76,19 @@ class AddressUsecase:
     def find_address_by_id(self, address_id: int) -> AddressResponse:
         address = self.address_repository.find_address_by_id(address_id)
         if not address:
-            raise HTTPException(status_code=404, detail="Address not found")
+            raise AddressNotFoundException(address_id=address_id)
         return AddressResponse(**address.__dict__)
 
 
     def find_addresses_by_user_id(self, user_id: int) -> list[AddressResponse]:
+        if not self.address_repository.find_addresses_by_user_id(user_id):
+            raise AddressNotFoundException(address_id=user_id)
+
         addresses = self.address_repository.find_addresses_by_user_id(user_id)
         return [AddressResponse(**address.__dict__) for address in addresses]
 
 
     def delete_address(self, address_id: int) -> bool:
         if not self.address_repository.find_address_by_id(address_id):
-            raise HTTPException(status_code=404, detail="Address not found")
+            raise AddressNotFoundException(address_id=address_id)
         return self.address_repository.delete_address(address_id)

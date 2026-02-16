@@ -1,11 +1,16 @@
-from fastapi import HTTPException
-from src.exceptions.exception_handlers import EmailAlreadyExistsException
 from src.domain.models.user import Users, UserRole
 from src.dto.request.user_request import CreateUserRequest
 from src.dto.response.user_response import UserResponse
 from src.domain.repositories.user_repository import UserRepositoryInterface
 from src.domain.repositories.account_repository import AccountRepositoryInterface
 from src.domain.models.account import Account, AccountStatus
+
+from src.exceptions.exception_handlers_user import (
+    EmailAlreadyExistsException,
+    UserNotFoundException,
+    UserPermissionDeniedException
+)
+
 
 
 class UserUsecase:
@@ -52,7 +57,7 @@ class UserUsecase:
     def get_user_by_id(self, user_id: int) -> UserResponse:
         user = self.user_repository.find_user_by_id(user_id)
         if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+            raise UserNotFoundException(user_id=user_id)
         return UserResponse(**user.__dict__)
 
 
@@ -92,11 +97,11 @@ class UserUsecase:
     ) -> UserResponse:
 
         if current_user.id != user_id and current_user.role != UserRole.ADMIN:
-            raise HTTPException(status_code=403, detail="You do not have permission to update this user.")
+            raise UserPermissionDeniedException(user_id=user_id)
 
         user = self.user_repository.find_user_by_id(user_id)
         if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+            raise UserNotFoundException(user_id=user_id)
 
         user.first_name = user_request.first_name
         user.last_name = user_request.last_name
@@ -117,6 +122,6 @@ class UserUsecase:
     def delete_user(self, user_id: int) -> bool:
         user = self.user_repository.find_user_by_id(user_id)
         if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+            raise UserNotFoundException(user_id=user_id)
         self.user_repository.delete_user(user_id)
         return True

@@ -6,7 +6,7 @@ from pydantic import ValidationError
 from src.domain.models.user import UserRole
 from src.dto.request.user_request import CreateUserRequest
 from src.dto.response.user_response import UserResponse
-from src.exceptions.exception_handlers import EmailAlreadyExistsException
+from src.exceptions.exception_handlers_user import EmailAlreadyExistsException
 
 
 

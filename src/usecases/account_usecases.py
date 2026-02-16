@@ -2,7 +2,9 @@ from src.domain.repositories.account_repository import AccountRepositoryInterfac
 from src.domain.models.account import Account, AccountStatus
 from src.dto.request.account_request import CreateAccountRequest
 from src.dto.response.account_response import AccountResponse
-from src.exceptions.exception_handlers import UsernameAlreadyExistsException
+from src.exceptions.exception_handlers_account import (
+    UsernameAlreadyExistsException
+)
 
 class CreateAccountUsecase:
     def __init__(self, account_repository: AccountRepositoryInterface):

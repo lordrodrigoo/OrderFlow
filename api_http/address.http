@@ -1,0 +1,16 @@
+@baseurl =http://localhost:8000/api/v1/addresses
+
+### CREATING A VALID ADDRESS
+POST {{baseurl}}
+Content-Type: application/json
+
+{
+    "street": "Rua das Flores",
+    "number": "123",
+    "city": "São Paulo",
+    "complement": "Apto 45",
+    "neighborhood": "Jardim das Acácias",
+    "state": "SP",
+    "zip_code": "01234-567",
+    "country": "Brasil"
+}

@@ -7,7 +7,10 @@ from fastapi.exceptions import RequestValidationError
 from src.api.controllers.user_controller import router as user_router
 from src.api.controllers.auth_controller import router as auth_router
 from src.api.controllers.auth_controller import router as auth_router
-from src.exceptions.exception_handlers import EmailAlreadyExistsException, email_exception_handler, validation_exception_handler
+from src.api.controllers.address_controller import router as address_router
+from src.exceptions.exception_handlers_user import (
+    EmailAlreadyExistsException, email_exception_handler, field_required_exception_handler, user_not_found_exception_handler)
+
 
 load_dotenv()
 app = FastAPI(
@@ -17,15 +20,12 @@ app = FastAPI(
 
 # Register exception handlers
 app.add_exception_handler(EmailAlreadyExistsException, email_exception_handler)
-app.add_exception_handler(RequestValidationError, validation_exception_handler)
-
-
-
+#app.add_exception_handler(FieldRequiredException, field_required_exception_handler)
 # Include routers
 
 app.include_router(user_router)
 app.include_router(auth_router)
-
+app.include_router(address_router)
 
 # Route for health check
 @app.get("/health")

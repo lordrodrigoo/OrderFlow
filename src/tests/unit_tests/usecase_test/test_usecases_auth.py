@@ -2,7 +2,8 @@ from unittest.mock import MagicMock
 import pytest
 from src.dto.request.auth_user_request import AuthUserRequest
 from src.dto.response.auth_user_response import AuthUserResponse
-from src.exceptions.exception_handlers import InvalidCredentialsException
+from src.exceptions.exception_handlers_account import InvalidCredentialsException
+
 
 def test_authenticate_success(
         usecase_auth,
