@@ -9,7 +9,7 @@ from src.infra.db.repositories.base_repository import BaseRepository
 
 class AddressRepository(AddressRepositoryInterface, BaseRepository[AddressEntity]):
     def __init__(self, db_connection: DBConnectionHandler):
-        super().__init__(AddressEntity, db_connection.get_session())
+        super().__init__(db_connection.get_session(), AddressEntity)
 
     def create_address(self, address: Address) -> Address:
         entity = AddressEntity(
@@ -70,4 +70,18 @@ class AddressRepository(AddressRepositoryInterface, BaseRepository[AddressEntity
     def find_addresses_by_user_id(self, user_id: int) -> List[Address]:
         entities = self.session.query(
             self.model).filter(self.model.user_id == user_id).all()
+        return [Address.from_entity(address) for address in entities]
+
+
+    def find_addresses_by_user_street_number(
+        self,
+        user_id: int,
+        street: str,
+        number: str
+    ) -> List[Address]:
+        entities = self.session.query(self.model).filter(
+            self.model.user_id == user_id,
+            self.model.street == street,
+            self.model.number == number
+        ).all()
         return [Address.from_entity(address) for address in entities]

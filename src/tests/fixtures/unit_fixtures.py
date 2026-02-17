@@ -4,7 +4,6 @@ from unittest.mock import MagicMock
 import pytest
 from passlib.context import CryptContext
 from src.usecases.user_usecases import UserUsecase
-from src.usecases.auth_user_usecases import AuthUserUsecase
 from src.dto.request.user_request import CreateUserRequest
 from src.dto.request.address_request import AddressRequest
 from src.usecases.address_usecase import AddressUsecase
@@ -55,10 +54,6 @@ def usecase(user_repository_mock, account_repository_mock):
 def pwd_context():
     return CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-
-@pytest.fixture
-def usecase_auth(user_repository_mock, account_repository_mock, pwd_context):
-    return AuthUserUsecase(user_repository_mock, account_repository_mock, pwd_context)
 
 
 @pytest.fixture

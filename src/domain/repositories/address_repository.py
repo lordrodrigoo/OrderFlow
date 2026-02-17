@@ -22,4 +22,12 @@ class AddressRepositoryInterface(ABC):
     def find_addresses_by_user_id(self, user_id: int) -> List[Address]: pass
 
     @abstractmethod
+    def find_addresses_by_user_street_number(
+        self,
+        user_id: int,
+        street: str,
+        number: str
+    )-> List[Address]: pass
+
+    @abstractmethod
     def delete_address(self, address_id: int) -> bool: pass
