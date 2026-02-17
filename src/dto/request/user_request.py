@@ -2,6 +2,9 @@ import re
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from src.domain.models.user import UserRole
 
+USERNAME_PATTERN = re.compile(r'^[A-Za-zÀ-ÿ0-9._]+$')
+PASSWORD_PATTERN = re.compile(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$')
+LETTERS_ONLY = re.compile(r'^[A-Za-zÀ-ÿ\s]+$')
 
 class CreateUserRequest(BaseModel):
     # ... means required field
@@ -11,71 +14,82 @@ class CreateUserRequest(BaseModel):
         ...,
         min_length=3,
         max_length=25,
-        description="first name must be between 3 and 25 characters",
+        description="First name ex: 'John'",
     )
     last_name: str = Field(
         ...,
         min_length=3,
         max_length=25,
-        description="last name must be between 3 and 25 characters",
+        description="Last name ex: 'Doe'",
     )
     age: int = Field(
         ...,
         ge=16,
-        description="age must be at least 16 years old",
+        description="Age greater than or equal to 16 years old",
     )
     email: EmailStr = Field(
         ...,
-        description="email address must be valid"
+        description="Email address must be valid ex: 'example@example.com'"
     )
     phone: str = Field(
         ...,
         min_length=10,
         max_length=15,
-        description="phone number must be between 10 and 15 characters",
+        description="Phone number ex: '11987654321'",
     )
     username: str = Field(
         ...,
         min_length=3,
         max_length=50,
-        description="username must be between 3 and 50 characters",
+        description="Username ex: 'john_doe'",
     )
     role: UserRole = Field(
         UserRole.USER,
-        description="role of the user, default is USER"
+        description="Role of the user, default is USER"
     )
     password: str = Field(
         ...,
         min_length=8,
-        description="password must be at least 8 characters long"
+        description="Password ex: 'P@ssw0rd' Minimum eight characters, at least one uppercase letter, and one special character"
     )
 
 
-    @field_validator("first_name", "last_name")
+    @field_validator('first_name', 'last_name')
     @classmethod
-    def field_names_must_be_alpha(cls, field: str) -> str:
-        if not field.isalpha():
-            raise ValueError("must contain only alphabetic characters")
-        return field
+    def validate_name(cls, value: str) -> str:
+        if not LETTERS_ONLY.match(value):
+            raise ValueError("must contain only letters.")
+        return value
 
 
-    @field_validator("phone")
+    @field_validator('age')
     @classmethod
-    def phone_must_be_numeric(cls, phone: str) -> str:
-        if not phone.isdigit():
-            raise ValueError("must contain only numeric characters")
-        return phone
+    def validate_age(cls, value: int) -> int:
+        if value > 120:
+            raise ValueError("age must be less than or equal to 120 years old.")
+        return value
 
 
-    @field_validator("password")
+    @field_validator('phone')
     @classmethod
-    # Minimum eight characters, at least one uppercase letter, and one special character
-    def validate_password(cls, password: str) -> str:
-        pattern = r'^(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+    def validate_phone(cls, value: str) -> str:
+        if not value.isdigit():
+            raise ValueError("phone must contain only numeric characters.")
+        return value
 
-        if not re.match(pattern, password):
+
+    @field_validator('password')
+    @classmethod
+    def validate_password(cls, value: str) -> str:
+        if not PASSWORD_PATTERN.match(value):
             raise ValueError(
-                "Password must contain at least one uppercase letter "
-                "and one special character"
-            )
-        return password
+                "password must contain at least one uppercase, one lowercase and one special character.")
+        return value
+
+
+    @field_validator('username')
+    @classmethod
+    def validate_username(cls, value: str) -> str:
+        if not USERNAME_PATTERN.match(value):
+            raise ValueError("username must contain only letters, numbers, dots or underscores.")
+        return value

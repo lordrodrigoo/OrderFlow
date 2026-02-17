@@ -1,27 +1,26 @@
 import os
 from typing import List, Optional
 from dotenv import load_dotenv
-from fastapi import APIRouter, Response, Query, status
+from fastapi import APIRouter, Response, Query, status, Depends
 from src.usecases.user_usecases import UserUsecase
-from src.infra.db.repositories.user_repository_interface import UserRepository
-from src.infra.db.repositories.account_user_repository_interface import AccountRepository
-from src.infra.db.settings.connection import DBConnectionHandler
 from src.dto.request.user_request import CreateUserRequest
 from src.dto.response.user_response import UserResponse
+from src.api.dependencies import get_user_usecase
 
 load_dotenv()
 API_PREFIX = os.getenv("API_V1_USER")
 TAG = os.getenv("TAG_USER")
 
 router = APIRouter(prefix=API_PREFIX, tags=[TAG])
-db_handler = DBConnectionHandler()
-user_repository = UserRepository(db_handler)
-account_repository = AccountRepository(db_handler)
-user_usecase = UserUsecase(user_repository, account_repository)
+
 
 
 @router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-def create_user(user_request: CreateUserRequest, response: Response):
+def create_user(
+    user_request: CreateUserRequest,
+    response: Response,
+    user_usecase: UserUsecase = Depends(get_user_usecase)
+):
     """Endpoint to create a new user."""
     user = user_usecase.create_user(user_request)
     response.headers['Location'] = f"{API_PREFIX}/{user.id}"
@@ -29,7 +28,11 @@ def create_user(user_request: CreateUserRequest, response: Response):
 
 
 @router.get("/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
-def get_user_by_id(user_id: int, response: Response):
+def get_user_by_id(
+    user_id: int,
+    response: Response,
+    user_usecase: UserUsecase = Depends(get_user_usecase)
+):
     """Endpoint to get a user by user_id."""
     user = user_usecase.get_user_by_id(user_id)
     response.headers['Location'] = f"{API_PREFIX}/{user.id}"
@@ -43,6 +46,7 @@ def list_users(
     active: Optional[bool] = Query(None, description="Filter users by active status"),
     skip: int = 0,
     limit: int = 10,
+    user_usecase: UserUsecase = Depends(get_user_usecase)
 ) -> List[UserResponse]:
 
     """Endpoint to list users with optional filters."""
@@ -54,7 +58,8 @@ def list_users(
 def update_user(
     user_id: int,
     user_request: CreateUserRequest,
-    current_user: None = None
+    current_user: None = None,
+    user_usecase: UserUsecase = Depends(get_user_usecase)
 ):
     """Endpoint to update an existing user."""
     updated_user = user_usecase.update_user(user_id, user_request, current_user)
@@ -62,7 +67,7 @@ def update_user(
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(user_id: int):
+def delete_user(user_id: int, user_usecase: UserUsecase = Depends(get_user_usecase)):
     """Endpoint to delete a user."""
     user_usecase.delete_user(user_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

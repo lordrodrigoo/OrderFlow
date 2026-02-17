@@ -7,6 +7,7 @@ from src.infra.db.settings.connection import DBConnectionHandler
 from src.domain.models.user import UserRole, Users
 
 
+
 @pytest.fixture
 def client():
     return TestClient(app)

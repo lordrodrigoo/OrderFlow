@@ -40,25 +40,35 @@ class ProductRepository(ProductRepositoryInterface, BaseRepository[ProductEntity
     def get_all_products(self) -> List[Product]:
         return [Product.from_entity(product) for product in self.get_all()]
 
+
     def find_products_by_category(self, category_id: int) -> List[Product]:
         entities = self.session.query(self.model).filter(self.model.category_id == category_id).all()
         return [Product.from_entity(product) for product in entities]
+
 
     def find_products_by_availability(self, is_available: bool) -> List[Product]:
         entities = self.session.query(self.model).filter(self.model.is_available == is_available).all()
         return [Product.from_entity(product) for product in entities]
 
+
     def find_products_by_price_range(self, min_price: Decimal, max_price: Decimal) -> List[Product]:
         entities = self.session.query(self.model).filter(self.model.price.between(min_price, max_price)).all()
         return [Product.from_entity(product) for product in entities]
 
-    def search_products_by_name(self, name):
+
+    def find_product_by_name(self, name: str) -> List[Product]:
         entities = self.session.query(self.model).filter(self.model.name.ilike(f"%{name}%")).all()
         return [Product.from_entity(product) for product in entities]
+
 
     def count_products_by_category(self, category_id: int) -> int:
         count = self.session.query(self.model).filter(self.model.category_id == category_id).count()
         return count
+
+
+    def find_product_by_id(self, product_id: int) -> Product:
+        entity = self.get_by_id(product_id)
+        return Product.from_entity(entity) if entity else None
 
     def delete_product(self, product_id: int) -> bool:
         entity = self.get_by_id(product_id)

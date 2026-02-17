@@ -2,11 +2,16 @@ import re
 from typing import Optional
 from pydantic import BaseModel, Field, field_validator
 
+
 VALID_UF ={
     "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO",
     "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI",
     "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"
 }
+
+LETTERS_AND_NUMBERS = re.compile(r'^[A-Za-zÀ-ÿ0-9\s]+$')
+LETTERS_ONLY = re.compile(r'^[A-Za-zÀ-ÿ\s]+$')
+ALPHANUMERIC_EXTENDED = re.compile(r'^[\w\s\-]+$')
 
 class AddressRequest(BaseModel):
     user_id: int = Field(
@@ -19,89 +24,103 @@ class AddressRequest(BaseModel):
         ...,
         min_length=3,
         max_length=100,
-        description="street must be between 3 and 100 characters",
+        description="Street name, ex: 'AV Paulista'",
     )
 
     number: str = Field(
         ...,
         min_length=1,
         max_length=10,
-        description="number must be between 1 and 10 characters",
+        description="Number of the address, ex: '123'",
     )
 
     complement: Optional[str] = Field(
         None,
         max_length=50,
-        description="complement must be up to 50 characters",
+        description="Complement of the address, ex: 'Apt 101'",
     )
 
     neighborhood: str = Field(
         ...,
         min_length=3,
         max_length=50,
-        description="neighborhood must be between 3 and 50 characters",
+        description="Neighborhood ex: 'Centro'",
     )
 
     city: str = Field(
         ...,
         min_length=3,
         max_length=50,
-        description="city must be between 3 and 50 characters",
+        description="City name, ex: 'São Paulo'",
     )
 
     state: str = Field(
         ...,
         min_length=2,
         max_length=2,
-        description="state must be 2 characters (UF)",
+        description="State must be 2 characters (UF), ex: 'SP'",
     )
 
     zip_code: str = Field(
         ...,
-        min_length=5,
-        max_length=10,
-        description="zip code must be between 5 and 10 characters",
+        description="Zip code ex: '01001-000'",
     )
 
     is_default: bool = True
 
-    @field_validator("number")
+
+    @field_validator("street")
     @classmethod
-    def validate_number(cls, value: str) -> str:
-        if not re.match(r'^[\w\s\-]+$', value) or value.strip() == "":
-            raise ValueError("number must contain letters or numbers")
+    def validate_street(cls, value: str) -> str:
+        if not LETTERS_AND_NUMBERS.match(value):
+            raise ValueError("street must contain letters or numbers")
         return value
 
 
-    @field_validator("zip_code")
+    @field_validator("number")
     @classmethod
-    def validate_zip_code(cls, zip_code: str) -> str:
-        cep_digits = re.sub(r'\D', '', zip_code)
-        if len(cep_digits) != 8:
-            raise ValueError("zip code invalid.")
-        return f"{cep_digits[:5]}-{cep_digits[5:]}"
+    def validate_number(cls, value: str) -> str:
+        if not ALPHANUMERIC_EXTENDED.match(value) or not value.strip():
+            raise ValueError("number must contain letters, numbers, or hyphens")
+        return value
+
+
+    @field_validator("complement")
+    @classmethod
+    def validate_complement(cls, value: Optional[str]) -> Optional[str]:
+        if value is not None and not ALPHANUMERIC_EXTENDED.match(value):
+            raise ValueError("complement must contain letters, numbers, or hyphens.")
+        return value
+
+
+    @field_validator("neighborhood")
+    @classmethod
+    def validate_neighborhood(cls, value: str) -> str:
+        if not LETTERS_ONLY.match(value):
+            raise ValueError("neighborhood must contain only letters.")
+        return value
+
+
+    @field_validator("city")
+    @classmethod
+    def validate_city(cls, value: str) -> str:
+        if not LETTERS_ONLY.match(value):
+            raise ValueError("city must contain only letters.")
+        return value
 
 
     @field_validator("state")
     @classmethod
-    def validate_state(cls, state: str) -> str:
-        state = state.upper()
-        if state not in VALID_UF:
-            raise ValueError("state invalid.")
-        return state
+    def validate_state(cls, value: str) -> str:
+        if value.upper() not in VALID_UF:
+            raise ValueError("invalid Brazilian state (UF).")
+        return value.upper()
 
 
-    @field_validator(
-        "street",
-        "neighborhood",
-        "city",
-        "complement",
-        "state"
-    )
+    @field_validator("zip_code")
     @classmethod
-    def validate_text_fields(cls, v: str) -> str:
-        if v is None:
-            return v
-        if not re.match(r'^[A-Za-zÀ-ÿ0-9\s]+$', v):
-            raise ValueError('Fields contains invalid characters.')
-        return v
+    def validate_zip_code(cls, value: str) -> str:
+        digits = re.sub(r'\D', '', value)
+        if len(digits) != 8:
+            raise ValueError("zip code must have exactly 8 digits.")
+        return f"{digits[:5]}-{digits[5:]}"

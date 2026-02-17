@@ -3,21 +3,18 @@ from fastapi import Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
+
 class UsernameAlreadyExistsException(Exception):
     def __init__(self, username: str):
         self.username = username
+        self.message = f"The username '{username}' is already registered."
+        super().__init__(self.message)
 
 
-async def username_exception_handler(
-        request: Request, exc: UsernameAlreadyExistsException
-    ):
+async def username_exception_handler(request: Request, exc: UsernameAlreadyExistsException):
     return JSONResponse(
         status_code=status.HTTP_409_CONFLICT,
-        content=jsonable_encoder({
-            "errors": {
-                "username": f"The username '{exc.username}' is already registered."
-            }
-        }),
+        content=jsonable_encoder({"message": exc.message})
     )
 
 

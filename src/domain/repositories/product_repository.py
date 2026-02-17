@@ -23,10 +23,13 @@ class ProductRepositoryInterface(ABC):
     def find_products_by_price_range(self, min_price: float, max_price: float) -> list[Product]: pass
 
     @abstractmethod
-    def search_products_by_name(self, name: str) -> list[Product]: pass
+    def find_products_by_name(self, name: str) -> list[Product]: pass
 
     @abstractmethod
     def count_products_by_category(self, category_id: int) -> int: pass
 
     @abstractmethod
     def get_all_products(self) -> list[Product]: pass
+
+    @abstractmethod
+    def find_product_by_id(self, product_id: int) -> Product: pass

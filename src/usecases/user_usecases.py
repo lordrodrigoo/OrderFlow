@@ -8,7 +8,11 @@ from src.domain.models.account import Account, AccountStatus
 from src.exceptions.exception_handlers_user import (
     EmailAlreadyExistsException,
     UserNotFoundException,
-    UserPermissionDeniedException
+    UserPermissionDeniedException,
+    FieldRequiredException
+)
+from src.exceptions.exception_handlers_account import (
+    UsernameAlreadyExistsException,
 )
 
 
@@ -26,6 +30,7 @@ class UserUsecase:
         if self.user_repository.find_by_email(user_request.email):
             raise EmailAlreadyExistsException(email=user_request.email)
 
+
         role = getattr(user_request, "role", UserRole.USER)
         if isinstance(role, UserRole):
             role_value = role.value
@@ -42,6 +47,17 @@ class UserUsecase:
             role=role_value
         )
         created_user = self.user_repository.create_user(user_entity)
+
+        # Validations to account creation
+        if self.account_repository.find_by_username(user_request.username):
+            raise UsernameAlreadyExistsException(username=user_request.username)
+
+        if not user_request.username:
+            raise FieldRequiredException(field="username")
+
+        if not user_request.password:
+            raise FieldRequiredException(field="password")
+
 
         # Creating account vinculated to user
         account_entity = Account(

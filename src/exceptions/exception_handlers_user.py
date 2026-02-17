@@ -2,7 +2,7 @@
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from fastapi.encoders import jsonable_encoder
+
 
 
 class EmailAlreadyExistsException(Exception):
@@ -15,7 +15,7 @@ class EmailAlreadyExistsException(Exception):
 async def email_exception_handler(request: Request, exc: EmailAlreadyExistsException):
     return JSONResponse(
         status_code=status.HTTP_409_CONFLICT,
-        content=jsonable_encoder({"message": exc.message})
+        content={"message": exc.message}
     )
 
 
@@ -31,7 +31,7 @@ class UserNotFoundException(Exception):
 async def user_not_found_exception_handler(request: Request, exc: UserNotFoundException):
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
-        content=jsonable_encoder({"message": exc.message})
+        content={"message": exc.message}
     )
 
 
@@ -39,6 +39,8 @@ async def user_not_found_exception_handler(request: Request, exc: UserNotFoundEx
 class FieldRequiredException(Exception):
     def __init__(self, field: str):
         self.field = field
+        self.message = f"Field '{field}' is required."
+        super().__init__(self.message)
 
 
 async def field_required_exception_handler(request: Request, exc: RequestValidationError):
@@ -59,7 +61,7 @@ async def field_required_exception_handler(request: Request, exc: RequestValidat
 
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-        content=jsonable_encoder({"message": message}),
+        content={"message": message, "details": details},
     )
 
 
@@ -74,5 +76,5 @@ class UserPermissionDeniedException(Exception):
 async def user_permission_denied_exception_handler(request: Request, exc: UserPermissionDeniedException):
     return JSONResponse(
         status_code=status.HTTP_403_FORBIDDEN,
-        content=jsonable_encoder({'message': exc.message, 'user_id': exc.user_id})
+        content={'message': exc.message, 'user_id': exc.user_id}
     )

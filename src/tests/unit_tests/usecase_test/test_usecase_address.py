@@ -1,10 +1,10 @@
 #pylint: disable=unused-argument
 from datetime import datetime
 import pytest
-from fastapi import HTTPException
 from pydantic import ValidationError
 from src.dto.request.address_request import AddressRequest
 from src.dto.response.address_response import AddressResponse
+from src.exceptions.exception_handlers_address import AddressNotFoundException
 
 
 def test_create_address(
@@ -105,36 +105,23 @@ def test_find_address_by_id_not_found(
         fake_address_repository_mock
     ):
     fake_address_repository_mock.find_address_by_id.return_value = None
-    with pytest.raises(HTTPException) as exc_info:
+    with pytest.raises(AddressNotFoundException):
         address_usecase.find_address_by_id(999)
-    assert exc_info.value.status_code == 404
-    assert exc_info.value.detail == "Address not found"
 
 
 
-def test_update_address_not_found(
-        address_usecase,
-        fake_address_repository_mock,
-        valid_address_data,
-        fake_user
-    ):
+
+def test_update_address_not_found(address_usecase, fake_address_repository_mock, valid_address_data, fake_user):
     fake_address_repository_mock.find_address_by_id.return_value = None
     request = AddressRequest(**valid_address_data)
-    with pytest.raises(HTTPException) as exc_info:
+    with pytest.raises(AddressNotFoundException):
         address_usecase.update_address(999, request, fake_user)
-    assert exc_info.value.status_code == 404
-    assert exc_info.value.detail == "Address not found"
 
 
-def test_delete_address_not_found(
-        address_usecase,
-        fake_address_repository_mock
-    ):
+def test_delete_address_not_found(address_usecase, fake_address_repository_mock):
     fake_address_repository_mock.find_address_by_id.return_value = None
-    with pytest.raises(HTTPException) as exc_info:
+    with pytest.raises(AddressNotFoundException):
         address_usecase.delete_address(999)
-    assert exc_info.value.status_code == 404
-    assert exc_info.value.detail == "Address not found"
 
 
 def test_delete_address(
