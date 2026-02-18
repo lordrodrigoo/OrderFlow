@@ -70,4 +70,3 @@ def update_user(
 def delete_user(user_id: int, user_usecase: UserUsecase = Depends(get_user_usecase)):
     """Endpoint to delete a user."""
     user_usecase.delete_user(user_id)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)

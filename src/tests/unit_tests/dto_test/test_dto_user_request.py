@@ -2,6 +2,7 @@
 import pytest
 from pydantic import ValidationError
 from src.dto.request.user_request import CreateUserRequest
+from src.domain.models.user import UserRole
 
 
 
@@ -14,7 +15,7 @@ def test_valid_user_request(valid_user_data):
     assert user_request.phone == valid_user_data["phone"]
     assert user_request.username == valid_user_data["username"]
     assert user_request.password == valid_user_data["password"]
-    assert user_request.role == valid_user_data["role"]
+    assert user_request.role == UserRole.USER
 
 
 @pytest.mark.parametrize("field,value,expected_msg", [

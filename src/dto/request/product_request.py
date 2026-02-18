@@ -1,5 +1,10 @@
+import re
 from decimal import Decimal
 from pydantic import BaseModel, Field, field_validator
+
+
+PRODUCT_NAME_PATTERN = re.compile(r'^[A-Za-zÀ-ÿ0-9\s\-]+$')
+
 
 
 class ProductRequest(BaseModel):
@@ -11,35 +16,35 @@ class ProductRequest(BaseModel):
         ...,
         min_length=3,
         max_length=100,
-        description="name must be between 3 and 100 characters",
+        description="product name, ex: 'Coca-Cola 2L'",
     )
     description: str = Field(
         ...,
         min_length=10,
         max_length=500,
-        description="description must be between 10 and 500 characters",
+        description="product description, ex: 'Refreshing beverage with a hint of lemon'",
     )
     price: Decimal = Field(
         ...,
         ge=0,  # don't allow negative prices
         le=10000,  # max limit for price
         decimal_places=2,  # It's assurance that the price has at most two decimal places
-        description="price must be entre 0 e 10000, com até duas casas decimais",
+        description="price of the product, ex: 9.99",
     )
     is_available: bool = Field(
         True,
-        description="availability status of the product, default is True"
+        description="availability of the product, default is True",
     )
     preparation_time: int = Field(
         ...,
         ge=1,
-        description="preparation time in minutes, must be at least 1 minute",
+        description="preparation time in minutes, ex: 15",
     )
 
 
     @field_validator("name")
     @classmethod
-    def name_must_be_alphanumeric(cls, name: str) -> str:
-        if not name.isalpha():
-            raise ValueError("name must contain only alphabetic characters")
-        return name
+    def validate_name(cls, value: str) -> str:
+        if not PRODUCT_NAME_PATTERN.match(value):
+            raise ValueError("must contain only letters, numbers, hyphens or spaces.")
+        return value
