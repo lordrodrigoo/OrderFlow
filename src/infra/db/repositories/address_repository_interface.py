@@ -59,13 +59,7 @@ class AddressRepository(AddressRepositoryInterface, BaseRepository[AddressEntity
         return [Address.from_entity(address) for address in entities]
 
     def delete_address(self, address_id: int) -> bool:
-        entity = self.get_by_id(address_id)
-
-        if entity:
-            self.delete(entity)
-            self.save()
-            return True
-        return False
+        return self.delete_by_id(address_id)
 
     def find_addresses_by_user_id(self, user_id: int) -> List[Address]:
         entities = self.session.query(

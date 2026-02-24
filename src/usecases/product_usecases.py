@@ -4,7 +4,6 @@ from src.dto.response.product_response import ProductResponse
 from src.domain.repositories.product_repository import ProductRepositoryInterface
 from src.exceptions.exception_handlers_product import (
     ProductNotFoundException,
-    ProductFieldRequiredException,
     ProductAlreadyExistsException,
     ProductCategoryNotFoundException,
     InvalidPriceProductException
@@ -27,8 +26,6 @@ class ProductUsecase:
         if not self.category_repository.find_category_by_id(product_request.category_id):
             raise ProductCategoryNotFoundException(category_id=product_request.category_id)
 
-        if not product_request.name:
-            raise ProductFieldRequiredException(field="name")
 
         if product_request.price <= 0:
             raise InvalidPriceProductException()

@@ -6,9 +6,17 @@ from src.domain.models.category import Category
 from src.infra.db.repositories.base_repository import BaseRepository
 
 
+
 class CategoryRepositoryInterface(CategoryRepository, BaseRepository[CategoryEntity]):
     def __init__(self, db_connection: DBConnectionHandler):
         super().__init__(db_connection.get_session(), CategoryEntity)
+
+    def get_all_categories(self) -> List[Category]:
+        return [Category.from_entity(entity) for entity in self.get_all()]
+
+    def get_category_by_id(self, category_id: int) -> Optional[Category]:
+        entity = self.get_by_id(category_id)
+        return Category.from_entity(entity) if entity else None
 
     def create_category(self, category: Category) -> Category:
         entity = CategoryEntity(
@@ -33,18 +41,6 @@ class CategoryRepositoryInterface(CategoryRepository, BaseRepository[CategoryEnt
 
         return Category.from_entity(entity)
 
-    def find_all_categories(self) -> List[Category]:
-        return [Category.from_entity(entity) for entity in self.get_all()]
-
-    def find_category_by_id(self, category_id: int) -> Optional[Category]:
-        entity = self.get_by_id(category_id)
-        return Category.from_entity(entity) if entity else None
 
     def delete_category(self, category_id: int) -> bool:
-        entity = self.get_by_id(category_id)
-
-        if entity:
-            self.delete(entity)
-            self.save()
-            return True
-        return False
+        return self.delete_by_id(category_id)

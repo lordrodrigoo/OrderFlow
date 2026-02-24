@@ -59,10 +59,4 @@ class AccountRepository(AccountRepositoryInterface, BaseRepository[AccountEntity
         return Account.from_entity(entity) if entity else None
 
     def delete_account(self, account_id: str) -> bool:
-        entity = self.get_by_id(account_id)
-
-        if entity:
-            self.delete(entity)
-            self.save()
-            return True
-        return False
+        return self.delete_by_id(account_id)

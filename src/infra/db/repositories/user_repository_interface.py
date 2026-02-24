@@ -65,10 +65,4 @@ class UserRepository(UserRepositoryInterface, BaseRepository[UserEntity]):
         return [Users.from_entity(user) for user in entities]
 
     def delete_user(self, user_id: int) -> bool:
-        entity = self.get_by_id(user_id)
-
-        if entity:
-            self.delete(entity)
-            self.save()
-            return True
-        return False
+        return self.delete_by_id(user_id)

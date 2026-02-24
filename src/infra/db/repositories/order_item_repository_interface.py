@@ -45,9 +45,4 @@ class OrderItemRepository(OrderItemRepositoryInterface, BaseRepository[OrderItem
         return None
 
     def delete_order_item(self, order_item_id: int) -> bool:
-        entity = self.get_by_id(order_item_id)
-        if entity:
-            self.delete(entity)
-            self.save()
-            return True
-        return False
+        return self.delete_by_id(order_item_id)

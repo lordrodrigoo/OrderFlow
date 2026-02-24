@@ -1,5 +1,4 @@
 from typing import List
-from decimal import Decimal
 from src.infra.db.settings.connection import DBConnectionHandler
 from src.infra.db.entities.product import ProductEntity
 from src.domain.repositories.product_repository import ProductRepositoryInterface
@@ -24,6 +23,7 @@ class ProductRepository(ProductRepositoryInterface, BaseRepository[ProductEntity
         self.add(entity)
         self.save()
         return Product.from_entity(entity)
+
 
     def update_product(self, product: Product) -> Product:
         entity = self.get_by_id(product.id)
@@ -51,14 +51,20 @@ class ProductRepository(ProductRepositoryInterface, BaseRepository[ProductEntity
         return [Product.from_entity(product) for product in entities]
 
 
-    def find_products_by_price_range(self, min_price: Decimal, max_price: Decimal) -> List[Product]:
+
+    def find_products_by_price_range(self, min_price: float, max_price: float) -> list[Product]:
         entities = self.session.query(self.model).filter(self.model.price.between(min_price, max_price)).all()
         return [Product.from_entity(product) for product in entities]
 
 
-    def find_product_by_name(self, name: str) -> List[Product]:
+    def find_products_by_name(self, name: str) -> list[Product]:
         entities = self.session.query(self.model).filter(self.model.name.ilike(f"%{name}%")).all()
         return [Product.from_entity(product) for product in entities]
+
+
+    def find_product_by_id(self, product_id: int) -> Product:
+        entity = self.get_by_id(product_id)
+        return Product.from_entity(entity) if entity else None
 
 
     def count_products_by_category(self, category_id: int) -> int:
@@ -66,15 +72,6 @@ class ProductRepository(ProductRepositoryInterface, BaseRepository[ProductEntity
         return count
 
 
-    def find_product_by_id(self, product_id: int) -> Product:
-        entity = self.get_by_id(product_id)
-        return Product.from_entity(entity) if entity else None
 
     def delete_product(self, product_id: int) -> bool:
-        entity = self.get_by_id(product_id)
-
-        if entity:
-            self.delete(entity)
-            self.save()
-            return True
-        return False
+        return self.delete_by_id(product_id)

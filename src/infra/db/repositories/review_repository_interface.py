@@ -41,9 +41,4 @@ class ReviewRepository(ReviewRepositoryInterface, BaseRepository[ReviewEntity]):
         return [Review.from_entity(review) for review in self.get_all()]
 
     def delete_review(self, review_id: int) -> bool:
-        entity = self.get_by_id(review_id)
-        if entity:
-            self.delete(entity)
-            self.save()
-            return True
-        return False
+        return self.delete_by_id(review_id)

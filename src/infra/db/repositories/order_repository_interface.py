@@ -68,9 +68,4 @@ class OrderRepository(OrderRepositoryInterface, BaseRepository[OrderEntity]):
         return False
 
     def delete_order(self, order_id: int) -> bool:
-        entity = self.get_by_id(order_id)
-        if entity:
-            self.delete(entity)
-            self.save()
-            return True
-        return False
+        return self.delete_by_id(order_id)
