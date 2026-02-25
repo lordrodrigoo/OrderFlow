@@ -5,3 +5,4 @@ from src.tests.fixtures.unit_fixtures.products_fixtures import *
 from src.tests.fixtures.unit_fixtures.user_fixtures import *
 from src.tests.fixtures.common_fixtures import *
 from src.tests.fixtures.integration_fixtures import *
+from src.tests.fixtures.unit_fixtures.category_fixtures import *

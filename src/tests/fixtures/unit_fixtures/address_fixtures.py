@@ -8,6 +8,22 @@ from src.dto.response.address_response import AddressResponse
 
 
 
+@pytest.fixture
+def fake_address_response_mock():
+    return AddressResponse(
+        id=1,
+        user_id=1,
+        street="Rua Exemplo",
+        number="123",
+        neighborhood="Centro",
+        city="São Paulo",
+        state="SP",
+        zip_code="12345-678",
+        is_default=True,
+        complement="casa 2 fundos",
+        created_at=datetime.now()
+    )
+
 
 @pytest.fixture
 def address_usecase(fake_address_repository_mock):
@@ -34,21 +50,7 @@ def valid_address_request(valid_address_data):
     return AddressRequest(**valid_address_data)
 
 
-@pytest.fixture
-def fake_address_response_mock():
-    return AddressResponse(
-        id=1,
-        user_id=1,
-        street="Rua Exemplo",
-        number="123",
-        neighborhood="Centro",
-        city="São Paulo",
-        state="SP",
-        zip_code="12345-678",
-        is_default=True,
-        complement="casa 2 fundos",
-        created_at=datetime.now()
-    )
+
 
 
 @pytest.fixture

@@ -12,6 +12,5 @@ class ProductResponse(BaseModel):
     is_available: bool
     preparation_time: int
     created_at: datetime
-    updated_at: datetime
 
     model_config = {"from_attributes": True}
