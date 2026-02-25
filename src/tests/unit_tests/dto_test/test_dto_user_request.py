@@ -1,13 +1,13 @@
 #pylint: disable=redefined-outer-name
 import pytest
 from pydantic import ValidationError
-from src.dto.request.user_request import CreateUserRequest
+from src.dto.request.user_request import UserRequest
 from src.domain.models.user import UserRole
 
 
 
 def test_valid_user_request(valid_user_data):
-    user_request = CreateUserRequest(**valid_user_data)
+    user_request = UserRequest(**valid_user_data)
     assert user_request.first_name == valid_user_data["first_name"]
     assert user_request.last_name == valid_user_data["last_name"]
     assert user_request.age == valid_user_data["age"]
@@ -42,5 +42,5 @@ def test_field_validations(valid_user_data, field, value, expected_msg):
     data[field] = value
 
     with pytest.raises(ValidationError) as exc_info:
-        CreateUserRequest(**data)
+        UserRequest(**data)
     assert expected_msg in str(exc_info.value)

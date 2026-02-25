@@ -3,7 +3,7 @@ from typing import List, Optional
 from dotenv import load_dotenv
 from fastapi import APIRouter, Response, Query, status, Depends
 from src.usecases.user_usecases import UserUsecase
-from src.dto.request.user_request import CreateUserRequest
+from src.dto.request.user_request import UserRequest
 from src.dto.response.user_response import UserResponse
 from src.api.dependencies import get_user_usecase
 
@@ -17,7 +17,7 @@ router = APIRouter(prefix=API_PREFIX, tags=[TAG])
 
 @router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def create_user(
-    user_request: CreateUserRequest,
+    user_request: UserRequest,
     response: Response,
     user_usecase: UserUsecase = Depends(get_user_usecase)
 ):
@@ -57,7 +57,7 @@ def list_users(
 @router.put("/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
 def update_user(
     user_id: int,
-    user_request: CreateUserRequest,
+    user_request: UserRequest,
     current_user: None = None,
     user_usecase: UserUsecase = Depends(get_user_usecase)
 ):

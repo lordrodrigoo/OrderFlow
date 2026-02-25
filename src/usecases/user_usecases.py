@@ -1,5 +1,5 @@
 from src.domain.models.user import Users, UserRole
-from src.dto.request.user_request import CreateUserRequest
+from src.dto.request.user_request import UserRequest
 from src.dto.response.user_response import UserResponse
 from src.domain.repositories.user_repository import UserRepositoryInterface
 from src.domain.repositories.account_repository import AccountRepositoryInterface
@@ -26,7 +26,7 @@ class UserUsecase:
         self.user_repository = user_repository
         self.account_repository = account_repository
 
-    def create_user(self, user_request: CreateUserRequest) -> UserResponse:
+    def create_user(self, user_request: UserRequest) -> UserResponse:
         if self.user_repository.find_by_email(user_request.email):
             raise EmailAlreadyExistsException(email=user_request.email)
 
@@ -108,7 +108,7 @@ class UserUsecase:
     def update_user(
             self,
             user_id: int,
-            user_request: CreateUserRequest,
+            user_request: UserRequest,
             current_user: None
     ) -> UserResponse:
 

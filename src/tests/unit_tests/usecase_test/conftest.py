@@ -1,3 +1,7 @@
-from src.tests.fixtures.unit_fixtures import * #pylint: disable=wildcard-import, unused-wildcard-import
-from src.tests.fixtures.common_fixtures import * #pylint: disable=wildcard-import, unused-wildcard-import
-from src.tests.fixtures.integration_fixtures import * #pylint: disable=wildcard-import, unused-wildcard-import
+#pylint: disable=wildcard-import, unused-wildcard-import
+from src.tests.fixtures.unit_fixtures.account_fixtures import *
+from src.tests.fixtures.unit_fixtures.address_fixtures import *
+from src.tests.fixtures.unit_fixtures.products_fixtures import *
+from src.tests.fixtures.unit_fixtures.user_fixtures import *
+from src.tests.fixtures.common_fixtures import *
+from src.tests.fixtures.integration_fixtures import *

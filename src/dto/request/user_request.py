@@ -6,7 +6,7 @@ USERNAME_PATTERN = re.compile(r'^[A-Za-zÀ-ÿ0-9._]+$')
 PASSWORD_PATTERN = re.compile(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$')
 LETTERS_ONLY = re.compile(r'^[A-Za-zÀ-ÿ\s]+$')
 
-class CreateUserRequest(BaseModel):
+class UserRequest(BaseModel):
     # ... means required field
     # property ge means greater than or equal to
     # property le means less than or equal to
