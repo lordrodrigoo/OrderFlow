@@ -10,6 +10,7 @@ PRODUCT_NAME_PATTERN = re.compile(r'^[A-Za-zÀ-ÿ0-9\s\-]+$')
 class ProductRequest(BaseModel):
     category_id: int = Field(
         ...,
+        ge=1,
         description="ID of the category the product belongs to"
     )
     name: str = Field(
