@@ -8,7 +8,8 @@ from src.usecases.address_usecase import AddressUsecase
 from src.infra.db.repositories.address_repository_interface import AddressRepository
 from src.infra.db.repositories.product_repository_interface import ProductRepository
 from src.usecases.product_usecases import ProductUsecase
-from src.infra.db.repositories.category_repository_interface import CategoryRepositoryInterface as CategoryRepository
+from src.usecases.category_usecases import CategoryUsecase
+from src.infra.db.repositories.category_repository_interface import CategoryRepository
 
 
 def get_db():
@@ -36,3 +37,8 @@ def get_product_usecase(db=Depends(get_db)):
     product_repository = ProductRepository(db)
     category_repository = CategoryRepository(db)
     return ProductUsecase(product_repository, category_repository)
+
+
+def get_category_usecase(db=Depends(get_db)):
+    category_repository = CategoryRepository(db)
+    return CategoryUsecase(category_repository)

@@ -14,3 +14,11 @@ def category_repository_mock():
         created_at=datetime.now()
     )
     return repository_mock
+
+
+@pytest.fixture
+def valid_category_data():
+    return {
+        "name": "Pizzas",
+        "description": "Categoria de pizzas deliciosas"
+    }
