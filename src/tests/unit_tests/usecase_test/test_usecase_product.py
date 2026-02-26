@@ -54,7 +54,7 @@ def test_product_category_not_found(
         category_repository_mock,
         valid_product_data
     ):
-    category_repository_mock.find_category_by_id.return_value = None
+    category_repository_mock.get_category_by_id.return_value = None
     request = ProductRequest(**valid_product_data)
     with pytest.raises(ProductCategoryNotFoundException) as exc_info:
         product_usecase.create_product(request)

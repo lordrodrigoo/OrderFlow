@@ -1,13 +1,13 @@
 from typing import List, Optional
 from src.infra.db.settings.connection import DBConnectionHandler
 from src.infra.db.entities.category import CategoryEntity
-from src.domain.repositories.category_repository import CategoryRepository
+from src.domain.repositories.category_repository import CategoryRepositoryInterface
 from src.domain.models.category import Category
 from src.infra.db.repositories.base_repository import BaseRepository
 
 
 
-class CategoryRepositoryInterface(CategoryRepository, BaseRepository[CategoryEntity]):
+class CategoryRepository(CategoryRepositoryInterface, BaseRepository[CategoryEntity]):
     def __init__(self, db_connection: DBConnectionHandler):
         super().__init__(db_connection.get_session(), CategoryEntity)
 
@@ -27,6 +27,11 @@ class CategoryRepositoryInterface(CategoryRepository, BaseRepository[CategoryEnt
         self.save()
 
         return Category.from_entity(entity)
+
+    def find_category_by_name(self, name: str) -> Optional[Category]:
+        entity = self.session.query(self.model).filter_by(name=name).first()
+        return Category.from_entity(entity) if entity else None
+
 
     def update_category(self, category: Category) -> Optional[Category]:
         if category.id is None:

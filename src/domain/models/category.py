@@ -1,15 +1,12 @@
 #pylint: disable=redefined-builtin
+from typing import Optional
+from dataclasses import dataclass
 
+@dataclass
 class Category:
-    def __init__(
-        self,
-        id: int,
-        name: str,
-        description: str,
-    ) -> None:
-        self.id = id
-        self.name = name
-        self.description = description
+    name: str
+    description: str
+    id: Optional[int] = None
 
     @classmethod
     def from_entity(cls, entity) -> "Category":
@@ -18,6 +15,7 @@ class Category:
             name=entity.name,
             description=entity.description,
         )
+
 
     def __repr__(self):
         return f"Category [id = {self.id}, name = {self.name}]"
