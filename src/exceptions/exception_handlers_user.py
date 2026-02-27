@@ -60,7 +60,7 @@ async def field_required_exception_handler(request: Request, exc: RequestValidat
         details.append({"message": message})
 
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={"message": message, "details": details},
     )
 

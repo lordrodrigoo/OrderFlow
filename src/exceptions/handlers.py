@@ -21,7 +21,10 @@ from src.exceptions.exception_handlres_category import (
     CategoryNotFoundException, category_not_found_exception_handler,
     CategoryAlreadyExistsException, category_already_exists_exception_handler,
 )
-
+from src.exceptions.exception_handlers_order import (
+    OrderNotFoundException, order_not_found_exception_handler,
+    OrderAlreadyCanceledException, order_already_canceled_exception_handler,
+)
 
 
 def register_exception_handlers(app: FastAPI):
@@ -37,3 +40,5 @@ def register_exception_handlers(app: FastAPI):
     app.add_exception_handler(InvalidPriceProductException, invalid_price_product_exception_handler)
     app.add_exception_handler(CategoryNotFoundException, category_not_found_exception_handler)
     app.add_exception_handler(CategoryAlreadyExistsException, category_already_exists_exception_handler)
+    app.add_exception_handler(OrderNotFoundException, order_not_found_exception_handler)
+    app.add_exception_handler(OrderAlreadyCanceledException, order_already_canceled_exception_handler)
