@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 from dataclasses import dataclass
 from typing import Optional
 from enum import Enum
@@ -13,16 +14,16 @@ class OrderStatus(Enum):
 @dataclass
 class Order:
     """Entity of domain - it represents an order in the system."""
-    id: Optional[int] = None
-    user_id: Optional[int] = None
-    address_id: Optional[int] = None
-    total_amount: float
-    delivery_fee: float
+    total_amount: Decimal
+    delivery_fee: Decimal
+    status: OrderStatus
     notes: Optional[str] = None
     scheduled_date: Optional[datetime] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-    status: OrderStatus
+    id: Optional[int] = None
+    user_id: Optional[int] = None
+    address_id: Optional[int] = None
 
     @property
     def is_delivered(self) -> bool:
@@ -60,8 +61,8 @@ class Order:
     def create_order(
         user_id: int,
         address_id: int,
-        total_amount: float,
-        delivery_fee: float,
+        total_amount: Decimal,
+        delivery_fee: Decimal,
         notes: Optional[str],
         scheduled_date: Optional[datetime],
         status: OrderStatus
