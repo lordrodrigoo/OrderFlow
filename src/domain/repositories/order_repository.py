@@ -32,3 +32,6 @@ class OrderRepositoryInterface(ABC):
 
     @abstractmethod
     def delete_order(self, order_id: int) -> bool: pass
+
+    @abstractmethod
+    def exists(self, order_id: int) -> bool: pass

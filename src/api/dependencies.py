@@ -10,6 +10,11 @@ from src.infra.db.repositories.product_repository_interface import ProductReposi
 from src.usecases.product_usecases import ProductUsecase
 from src.usecases.category_usecases import CategoryUsecase
 from src.infra.db.repositories.category_repository_interface import CategoryRepository
+from src.usecases.order_usecases import OrderUsecase
+from src.usecases.order_item_usecases import OrderItemUsecase
+from src.infra.db.repositories.order_repository_interface import OrderRepository
+from src.infra.db.repositories.order_item_repository_interface import OrderItemRepository
+
 
 
 def get_db():
@@ -42,3 +47,15 @@ def get_product_usecase(db=Depends(get_db)):
 def get_category_usecase(db=Depends(get_db)):
     category_repository = CategoryRepository(db)
     return CategoryUsecase(category_repository)
+
+
+def get_order_usecase(db=Depends(get_db)):
+    order_repository = OrderRepository(db)
+    return OrderUsecase(order_repository)
+
+
+def get_order_item_usecase(db=Depends(get_db)):
+    order_item_repository = OrderItemRepository(db)
+    product_repository = ProductRepository(db)
+    order_repository = OrderRepository(db)
+    return OrderItemUsecase(order_item_repository, product_repository, order_repository)

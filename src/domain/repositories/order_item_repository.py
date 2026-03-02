@@ -19,3 +19,9 @@ class OrderItemRepositoryInterface(ABC):
 
     @abstractmethod
     def delete_order_item(self, order_item_id: int) -> bool: pass
+
+    @abstractmethod
+    def exists(self, order_id: int, product_id: int) -> bool: pass
+
+    @abstractmethod
+    def get_order_items_by_order_id(self, order_id: int) -> list[OrderItem]: pass

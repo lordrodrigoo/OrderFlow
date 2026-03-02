@@ -7,13 +7,13 @@ from decimal import Decimal
 @dataclass
 class OrderItem:
     """Entity of domain - it represents an item in an order."""
-    id: Optional[int] = None
-    order_id: Optional[int] = None
-    product_id: Optional[int] = None
     quantity: int
     unit_price: Decimal
     subtotal: Decimal
     notes: Optional[str] = None
+    id: Optional[int] = None
+    order_id: Optional[int] = None
+    product_id: Optional[int] = None
 
     @property
     def total_price(self) -> Decimal:

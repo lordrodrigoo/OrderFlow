@@ -69,3 +69,7 @@ class OrderRepository(OrderRepositoryInterface, BaseRepository[OrderEntity]):
 
     def delete_order(self, order_id: int) -> bool:
         return self.delete_by_id(order_id)
+
+
+    def exists(self, order_id: int) -> bool:
+        return self.session.query(self.model).filter(self.model.id == order_id).count() > 0

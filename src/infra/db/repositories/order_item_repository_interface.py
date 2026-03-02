@@ -46,3 +46,11 @@ class OrderItemRepository(OrderItemRepositoryInterface, BaseRepository[OrderItem
 
     def delete_order_item(self, order_item_id: int) -> bool:
         return self.delete_by_id(order_item_id)
+
+    def exists(self, order_id: int, product_id: int) -> bool:
+        return self.session.query(self.model).filter_by(
+            order_id=order_id, product_id=product_id).first() is not None
+
+    def get_order_items_by_order_id(self, order_id: int) -> List[OrderItem]:
+        entities = self.session.query(self.model).filter_by(order_id=order_id).all()
+        return [OrderItem.from_entity(item) for item in entities]
