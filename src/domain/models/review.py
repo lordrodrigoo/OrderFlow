@@ -6,10 +6,10 @@ from typing import Optional
 @dataclass
 class Review:
     """Entity of domain - it represents a review in the system."""
-    id: Optional[int] = None
-    order_id: Optional[int] = None
-    user_id: Optional[int] = None
     rating: int
+    id: Optional[int] = None
+    user_id: Optional[int] = None
+    product_id: Optional[int] = None
     comment: Optional[str] = None
     created_at: Optional[datetime] = None
 
@@ -25,18 +25,18 @@ class Review:
 
     @staticmethod
     def create_review(
-        order_id: int,
-        user_id: int,
         rating: int,
+        user_id: int,
+        product_id: int,
         comment: Optional[str] = None
     ) -> 'Review':
         """Factory method to create a new Review."""
         return Review(
-            order_id=order_id,
             user_id=user_id,
+            product_id=product_id,
             rating=rating,
             comment=comment,
-            created_at=datetime.utcnow()
+            created_at=datetime.now()
         )
 
     @staticmethod
@@ -44,8 +44,8 @@ class Review:
         """Converts a ReviewEntity to a Review domain model."""
         return Review(
             id=entity.id,
-            order_id=entity.order_id,
             user_id=entity.user_id,
+            product_id=entity.product_id,
             rating=entity.rating,
             comment=entity.comment,
             created_at=entity.created_at

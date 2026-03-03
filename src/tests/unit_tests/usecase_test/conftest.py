@@ -7,3 +7,5 @@ from src.tests.fixtures.common_fixtures import *
 from src.tests.fixtures.integration_fixtures import *
 from src.tests.fixtures.unit_fixtures.category_fixtures import *
 from src.tests.fixtures.unit_fixtures.order_item_fixtures import *
+from src.tests.fixtures.unit_fixtures.order_fixtures import *
+from src.tests.fixtures.unit_fixtures.review_fixtures import *

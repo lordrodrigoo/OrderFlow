@@ -16,7 +16,6 @@ class ReviewResponse(BaseModel):
         description="Comment should have at most 500 characters"
     )
     created_at: datetime
-    order_id: int
     user_id: int
     product_id: int
 
