@@ -2,7 +2,7 @@ from src.domain.models.category import Category
 from src.dto.request.category_request import CategoryRequest
 from src.dto.response.category_response import CategoryResponse
 from src.domain.repositories.category_repository import CategoryRepositoryInterface
-from src.exceptions.exception_handlres_category import (
+from src.exceptions.exception_handlers_category import (
     CategoryNotFoundException,
     CategoryAlreadyExistsException
 )

@@ -17,7 +17,7 @@ from src.exceptions.exception_handlers_product import (
     ProductCategoryNotFoundException, product_category_not_found_exception_handler,
     InvalidPriceProductException, invalid_price_product_exception_handler,
 )
-from src.exceptions.exception_handlres_category import (
+from src.exceptions.exception_handlers_category import (
     CategoryNotFoundException, category_not_found_exception_handler,
     CategoryAlreadyExistsException, category_already_exists_exception_handler,
 )
