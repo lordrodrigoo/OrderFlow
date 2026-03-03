@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 from decimal import Decimal
+from datetime import datetime
 
 
 
@@ -14,6 +15,7 @@ class OrderItem:
     id: Optional[int] = None
     order_id: Optional[int] = None
     product_id: Optional[int] = None
+    created_at: Optional[datetime] = None
 
     @property
     def total_price(self) -> Decimal:

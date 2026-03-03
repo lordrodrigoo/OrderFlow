@@ -54,7 +54,17 @@ def valid_order_request(valid_order_data):
 @pytest.fixture
 def fake_order_repository_mock():
     repository_mock = MagicMock()
-    repository_mock.get_order_by_id.return_value = None
+    repository_mock.get_order_by_id.return_value = Order(
+        id=1,
+        user_id=1,
+        address_id=1,
+        total_amount=Decimal("59.90"),
+        delivery_fee=Decimal("5.00"),
+        notes="Please deliver between 6-7 PM",
+        scheduled_date=datetime.now() + timedelta(days=1),
+        status=OrderStatus.PENDING,
+        created_at=datetime.now()
+    )
     repository_mock.create_order.return_value = Order(
         id=1,
         user_id=1,
@@ -66,6 +76,7 @@ def fake_order_repository_mock():
         status=OrderStatus.PENDING,
         created_at=datetime.now()
     )
+    repository_mock.exists.return_value = False
     return repository_mock
 
 
