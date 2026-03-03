@@ -14,12 +14,10 @@ class ReviewEntity(Base):
 
 
     "Bellow are foreign keys and relationships"
-    order_id = Column(Integer, ForeignKey('orders.id'), nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    order = relationship('OrderEntity', back_populates='review')
     user = relationship('UserEntity', back_populates='reviews')
     product_id = Column(Integer, ForeignKey('products.id'), nullable=False)
     product = relationship('ProductEntity', back_populates='reviews')
 
     def __repr__(self):
-        return f"Review [id = {self.id}, order_id = {self.order_id}, rating = {self.rating}]"
+        return f"Review [id = {self.id}, rating = {self.rating}]"

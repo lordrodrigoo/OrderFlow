@@ -15,8 +15,8 @@ class ReviewRepository(ReviewRepositoryInterface, BaseRepository[ReviewEntity]):
             rating = review.rating,
             comment = review.comment,
             created_at = review.created_at,
-            order_id = review.order_id,
             user_id = review.user_id,
+            product_id = review.product_id,
         )
         self.add(entity)
         self.save()

@@ -36,12 +36,6 @@ def test_relationship_between_user_and_review(db_session, fake_user, fake_review
     assert review.product_id == fake_review.product_id
 
 
-def test_relationship_between_order_and_review(db_session, fake_order, fake_review):
-    # This test I will use fake_review to access the order relationship
-    review = db_session.query(ReviewEntity).filter_by(id=fake_review.id).first()
-    assert review.order.id == fake_review.order_id
-    assert review.order.total_amount == fake_order.total_amount
-    assert review.user_id == fake_review.user_id
 
 
 def test_delete_review(db_session, fake_review):

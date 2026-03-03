@@ -22,7 +22,6 @@ class OrderEntity(Base):
 
     user = relationship('UserEntity', back_populates='orders')
     order_items = relationship('OrderItemEntity', back_populates='order')
-    review = relationship('ReviewEntity', back_populates='order', uselist=False)
 
     def __repr__(self):
         return f"Order [id = {self.id}, user_id = {self.user_id}, total_amount = {self.total_amount}, status = {self.status}]"

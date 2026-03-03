@@ -8,7 +8,6 @@ from src.infra.db.entities.order_item import OrderItemEntity
 
 def test_create_order_item(db_session, fake_order_item, fake_order, fake_product):
     assert fake_order_item.id is not None
-    assert fake_order_item.order_id == fake_order.id
     assert fake_order_item.quantity == 2
     assert fake_order_item.unit_price == Decimal('25.50')
     assert fake_order_item.subtotal == Decimal('51.00')

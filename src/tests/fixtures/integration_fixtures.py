@@ -86,7 +86,9 @@ def fake_product(db_session, fake_category):
 def fake_order(db_session, fake_user, fake_account, fake_address):
     order = OrderEntity(
         user_id = fake_user.id,
-        total_amount = 150.75,
+        address_id = fake_address.id,
+        total_amount = Decimal('150.75'),
+        delivery_fee = Decimal('5.00'),
         status = "pending",
         created_at = datetime.now(),
         updated_at = None
@@ -143,9 +145,8 @@ def fake_address(db_session, fake_user):
 
 
 @pytest.fixture
-def fake_review(db_session, fake_user, fake_order, fake_account, fake_product, fake_category):
+def fake_review(db_session, fake_user, fake_account, fake_product, fake_category):
     review = ReviewEntity(
-        order_id=fake_order.id,
         user_id=fake_user.id,
         product_id=fake_product.id,
         rating=5,
