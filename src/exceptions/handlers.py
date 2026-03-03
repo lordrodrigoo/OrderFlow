@@ -30,6 +30,10 @@ from src.exceptions.exception_handlers_order_item import (
     InvalidOrderItemException, invalid_order_item_exception_handler,
     DuplicateOrderItemException, duplicate_order_item_exception_handler,
 )
+from src.exceptions.exception_handlers_review import (
+    ReviewNotFoundException, review_not_found_exception_handler,
+    InvalidReviewException, invalid_review_exception_handler,
+)
 
 def register_exception_handlers(app: FastAPI):
     app.add_exception_handler(RequestValidationError, pydantic_validation_handler)
@@ -49,3 +53,5 @@ def register_exception_handlers(app: FastAPI):
     app.add_exception_handler(OrderItemNotFoundException, order_item_not_found_exception_handler)
     app.add_exception_handler(InvalidOrderItemException, invalid_order_item_exception_handler)
     app.add_exception_handler(DuplicateOrderItemException, duplicate_order_item_exception_handler)
+    app.add_exception_handler(ReviewNotFoundException, review_not_found_exception_handler)
+    app.add_exception_handler(InvalidReviewException, invalid_review_exception_handler)

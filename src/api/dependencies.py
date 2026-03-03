@@ -14,7 +14,8 @@ from src.usecases.order_usecases import OrderUsecase
 from src.usecases.order_item_usecases import OrderItemUsecase
 from src.infra.db.repositories.order_repository_interface import OrderRepository
 from src.infra.db.repositories.order_item_repository_interface import OrderItemRepository
-
+from src.usecases.review_usecases import ReviewUsecase
+from src.infra.db.repositories.review_repository_interface import ReviewRepository
 
 
 def get_db():
@@ -59,3 +60,10 @@ def get_order_item_usecase(db=Depends(get_db)):
     product_repository = ProductRepository(db)
     order_repository = OrderRepository(db)
     return OrderItemUsecase(order_item_repository, product_repository, order_repository)
+
+
+def get_review_usecase(db=Depends(get_db)):
+    review_repository = ReviewRepository(db)
+    user_repository = UserRepository(db)
+    product_repository = ProductRepository(db)
+    return ReviewUsecase(review_repository, user_repository, product_repository)
