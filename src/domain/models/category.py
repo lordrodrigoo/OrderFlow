@@ -9,6 +9,11 @@ class Category:
     id: Optional[int] = None
 
     @classmethod
+    def create_category(cls, name: str, description: str) -> "Category":
+        return cls(name=name, description=description)
+
+
+    @classmethod
     def from_entity(cls, entity) -> "Category":
         return cls(
             id=entity.id,

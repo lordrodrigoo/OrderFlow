@@ -11,6 +11,7 @@ class CategoryRequest(BaseModel):
         description="category name, ex: 'Cakes'",
     )
     description: str = Field(
+        None,
         min_length=10,
         max_length=50,
         description="category description, ex: 'Delicious cakes for every occasion'",

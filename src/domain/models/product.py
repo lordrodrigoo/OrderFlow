@@ -18,7 +18,7 @@ class Product:
     @property
     def full_description(self) -> str:
         """Returns the full description of the product."""
-        return f"{self.name}: {self.description}"
+        return f"{self.name}: ${self.price} - {self.description}"
 
     @staticmethod
     def create_product(

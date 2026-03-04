@@ -26,7 +26,7 @@ class Account:
     @property
     def is_active(self) -> bool:
         """Returns the active status of the account."""
-        return self.status
+        return self.status == AccountStatus.ACTIVE
 
     @staticmethod
     def create_account(
