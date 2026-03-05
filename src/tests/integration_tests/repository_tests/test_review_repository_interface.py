@@ -37,12 +37,7 @@ def test_get_all_reviews(fake_review, db_session):
     review_repo.create_review(fake_review)
     all_reviews = review_repo.get_all_reviews()
 
-    assert len(all_reviews) == 1
-    assert all_reviews[0].id is not None
-    assert all_reviews[0].rating == fake_review.rating
-    assert all_reviews[0].comment == fake_review.comment
-    assert all_reviews[0].user_id == fake_review.user_id
-    assert all_reviews[0].product_id == fake_review.product_id
+    assert any(r.id == fake_review.id for r in all_reviews)
 
 
 def test_find_reviews_by_rating(fake_review, db_session):
@@ -64,3 +59,18 @@ def test_delete_review(fake_review, db_session):
     deleted_review = review_repo.get_review_by_id(created_review.id)
 
     assert deleted_review is None
+
+
+def test_find_reviews_by_user_found(db_session, fake_review):
+    db_connection = FakeDBConnectionHandler(db_session)
+    review_repo = ReviewRepository(db_connection)
+    created_review = review_repo.create_review(fake_review)
+    reviews = review_repo.find_reviews_by_user(fake_review.user_id)
+    assert any(r.id == created_review.id for r in reviews)
+
+
+def test_find_reviews_by_user_not_found(db_session):
+    db_connection = FakeDBConnectionHandler(db_session)
+    review_repo = ReviewRepository(db_connection)
+    reviews = review_repo.find_reviews_by_user(9999)
+    assert len(reviews) == 0

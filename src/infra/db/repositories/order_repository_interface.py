@@ -37,7 +37,8 @@ class OrderRepository(OrderRepositoryInterface, BaseRepository[OrderEntity]):
             entity.scheduled_date = order.scheduled_date
             entity.updated_at = order.updated_at
             self.save()
-        return Order.from_entity(entity)
+            return Order.from_entity(entity)
+        return None
 
     def get_all_orders(self) -> List[Order]:
         return [Order.from_entity(order) for order in self.get_all()]

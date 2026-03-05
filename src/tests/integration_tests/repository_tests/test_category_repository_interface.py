@@ -1,3 +1,4 @@
+import pytest
 from src.domain.models.category import Category
 from src.infra.db.repositories.category_repository_interface import CategoryRepository
 from src.tests.helpers import FakeDBConnectionHandler
@@ -7,6 +8,13 @@ from src.tests.helpers import FakeDBConnectionHandler
 def test_get_all_categories(db_session):
     db_handler = FakeDBConnectionHandler(db_session)
     category_repo = CategoryRepository(db_handler)
+
+    new_category = Category.create_category(
+        name="Categoria Teste",
+        description="Descrição teste"
+    )
+    category_repo.create_category(new_category)
+
     categories = category_repo.get_all_categories()
     assert isinstance(categories, list)
     for category in categories:
@@ -48,6 +56,22 @@ def test_update_category(db_session):
 
     assert updated_category.name == "Updated Category"
     assert updated_category.description == "This is the updated category"
+
+
+def test_update_category_without_id(db_session):
+    db_handler = FakeDBConnectionHandler(db_session)
+    category_repo = CategoryRepository(db_handler)
+    category = Category(name="No ID", description="No ID provided")
+    with pytest.raises(ValueError):
+        category_repo.update_category(category)
+
+
+def test_update_category_not_found(db_session):
+    db_handler = FakeDBConnectionHandler(db_session)
+    category_repo = CategoryRepository(db_handler)
+    category = Category(id=9999, name="Not Found", description="Should not exist")
+    result = category_repo.update_category(category)
+    assert result is None
 
 
 def test_find_category_by_name(db_session, fake_category):

@@ -89,3 +89,18 @@ def test_exists(db_session, fake_order, fake_product, fake_order_item):
     non_existent_id = fake_order_item.id + 999
     exists = order_item_repo.exists(order_id=non_existent_id, product_id=fake_product.id)
     assert exists is False
+
+
+
+def test_get_order_items_by_order_id_found(db_session, fake_order_item):
+    db_handler = FakeDBConnectionHandler(db_session)
+    repo = OrderItemRepository(db_handler)
+    items = repo.get_order_items_by_order_id(fake_order_item.order_id)
+    assert any(item.id == fake_order_item.id for item in items)
+
+
+def test_get_order_items_by_order_id_not_found(db_session):
+    db_handler = FakeDBConnectionHandler(db_session)
+    repo = OrderItemRepository(db_handler)
+    items = repo.get_order_items_by_order_id(9999)
+    assert items == []

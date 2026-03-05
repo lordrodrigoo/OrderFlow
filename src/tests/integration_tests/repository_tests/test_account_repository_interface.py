@@ -1,3 +1,4 @@
+import pytest
 from src.domain.models.account import Account, AccountStatus
 from src.infra.db.repositories.account_user_repository_interface import AccountRepository
 from src.tests.helpers import FakeDBConnectionHandler
@@ -17,6 +18,22 @@ def test_update_account(fake_account, db_session):
     assert updated_account.username == "ana_silva_updated"
     assert updated_account.password_hash == "NewStrongHashedPassword456!"
     assert updated_account.status == AccountStatus.INACTIVE
+
+
+def test_update_account_without_id(db_session):
+    db_handler = FakeDBConnectionHandler(db_session)
+    account_repo = AccountRepository(db_handler)
+    account = Account(username="no_id", password_hash="hash", status=AccountStatus.ACTIVE, user_id=1)
+    with pytest.raises(ValueError):
+        account_repo.update_account(account)
+
+
+def test_update_account_not_found(db_session):
+    db_handler = FakeDBConnectionHandler(db_session)
+    account_repo = AccountRepository(db_handler)
+    account = Account(id=9999, username="not_found", password_hash="hash", status=AccountStatus.ACTIVE, user_id=1)
+    result = account_repo.update_account(account)
+    assert result is None
 
 
 def test_find_all_accounts(fake_account, db_session):

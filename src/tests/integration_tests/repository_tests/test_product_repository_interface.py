@@ -108,3 +108,17 @@ def test_delete_product(fake_product, db_session):
     product_repo.delete_product(fake_product.id)
     deleted_product = product_repo.find_product_by_id(fake_product.id)
     assert deleted_product is None
+
+
+def test_find_products_by_price_range_found(db_session, fake_product):
+    db_handler = FakeDBConnectionHandler(db_session)
+    repo = ProductRepository(db_handler)
+    products = repo.find_products_by_price_range(10, 30)
+    assert any(p.id == fake_product.id for p in products)
+
+
+def test_find_products_by_price_range_not_found(db_session):
+    db_handler = FakeDBConnectionHandler(db_session)
+    repo = ProductRepository(db_handler)
+    products = repo.find_products_by_price_range(1000, 2000)
+    assert products == []

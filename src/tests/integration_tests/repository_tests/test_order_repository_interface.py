@@ -53,6 +53,14 @@ def test_update_order(db_session, fake_order):
     assert updated_order.total_amount == Decimal('160.00')
 
 
+def test_update_order_not_found(db_session):
+    db_handler = FakeDBConnectionHandler(db_session)
+    order_repo = OrderRepository(db_handler)
+    order = Order(id=9999, user_id=1, address_id=1, status=OrderStatus.PAID, total_amount=10, delivery_fee=1)
+    result = order_repo.update_order(order)
+    assert result is None or result.id is None
+
+
 
 def test_get_all_orders(db_session, fake_order):
     db_handler = FakeDBConnectionHandler(db_session)
@@ -76,6 +84,13 @@ def test_get_order_by_id(db_session, fake_order):
     assert order.delivery_fee == Decimal('5.00')
 
 
+def test_get_order_by_id_not_found(db_session):
+    db_handler = FakeDBConnectionHandler(db_session)
+    order_repo = OrderRepository(db_handler)
+    result = order_repo.get_order_by_id(9999)
+    assert result is None
+
+
 def test_find_orders_by_total_amount(db_session, fake_order):
     db_handler = FakeDBConnectionHandler(db_session)
     order_repo = OrderRepository(db_handler)
@@ -96,6 +111,13 @@ def test_cancel_order(db_session, fake_order):
     assert canceled_order.status == OrderStatus.CANCELED
 
 
+def test_cancel_order_not_found(db_session):
+    db_handler = FakeDBConnectionHandler(db_session)
+    order_repo = OrderRepository(db_handler)
+    result = order_repo.cancel_order(9999)
+    assert result is False
+
+
 def test_delete_order(db_session, fake_order):
     db_handler = FakeDBConnectionHandler(db_session)
     order_repo = OrderRepository(db_handler)
@@ -112,3 +134,17 @@ def test_exists(db_session, fake_order):
 
     assert order_repo.exists(fake_order.id) is True
     assert order_repo.exists(9999) is False
+
+
+
+def test_delete_order_not_found(db_session):
+    db_handler = FakeDBConnectionHandler(db_session)
+    order_repo = OrderRepository(db_handler)
+    result = order_repo.delete_order(9999)
+    assert result is False
+
+def test_exists_not_found(db_session):
+    db_handler = FakeDBConnectionHandler(db_session)
+    order_repo = OrderRepository(db_handler)
+    result = order_repo.exists(9999)
+    assert result is False

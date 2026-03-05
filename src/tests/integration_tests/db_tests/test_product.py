@@ -53,7 +53,7 @@ def test_product_without_category_should_fail(db_session):
         price = Decimal('9.99'),
         image_url = "http://example.com/invalid_image.png",
         is_available = True,
-        preparation_time_minutes = 10,
+        preparation_time = 10,
         created_at = datetime.now(),
         updated_at = None,
         category_id = 9999  # assuming this ID does not exist
@@ -74,7 +74,7 @@ def test_unique_name(db_session, fake_category, fake_product):
         price = Decimal('29.99'),
         image_url = "http://example.com/duplicate_image.png",
         is_available = True,
-        preparation_time_minutes = 20,
+        preparation_time = 20,
         created_at = datetime.now(),
         updated_at = None,
         category_id = fake_category.id

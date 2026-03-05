@@ -43,6 +43,7 @@ def test_from_entity():
             self.price = 999.99
             self.is_available = True
             self.preparation_time = 20
+            self.image_url = "http://example.com/cake.png"
             self.created_at = None
             self.updated_at = None
 
