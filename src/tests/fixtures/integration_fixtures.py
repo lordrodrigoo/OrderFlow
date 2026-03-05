@@ -18,6 +18,7 @@ from src.infra.db.entities.order_item import OrderItemEntity
 from src.infra.db.entities.review import ReviewEntity
 
 
+
 @pytest.fixture(scope="function")
 def db_session():
     with PostgresContainer("postgres:16") as postgres:
@@ -72,7 +73,7 @@ def fake_product(db_session, fake_category):
         price = Decimal('19.99'),
         image_url = "http://example.com/image.png",
         is_available = True,
-        preparation_time_minutes = 15,
+        preparation_time = 15,
         created_at = datetime.now(),
         updated_at = None,
         category_id = fake_category.id
@@ -90,6 +91,8 @@ def fake_order(db_session, fake_user, fake_account, fake_address):
         total_amount = Decimal('150.75'),
         delivery_fee = Decimal('5.00'),
         status = "pending",
+        notes = "Please deliver between 5-6 PM",
+        scheduled_date = datetime.now(),
         created_at = datetime.now(),
         updated_at = None
     )

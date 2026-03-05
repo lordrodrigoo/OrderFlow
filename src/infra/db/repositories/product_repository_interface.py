@@ -12,10 +12,12 @@ class ProductRepository(ProductRepositoryInterface, BaseRepository[ProductEntity
 
     def create_product(self, product: Product) -> Product:
         entity = ProductEntity(
+            category_id = product.category_id,
             name = product.name,
             description = product.description,
             price = product.price,
             image_url = product.image_url,
+            preparation_time = product.preparation_time,
             is_available = product.is_available,
             created_at = product.created_at,
             updated_at = product.updated_at
@@ -28,11 +30,13 @@ class ProductRepository(ProductRepositoryInterface, BaseRepository[ProductEntity
     def update_product(self, product: Product) -> Product:
         entity = self.get_by_id(product.id)
         if entity:
+            entity.category_id = product.category_id
             entity.name = product.name
             entity.description = product.description
             entity.price = product.price
             entity.image_url = product.image_url
             entity.is_available = product.is_available
+            entity.preparation_time = product.preparation_time
             entity.updated_at = product.updated_at
             self.save()
         return Product.from_entity(entity)

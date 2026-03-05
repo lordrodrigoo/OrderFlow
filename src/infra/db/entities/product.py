@@ -14,7 +14,7 @@ class ProductEntity(Base):
     price = Column(Numeric(10, 2), nullable=False)
     image_url = Column(String, nullable=True)
     is_available = Column(Boolean, default=True)
-    preparation_time_minutes = Column(Integer, nullable=True)
+    preparation_time = Column(Integer, nullable=True)
     created_at = Column(DateTime, nullable=False, default=datetime.now())
     updated_at = Column(DateTime, nullable=True, default=None, onupdate=datetime.now())
 

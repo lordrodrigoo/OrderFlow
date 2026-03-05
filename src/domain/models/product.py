@@ -11,6 +11,7 @@ class Product:
     price: float
     is_available: bool
     preparation_time: int  # in minutes
+    image_url: Optional[str] = None
     id: Optional[int] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
@@ -27,7 +28,8 @@ class Product:
         category_id: int,
         price: float,
         is_available: bool,
-        preparation_time: int
+        preparation_time: int,
+        image_url: Optional[str] = None
     ) -> 'Product':
         """Factory method to create a new product instance."""
         return Product(
@@ -36,7 +38,8 @@ class Product:
             category_id=category_id,
             price=price,
             is_available=is_available,
-            preparation_time=preparation_time
+            preparation_time=preparation_time,
+            image_url=image_url
         )
 
     @staticmethod
@@ -50,6 +53,7 @@ class Product:
             price=entity.price,
             is_available=entity.is_available,
             preparation_time=entity.preparation_time,
+            image_url=entity.image_url,
             created_at=entity.created_at,
             updated_at=entity.updated_at
         )

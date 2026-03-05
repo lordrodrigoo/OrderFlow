@@ -13,7 +13,9 @@ class OrderRepository(OrderRepositoryInterface, BaseRepository[OrderEntity]):
 
     def create_order(self, order: Order) -> Order:
         entity = OrderEntity(
-            status = order.status,
+            user_id = order.user_id,
+            address_id = order.address_id,
+            status = order.status.value,
             total_amount = order.total_amount,
             delivery_fee = order.delivery_fee,
             notes = order.notes,
@@ -28,7 +30,7 @@ class OrderRepository(OrderRepositoryInterface, BaseRepository[OrderEntity]):
     def update_order(self, order: Order) -> Order:
         entity = self.get_by_id(order.id)
         if entity:
-            entity.status = order.status
+            entity.status = order.status.value if hasattr(order.status, 'value') else order.status
             entity.total_amount = order.total_amount
             entity.delivery_fee = order.delivery_fee
             entity.notes = order.notes

@@ -50,9 +50,6 @@ class AccountRepository(AccountRepositoryInterface, BaseRepository[AccountEntity
         entity = self.get_by_id(account_id)
         return Account.from_entity(entity) if entity else None
 
-    def find_by_account_number(self, account_number: str) -> Optional[Account]:
-        entity = self.session.query(AccountEntity).filter_by(account_number=account_number).first()
-        return Account.from_entity(entity) if entity else None
 
     def find_by_username(self, username: str) -> Optional[Account]:
         entity = self.session.query(AccountEntity).filter_by(username=username).first()

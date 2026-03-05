@@ -17,8 +17,6 @@ class AccountRepositoryInterface(ABC):
     @abstractmethod
     def find_account_by_id(self, account_id: int) -> Optional[Account]: pass
 
-    @abstractmethod
-    def find_by_account_number(self, account_number: str) -> Optional[Account]: pass
 
     @abstractmethod
     def delete_account(self, account_id: int) -> bool: pass
