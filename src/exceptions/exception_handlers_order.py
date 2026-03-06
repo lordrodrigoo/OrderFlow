@@ -24,6 +24,6 @@ class OrderAlreadyCanceledException(Exception):
 
 async def order_already_canceled_exception_handler(request: Request, exc: OrderAlreadyCanceledException):
     return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
+        status_code=status.HTTP_409_CONFLICT,
         content={"message": exc.message}
     )

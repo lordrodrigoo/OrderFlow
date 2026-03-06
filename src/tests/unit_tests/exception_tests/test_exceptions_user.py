@@ -1,4 +1,3 @@
-# pylint: disable=redefined-outer-name
 import pytest
 from fastapi import status
 from src.tests.helpers import _call_handler

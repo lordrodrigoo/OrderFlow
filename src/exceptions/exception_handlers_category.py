@@ -17,9 +17,9 @@ async def category_not_found_exception_handler(request: Request, exc: CategoryNo
 
 
 class CategoryAlreadyExistsException(Exception):
-    def __init__(self, name: str):
-        self.name = name
-        self.message = f"Category with name: '{name}' already exists."
+    def __init__(self, category_name: str):
+        self.category_name = category_name
+        self.message = f"Category with name: '{category_name}' already exists."
         super().__init__(self.message)
 
 async def category_already_exists_exception_handler(request: Request, exc: CategoryAlreadyExistsException):

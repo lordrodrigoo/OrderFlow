@@ -4,8 +4,6 @@ from fastapi.responses import JSONResponse
 
 
 
-
-
 class ProductNotFoundException(Exception):
     def __init__(self, product_id: int):
         self.product_id = product_id
@@ -21,9 +19,9 @@ async def product_not_found_exception_handler(request: Request, exc: ProductNotF
 
 
 class ProductAlreadyExistsException(Exception):
-    def __init__(self, name: str):
-        self.name = name
-        self.message = f"Product with name: '{name}' already exists."
+    def __init__(self, product_name: str):
+        self.product_name = product_name
+        self.message = f"Product with name: '{product_name}' already exists."
         super().__init__(self.message)
 
 
@@ -57,6 +55,6 @@ class InvalidPriceProductException(Exception):
 
 async def invalid_price_product_exception_handler(request: Request, exc: InvalidPriceProductException):
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={"message": exc.message}
     )
