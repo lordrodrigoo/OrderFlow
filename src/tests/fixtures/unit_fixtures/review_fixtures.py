@@ -2,24 +2,9 @@
 from datetime import datetime
 from unittest.mock import MagicMock
 import pytest
-from src.dto.response.review_response import ReviewResponse
 from src.usecases.review_usecases import ReviewUsecase
 from src.dto.request.review_request import ReviewRequest
 from src.domain.models.review import Review
-
-
-
-@pytest.fixture
-def fake_review_response_mock():
-    return ReviewResponse(
-        id=1,
-        user_id=1,
-        product_id=1,
-        rating=5,
-        comment="Great product!",
-        created_at=datetime.now()
-    )
-
 
 
 @pytest.fixture

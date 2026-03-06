@@ -2,7 +2,6 @@
 from datetime import datetime
 from unittest.mock import MagicMock
 import pytest
-from src.dto.request.address_request import AddressRequest
 from src.usecases.address_usecase import AddressUsecase
 from src.dto.response.address_response import AddressResponse
 
@@ -43,13 +42,6 @@ def valid_address_data():
         "is_default": True,
         "complement": "casa 2 fundos"
     }
-
-
-@pytest.fixture
-def valid_address_request(valid_address_data):
-    return AddressRequest(**valid_address_data)
-
-
 
 
 

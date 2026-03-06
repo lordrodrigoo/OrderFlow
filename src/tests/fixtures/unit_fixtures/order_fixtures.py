@@ -3,25 +3,8 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from unittest.mock import MagicMock
 import pytest
-from src.dto.request.order_request import OrderRequest
 from src.usecases.order_usecases import OrderUsecase
-from src.dto.response.order_response import OrderResponse
 from src.domain.models.order import Order, OrderStatus
-
-
-@pytest.fixture
-def fake_order_response_mock():
-    return OrderResponse(
-        id=1,
-        user_id=1,
-        address_id=1,
-        total_amount=Decimal("59.90"),
-        delivery_fee=Decimal("5.00"),
-        notes="Please deliver between 6-7 PM",
-        scheduled_date=datetime(2026, 6, 30, 18),
-        status=OrderStatus.PENDING,
-        created_at=datetime.now()
-    )
 
 
 
@@ -43,11 +26,6 @@ def valid_order_data():
         "notes": "Please deliver between 6-7 PM",
         "scheduled_date": datetime.now() + timedelta(days=1)
     }
-
-
-@pytest.fixture
-def valid_order_request(valid_order_data):
-    return OrderRequest(**valid_order_data)
 
 
 

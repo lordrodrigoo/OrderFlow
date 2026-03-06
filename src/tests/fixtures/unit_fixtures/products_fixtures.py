@@ -2,7 +2,6 @@
 from datetime import datetime
 from unittest.mock import MagicMock
 import pytest
-from src.dto.request.product_request import ProductRequest
 from src.usecases.product_usecases import ProductUsecase
 from src.dto.response.product_response import ProductResponse
 from src.domain.models.product import Product
@@ -40,10 +39,6 @@ def valid_product_data():
         "preparation_time": 20
     }
 
-
-@pytest.fixture
-def valid_product_request(valid_product_data):
-    return ProductRequest(**valid_product_data)
 
 
 @pytest.fixture

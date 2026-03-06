@@ -143,8 +143,29 @@ def test_delete_order_not_found(db_session):
     result = order_repo.delete_order(9999)
     assert result is False
 
+
 def test_exists_not_found(db_session):
     db_handler = FakeDBConnectionHandler(db_session)
     order_repo = OrderRepository(db_handler)
     result = order_repo.exists(9999)
     assert result is False
+
+
+def test_orders_by_user(db_session, fake_order):
+    db_handler = FakeDBConnectionHandler(db_session)
+    order_repo = OrderRepository(db_handler)
+
+    orders = order_repo.find_orders_by_user(fake_order.user_id)
+    assert len(orders) > 0
+    assert any(order.id == fake_order.id for order in orders)
+    assert all(order.user_id == fake_order.user_id for order in orders)
+
+
+def test_find_orders_by_status(db_session, fake_order):
+    db_handler = FakeDBConnectionHandler(db_session)
+    order_repo = OrderRepository(db_handler)
+
+    orders = order_repo.find_orders_by_status(OrderStatus.PENDING)
+    assert len(orders) > 0
+    assert any(order.id == fake_order.id for order in orders)
+    assert all(order.status == OrderStatus.PENDING for order in orders)

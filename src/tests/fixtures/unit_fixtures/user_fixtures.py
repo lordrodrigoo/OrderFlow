@@ -3,7 +3,7 @@ from datetime import datetime
 from unittest.mock import MagicMock
 import pytest
 from src.usecases.user_usecases import UserUsecase
-from src.dto.request.user_request import UserRequest
+
 
 
 
@@ -26,34 +26,5 @@ def user_repository_mock():
 
 
 @pytest.fixture
-def user_response_mock():
-    return MagicMock(
-        id=1,
-        first_name="Rodrigo",
-        last_name="Souza",
-        age=30,
-        phone="11999999999",
-        email="rodrigo.souza@example.com",
-        role="user",
-        is_active=True,
-        created_at=datetime.now()
-    )
-
-
-@pytest.fixture
 def usecase(user_repository_mock, account_repository_mock):
     return UserUsecase(user_repository_mock, account_repository_mock)
-
-
-@pytest.fixture
-def make_valid_request():
-    return UserRequest(
-        first_name="John",
-        last_name="Lennon",
-        age=30,
-        email="john.lennon@example.com",
-        phone="1191234-5678",
-        username="johnl.ennon",
-        password="StrongPass@123",
-        role="user"
-    )

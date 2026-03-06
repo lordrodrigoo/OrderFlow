@@ -3,7 +3,7 @@ from decimal import Decimal
 from src.infra.db.settings.connection import DBConnectionHandler
 from src.infra.db.entities.order import OrderEntity
 from src.domain.repositories.order_repository import OrderRepositoryInterface
-from src.domain.models.order import Order
+from src.domain.models.order import Order, OrderStatus
 from src.infra.db.repositories.base_repository import BaseRepository
 
 
@@ -43,8 +43,8 @@ class OrderRepository(OrderRepositoryInterface, BaseRepository[OrderEntity]):
     def get_all_orders(self) -> List[Order]:
         return [Order.from_entity(order) for order in self.get_all()]
 
-    def find_orders_by_status(self, status: str) -> List[Order]:
-        entities = self.session.query(self.model).filter(self.model.status == status).all()
+    def find_orders_by_status(self, status: OrderStatus) -> List[Order]:
+        entities = self.session.query(self.model).filter(self.model.status == status.value).all()
         return [Order.from_entity(order) for order in entities]
 
     def find_orders_by_user(self, user_id: int) -> List[Order]:
@@ -65,7 +65,7 @@ class OrderRepository(OrderRepositoryInterface, BaseRepository[OrderEntity]):
     def cancel_order(self, order_id: int) -> bool:
         entity = self.get_by_id(order_id)
         if entity:
-            entity.status = 'canceled'
+            entity.status = OrderStatus.CANCELED.value
             self.save()
             return True
         return False
