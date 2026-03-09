@@ -1,5 +1,5 @@
 from src.domain.models.review import Review
-
+from src.infra.db.entities.review import ReviewEntity
 
 
 def test_create_review():
@@ -52,3 +52,9 @@ def test_is_negative_property():
     assert review.is_negative is True
     review = Review(rating=4)
     assert review.is_negative is False
+
+
+def test_review_repr():
+    review = ReviewEntity(id=1, rating=5)
+    expected = "Review [id = 1, rating = 5]"
+    assert repr(review) == expected

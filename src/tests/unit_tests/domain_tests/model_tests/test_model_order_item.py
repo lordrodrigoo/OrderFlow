@@ -1,6 +1,6 @@
 from decimal import Decimal
 from src.domain.models.order_item import OrderItem
-from src.domain.models.order_item import OrderItem
+from src.infra.db.entities.order_item import OrderItemEntity
 
 def test_create_order_item():
     order_item = OrderItem.create_order_item(
@@ -73,3 +73,14 @@ def test_from_entity():
     assert order_item.subtotal == Decimal('29.97')
     assert order_item.notes == "Extra frosting"
     assert order_item.created_at is None
+
+
+def test_order_item_repr():
+    item = OrderItemEntity(
+        id=1,
+        order_id=10,
+        product_id=5,
+        quantity=2
+    )
+    expected = "OrderItem [id = 1, order_id = 10, product_id = 5, quantity = 2]"
+    assert repr(item) == expected

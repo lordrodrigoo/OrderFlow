@@ -1,5 +1,5 @@
 from src.domain.models.address import Address
-
+from src.infra.db.entities.address import AddressEntity
 
 def test_create_address():
     address = Address.create_address(
@@ -45,3 +45,14 @@ def test_full_address_property_with_complement():
         complement="Apt 4"
     )
     assert address.full_address == "Main St, 123, Apt 4, Anytown, State, 12345"
+
+
+def test_repr():
+    address = AddressEntity(
+        id=1,
+        user_id=1,
+        street="Main St",
+        city="Anytown"
+    )
+    expected = "Address [id = 1, user_id = 1, street = Main St, city = Anytown]"
+    assert repr(address) == expected

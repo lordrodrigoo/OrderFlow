@@ -1,6 +1,7 @@
 from datetime import datetime
 from unittest.mock import Mock
 from src.domain.models.user import Users, UserRole
+from src.infra.db.entities.user import UserEntity
 
 
 
@@ -36,3 +37,20 @@ def test_from_entity():
     assert user.id == 1
     assert user.full_name == "Alice Johnson"
     assert user.role == UserRole.USER
+
+
+def test_repr():
+    user = UserEntity(
+        id=1,
+        first_name="Alice",
+        last_name="Johnson",
+        age=28,
+        phone="5555555555",
+        email="alice.johnson@example.com",
+        is_active=True,
+        role=UserRole.USER,
+        created_at=datetime.now(),
+        updated_at=datetime.now()
+    )
+    expected = "UserEntity(id=1, first_name='Alice', last_name='Johnson', email='alice.johnson@example.com')"
+    assert repr(user) == expected

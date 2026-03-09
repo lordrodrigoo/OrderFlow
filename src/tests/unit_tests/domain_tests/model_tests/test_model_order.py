@@ -3,7 +3,7 @@ from types import SimpleNamespace
 from datetime import datetime, timedelta
 import pytest
 from src.domain.models.order import Order, OrderStatus
-
+from src.infra.db.entities.order import OrderEntity
 
 
 @pytest.fixture
@@ -85,3 +85,14 @@ def test_is_paid_property(order_data):
     order_data["status"] = OrderStatus.PAID
     order = Order(**order_data)
     assert order.is_paid is True
+
+
+def test_repr():
+    order = OrderEntity(
+        id = 1,
+        user_id = 1,
+        total_amount = 150.0,
+        status = OrderStatus.PENDING
+    )
+    expected = "Order [id = 1, user_id = 1, total_amount = 150.0, status = OrderStatus.PENDING]"
+    assert repr(order) == expected

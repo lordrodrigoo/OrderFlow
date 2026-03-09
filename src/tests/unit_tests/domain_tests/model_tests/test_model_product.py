@@ -1,5 +1,5 @@
 from src.domain.models.product import Product
-
+from src.infra.db.entities.product import ProductEntity
 
 
 def test_create_product():
@@ -58,3 +58,20 @@ def test_from_entity():
     assert product.preparation_time == 20
     assert product.created_at is None
     assert product.updated_at is None
+
+
+def test_repr():
+    product = ProductEntity(
+        id=1,
+        name="cake",
+        description="A delicious cake",
+        category_id=1,
+        price=999.99,
+        is_available=True,
+        preparation_time=20,
+        image_url="http://example.com/cake.png",
+        created_at=None,
+        updated_at=None
+    )
+    expected = "Product [id = 1, name = cake, price = 999.99, category_id = 1]"
+    assert repr(product) == expected

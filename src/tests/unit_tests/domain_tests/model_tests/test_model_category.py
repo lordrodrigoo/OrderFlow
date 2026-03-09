@@ -1,5 +1,5 @@
 from src.domain.models.category import Category
-
+from src.infra.db.entities.category import CategoryEntity
 
 
 def test_create_category():
@@ -27,6 +27,5 @@ def test_from_entity():
 
 
 def test_repr():
-    category = Category(id=1, name="Desserts", description="Sweet treats to enjoy after meals")
-    expected_repr = "Category [id = 1, name = Desserts]"
-    assert repr(category) == expected_repr
+    category = CategoryEntity(id=1, name="Desserts")
+    assert repr(category) == "CategoryEntity [id = 1, name = Desserts]"

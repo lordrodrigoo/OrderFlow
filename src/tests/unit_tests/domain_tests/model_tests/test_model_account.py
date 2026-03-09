@@ -1,5 +1,5 @@
 from src.domain.models.account import Account, AccountStatus
-
+from src.infra.db.entities.account import AccountEntity
 
 def test_create_account():
     account = Account.create_account(
@@ -29,3 +29,17 @@ def test_is_active_property():
     )
     assert active_account.is_active is True
     assert inactive_account.is_active is False
+
+def test_repr():
+    account = AccountEntity(
+        id=1,
+        user_id=1,
+        username="testuser",
+        status=AccountStatus.ACTIVE
+    )
+    result = repr(account)
+    assert "AccountEntity" in result
+    assert "id=1" in result
+    assert "user_id=1" in result
+    assert "username='testuser'" in result
+    assert "status=AccountStatus.ACTIVE" in result
