@@ -14,9 +14,8 @@ class OrderUsecase:
         self.order_repository = order_repository
 
 
-    def create_order(self, user_id: int, order_request: OrderRequest) -> OrderResponse:
+    def create_order(self, order_request: OrderRequest) -> OrderResponse:
         order_entity = Order(
-            user_id=user_id,
             address_id=order_request.address_id,
             total_amount=order_request.total_amount,
             delivery_fee=order_request.delivery_fee,

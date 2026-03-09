@@ -76,6 +76,20 @@ class ProductUsecase:
         return ProductResponse(**product.__dict__)
 
 
+    def find_products_by_category(self, category_id: int) -> list[ProductResponse]:
+        if not self.category_repository.get_category_by_id(category_id):
+            raise ProductCategoryNotFoundException(category_id=category_id)
+
+        products = self.product_repository.find_products_by_category(category_id)
+        return [ProductResponse(**product.__dict__) for product in products]
+
+
+    def count_products_by_category(self, category_id: int) -> int:
+        if not self.category_repository.get_category_by_id(category_id):
+            raise ProductCategoryNotFoundException(category_id=category_id)
+
+        return self.product_repository.count_products_by_category(category_id)
+
 
     def list_products(
         self,
