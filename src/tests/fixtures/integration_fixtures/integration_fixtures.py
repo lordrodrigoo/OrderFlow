@@ -4,9 +4,12 @@
 from datetime import datetime
 from decimal import Decimal
 import pytest
+from fastapi.testclient import TestClient
 from testcontainers.postgres import PostgresContainer
+from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from src.main import app
+from src.api.dependencies import get_db
 from src.infra.db.settings.base import Base
 from src.infra.db.entities.user import UserEntity
 from src.infra.db.entities.account import AccountEntity
@@ -16,38 +19,37 @@ from src.infra.db.entities.product import ProductEntity
 from src.infra.db.entities.order import OrderEntity
 from src.infra.db.entities.order_item import OrderItemEntity
 from src.infra.db.entities.review import ReviewEntity
+from src.tests.helpers import FakeDBConnectionHandler
+
+
+@pytest.fixture
+def client(db_session):
+    fake_db = FakeDBConnectionHandler(db_session)
+    app.dependency_overrides[get_db] = lambda: fake_db
+    with TestClient(app) as test_client:
+        yield test_client
+    app.dependency_overrides.clear()
+
+
+
+@pytest.fixture(scope="session")
+def db_engine():
+    with PostgresContainer("postgres:16") as postgres:
+        engine = create_engine(postgres.get_connection_url())
+        Base.metadata.create_all(engine)
+        yield engine
+        Base.metadata.drop_all(engine)
 
 
 
 @pytest.fixture(scope="function")
-def db_session():
-    with PostgresContainer("postgres:16") as postgres:
-        engine = create_engine(postgres.get_connection_url())
-        Base.metadata.create_all(engine)
-        session_instance = sessionmaker(bind=engine)
-        session = session_instance()
-        yield session
-        session.close()
-        Base.metadata.drop_all(engine)
-        engine.dispose()
+def db_session(db_engine):
+    with db_engine.connect() as connection:
+        with connection.begin() as transaction:
+            session = Session(connection)
+            yield session
+            transaction.rollback()
 
-
-@pytest.fixture
-def fake_user(db_session):
-    user = UserEntity(
-        first_name="Ana",
-        last_name="Silva",
-        age=28,
-        email="ana.silva@example.com",
-        phone="123456789",
-        is_active=True,
-        role="user",
-        created_at=datetime.now(),
-        updated_at=None
-    )
-    db_session.add(user)
-    db_session.commit()
-    return user
 
 
 @pytest.fixture

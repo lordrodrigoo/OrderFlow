@@ -21,7 +21,7 @@ class ProductUsecase:
 
     def create_product(self, product_request: ProductRequest) -> ProductResponse:
         if self.product_repository.find_products_by_name(product_request.name):
-            raise ProductAlreadyExistsException(name=product_request.name)
+            raise ProductAlreadyExistsException(product_name=product_request.name)
 
         if not self.category_repository.get_category_by_id(product_request.category_id):
             raise ProductCategoryNotFoundException(category_id=product_request.category_id)
@@ -53,7 +53,7 @@ class ProductUsecase:
 
         existing = self.product_repository.find_product_by_id(product_id)
         if existing and existing.id != product_id and existing.name == product_request.name:
-            raise ProductAlreadyExistsException(name=product_request.name)
+            raise ProductAlreadyExistsException(product_name=product_request.name)
 
         product_entity = Product (
             id=product_id,

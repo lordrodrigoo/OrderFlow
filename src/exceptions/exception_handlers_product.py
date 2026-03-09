@@ -55,6 +55,6 @@ class InvalidPriceProductException(Exception):
 
 async def invalid_price_product_exception_handler(request: Request, exc: InvalidPriceProductException):
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
         content={"message": exc.message}
     )

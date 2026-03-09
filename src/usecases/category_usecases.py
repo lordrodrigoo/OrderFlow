@@ -15,7 +15,7 @@ class CategoryUsecase:
 
     def create_category(self, category_request: CategoryRequest) -> CategoryResponse:
         if self.category_repository.find_category_by_name(category_request.name):
-            raise CategoryAlreadyExistsException(name=category_request.name)
+            raise CategoryAlreadyExistsException(category_name=category_request.name)
 
         category_entity = Category (
             name=category_request.name,
@@ -36,7 +36,7 @@ class CategoryUsecase:
 
         existing = self.category_repository.get_category_by_id(category_id)
         if existing and existing.id != category_id and existing.name == category_request.name:
-            raise CategoryAlreadyExistsException(name=category_request.name)
+            raise CategoryAlreadyExistsException(category_name=category_request.name)
 
 
         category_entity = Category (

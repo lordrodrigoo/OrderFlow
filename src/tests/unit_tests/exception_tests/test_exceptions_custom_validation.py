@@ -12,7 +12,7 @@ async def test_pydantic_validation_handler():
     exc = MagicMock(spec=RequestValidationError)
     exc.errors.return_value = [{"msg": "Value error, invalid field"}]
     response = await pydantic_validation_handler(request, exc)
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
 
 @pytest.mark.asyncio
