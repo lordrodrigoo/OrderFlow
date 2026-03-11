@@ -2,6 +2,7 @@
 #pylint: disable=unused-argument
 #pylint: disable=unused-import
 from datetime import datetime
+from decimal import Decimal
 import pytest
 from src.infra.db.entities.order import OrderEntity
 
@@ -9,7 +10,7 @@ from src.infra.db.entities.order import OrderEntity
 def test_create_order(db_session, fake_order):
     assert fake_order.id is not None
     assert fake_order.user_id == fake_order.user_id
-    assert fake_order.total_amount == 150.75
+    assert fake_order.total_amount == Decimal('150.75')
     assert fake_order.status == "pending"
 
 
@@ -37,18 +38,18 @@ def test_relationship_between_user_and_order(db_session, fake_user, fake_order):
     assert order.user.email == fake_order.user.email
 
 
-def test_order_without_user_should_fail(db_session):
-    """This test checks that creating an order without a valid user_id fails.
-    I will to create an order with a non-existent user_id and expect an exception.
-    """
-    invalid_order = OrderEntity(
-        user_id = 99999,  # assuming this user_id does not exist
-        total_amount = 200.00,
-        status = "pending",
-        created_at = datetime.now(),
-        updated_at = None
+def test_order_without_user_should_fail(db_session, fake_address):
+    order = OrderEntity(
+        user_id=None,
+        address_id=fake_address.id,
+        total_amount=Decimal('100.00'),
+        delivery_fee=Decimal('10.00'),
+        status="pending",
+        notes="No user",
+        scheduled_date=datetime.now(),
+        created_at=datetime.now(),
+        updated_at=None
     )
-    db_session.add(invalid_order)
+    db_session.add(order)
     with pytest.raises(Exception):
         db_session.commit()
-    db_session.rollback()

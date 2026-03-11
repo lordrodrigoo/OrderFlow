@@ -34,12 +34,6 @@ def test_find_all_users(db_session, fake_user):
     assert len(users) >= 1
 
 def test_uniq_email(db_session, fake_user):
-    # In this test, I used fake_user to don't need to create another user
-    """I insert a user with an email that already exists to test the unique constraint.
-       try to commit and wait that db raise an exception (IntegrityError).
-       pytest.raises(Exception) is used to check if the exception is raised.
-       after that, I rollback the session to clean the state.
-    """
     another_user = UserEntity(
         first_name="Carlos",
         last_name="Pereira",
@@ -54,7 +48,6 @@ def test_uniq_email(db_session, fake_user):
     db_session.add(another_user)
     with pytest.raises(Exception):
         db_session.commit()
-    db_session.rollback()
 
 def test_inactive_user(db_session, fake_user):
     fake_user.is_active = False

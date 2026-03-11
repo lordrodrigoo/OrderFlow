@@ -49,18 +49,22 @@ def valid_address_data():
 def fake_address_repository_mock():
     repository_mock = MagicMock()
     repository_mock.find_addresses_by_user_street_number.return_value = None
-    repository_mock.create_address.return_value = MagicMock(
-        id=1,
-        user_id=1,
-        street="Rua Exemplo",
-        number="123A",
-        neighborhood="Bairro Exemplo",
-        city="Cidade Exemplo",
-        state="SP",
-        zip_code="12345-678",
-        is_default=True,
-        complement="Apto 45",
-        created_at=datetime.now()
-    )
+
+    def create_address_side_effect(address):
+        # Retorna um mock com os mesmos dados do address recebido
+        return MagicMock(
+            id=1,
+            user_id=address.user_id,
+            street=address.street,
+            number=address.number,
+            neighborhood=address.neighborhood,
+            city=address.city,
+            state=address.state,
+            zip_code=address.zip_code,
+            is_default=address.is_default,
+            complement=address.complement,
+            created_at=datetime.now()
+        )
+    repository_mock.create_address.side_effect = create_address_side_effect
     repository_mock.find_address_by_id.return_value = None
     return repository_mock

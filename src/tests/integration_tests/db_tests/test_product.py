@@ -43,46 +43,38 @@ def test_find_all_products(db_session, fake_product):
     assert len(products) >= 1
 
 
-def test_product_without_category_should_fail(db_session):
-    """This test checks that creating a product without a valid category_id fails.
-    I will to create a product with a non-existent category_id and expect an exception.
-    """
-    invalid_product = ProductEntity(
-        name = "Invalid Product",
-        description = "This product has an invalid category",
-        price = Decimal('9.99'),
-        image_url = "http://example.com/invalid_image.png",
-        is_available = True,
-        preparation_time = 10,
-        created_at = datetime.now(),
-        updated_at = None,
-        category_id = 9999  # assuming this ID does not exist
+def test_product_without_category_should_fail(db_session, fake_product):
+    product = ProductEntity(
+        name="No Category Product",
+        description="No category",
+        price=Decimal('19.99'),
+        image_url="http://example.com/no_category.png",
+        is_available=True,
+        preparation_time=10,
+        created_at=datetime.now(),
+        updated_at=None,
+        category_id=None
     )
-    db_session.add(invalid_product)
+    db_session.add(product)
     with pytest.raises(Exception):
         db_session.commit()
-    db_session.rollback()
 
 
 def test_unique_name(db_session, fake_category, fake_product):
-    """This test checks that the name field in ProductEntity is unique.
-    I will create two products with the same name and expect an exception on the second insert.
-    """
     duplicate_product = ProductEntity(
-        name = "Test Product",  # same name as fake_product
-        description = "This is a duplicate test product",
-        price = Decimal('29.99'),
-        image_url = "http://example.com/duplicate_image.png",
-        is_available = True,
-        preparation_time = 20,
-        created_at = datetime.now(),
-        updated_at = None,
-        category_id = fake_category.id
+        name="Test Product",  # same name as fake_product
+        description="This is a duplicate test product",
+        price=Decimal('29.99'),
+        image_url="http://example.com/duplicate_image.png",
+        is_available=True,
+        preparation_time=20,
+        created_at=datetime.now(),
+        updated_at=None,
+        category_id=fake_category.id
     )
     db_session.add(duplicate_product)
     with pytest.raises(Exception):
         db_session.commit()
-    db_session.rollback()
 
 
 def test_relationship_between_product_and_order_items(db_session, fake_product):

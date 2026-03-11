@@ -28,3 +28,26 @@ def user_repository_mock():
 @pytest.fixture
 def usecase(user_repository_mock, account_repository_mock):
     return UserUsecase(user_repository_mock, account_repository_mock)
+
+
+@pytest.fixture
+def fake_user():
+    user_mock = MagicMock()
+    user_mock.id = 1
+    user_mock.first_name = "Rodrigo"
+    user_mock.last_name = "Souza"
+    user_mock.age = 30
+    user_mock.phone = "11999999999"
+    user_mock.email = "rodrigo.souza@example.com"
+    user_mock.is_active = True
+    user_mock.role = "user"
+    user_mock.created_at = datetime.now()
+    return user_mock
+
+
+@pytest.fixture
+def fake_admin_user():
+    admin_mock = MagicMock()
+    admin_mock.id = 2
+    admin_mock.role = "admin"
+    return admin_mock

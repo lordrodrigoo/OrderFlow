@@ -26,22 +26,21 @@ def test_relationship_between_user_and_account(db_session, fake_user, fake_accou
     assert account.user.email == fake_account.user.email
 
 
-def test_account_username_is_unique(db_session, fake_user, fake_account):
+def test_account_username_is_unique(db_session, fake_account):
     """This test checks if the username field in AccountEntity is unique.
     I'm using fake_user to create a duplicate account with the same username.
     """
-    duplicate_account = AccountEntity(
-        user_id=fake_user.id,
-        username="ana_silva",  # same username as fake_account
-        password_hash="another_hashed_password",
+    another_account = AccountEntity(
+        user_id=2,
+        username=fake_account.username,  # Duplicate username
+        password_hash="hash2",
         status="active",
         created_at=datetime.now(),
         updated_at=None
     )
-    db_session.add(duplicate_account)
+    db_session.add(another_account)
     with pytest.raises(Exception):
         db_session.commit()
-    db_session.rollback()
 
 
 def test_delete_account(db_session, fake_account):

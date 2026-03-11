@@ -38,39 +38,32 @@ def test_delete_order_item(db_session, fake_order_item):
     assert deleted_order_item is None
 
 
-def test_order_item_without_order_or_product_should_fail(db_session, fake_product, fake_order):
-    """This test checks that creating an order item without a valid order_id or product_id fails.
-    I will try to create order items with non-existent order_id and product_id and expect exceptions.
-    """
-
-    # without order_id
+def test_order_item_without_order_id_should_fail(db_session, fake_product):
     item_no_order = OrderItemEntity(
-        order_id = None,
-        product_id = fake_product.id,
-        quantity = 1,
-        unit_price = Decimal('10.00'),
-        subtotal = Decimal('10.00'),
-        notes = "No order"
+        order_id=None,
+        product_id=fake_product.id,
+        quantity=1,
+        unit_price=Decimal('10.00'),
+        subtotal=Decimal('10.00'),
+        notes="No order"
     )
     db_session.add(item_no_order)
     with pytest.raises(Exception):
         db_session.commit()
     db_session.rollback()
 
-    # without product_id
+def test_order_item_without_product_id_should_fail(db_session, fake_order):
     item_no_product = OrderItemEntity(
-        order_id = fake_order.id,
-        product_id = None,
-        quantity = 1,
-        unit_price = Decimal('10.00'),
-        subtotal = Decimal('10.00'),
-        notes = "No product"
+        order_id=fake_order.id,
+        product_id=None,
+        quantity=1,
+        unit_price=Decimal('10.00'),
+        subtotal=Decimal('10.00'),
+        notes="No product"
     )
     db_session.add(item_no_product)
     with pytest.raises(Exception):
         db_session.commit()
-    db_session.rollback()
-
 
 def test_find_order_itens_by_order(db_session, fake_order, fake_order_item):
     order_items = db_session.query(OrderItemEntity).filter_by(order_id=fake_order.id).all()

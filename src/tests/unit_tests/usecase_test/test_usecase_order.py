@@ -19,7 +19,7 @@ def test_create_order(
         valid_order_data
     ):
     request = OrderRequest(**valid_order_data)
-    response = order_usecase.create_order(valid_order_data["user_id"], request)
+    response = order_usecase.create_order(request)
 
     assert isinstance(response, OrderResponse)
     assert response.user_id == valid_order_data["user_id"]

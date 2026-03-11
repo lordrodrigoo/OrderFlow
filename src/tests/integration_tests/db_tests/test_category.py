@@ -19,13 +19,12 @@ def test_update_category(db_session, fake_category):
 
 def test_unique_name(db_session, fake_category):
     duplicate_category = CategoryEntity(
-        name="Sample Category",  # same name as fake_category
-        description="Another category with the same name.",
+        name=fake_category.name,  # Duplicate name
+        description="Another category",
     )
     db_session.add(duplicate_category)
     with pytest.raises(Exception):
         db_session.commit()
-    db_session.rollback()
 
 
 def test_delete_category(db_session, fake_category):
