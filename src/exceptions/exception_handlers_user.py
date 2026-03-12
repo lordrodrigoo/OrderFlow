@@ -20,9 +20,11 @@ async def email_exception_handler(request: Request, exc: EmailAlreadyExistsExcep
 
 
 class UserNotFoundException(Exception):
-    def __init__(self, user_id: int):
-        self.user_id = user_id
-        self.message = f"User with ID: '{user_id}' not found."
+    def __init__(self, user_id: int = None, email: str = None):
+        if email:
+            self.message = f"User with email '{email}' not found."
+        else:
+            self.message = f"User with ID '{user_id}' not found."
         super().__init__(self.message)
 
 

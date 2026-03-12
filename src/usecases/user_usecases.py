@@ -4,6 +4,7 @@ from src.dto.response.user_response import UserResponse
 from src.domain.repositories.user_repository import UserRepositoryInterface
 from src.domain.repositories.account_repository import AccountRepositoryInterface
 from src.domain.models.account import Account, AccountStatus
+from src.config.security import hash_password
 
 from src.exceptions.exception_handlers_user import (
     EmailAlreadyExistsException,
@@ -56,7 +57,7 @@ class UserUsecase:
         account_entity = Account(
             user_id=created_user.id,
             username=user_request.username,
-            password_hash=Account.hash_password(user_request.password),
+            password_hash=hash_password(user_request.password),
             status=AccountStatus.ACTIVE
         )
         self.account_repository.create_account(account_entity)
@@ -67,6 +68,13 @@ class UserUsecase:
         user = self.user_repository.find_user_by_id(user_id)
         if not user:
             raise UserNotFoundException(user_id=user_id)
+        return UserResponse(**user.__dict__)
+
+
+    def get_user_by_email(self, email: str) -> UserResponse:
+        user = self.user_repository.find_by_email(email)
+        if not user:
+            raise UserNotFoundException(email=email)
         return UserResponse(**user.__dict__)
 
 
@@ -102,7 +110,7 @@ class UserUsecase:
             self,
             user_id: int,
             user_request: UserRequest,
-            current_user: None
+            current_user: UserResponse
     ) -> UserResponse:
 
         if current_user.id != user_id and current_user.role != UserRole.ADMIN:
