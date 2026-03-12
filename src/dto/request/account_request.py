@@ -8,6 +8,7 @@ USERNAME_PATTERN = re.compile(r'^[A-Za-zÀ-ÿ0-9._]+$')
 
 
 class AccountRequest(BaseModel):
+    user_id: int = Field(..., gt=0)
     username: str = Field(..., min_length=3, max_length=50, description="Username ex: 'john_doe'")
     password: str = Field(..., min_length=8, description="Password ex: 'P@ssw0rd'")
 

@@ -79,3 +79,20 @@ class AddressRepository(AddressRepositoryInterface, BaseRepository[AddressEntity
             self.model.number == number
         ).all()
         return [Address.from_entity(address) for address in entities]
+
+
+    def set_default_address(self, address_id: int, user_id: int) -> Optional[Address]:
+        # First, unset the current default address for the user
+        self.session.query(self.model).filter(
+            self.model.user_id == user_id,
+            self.model.is_default is True
+        ).update({self.model.is_default: False})
+
+        # After that, set the specified address as default
+        entity = self.get_by_id(address_id)
+        if entity and entity.user_id == user_id:
+            entity.is_default = True
+            self.save()
+            return Address.from_entity(entity)
+
+        return None

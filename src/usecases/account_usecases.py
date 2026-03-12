@@ -139,6 +139,15 @@ class AccountUsecase:
         return AccountResponse(**updated.__dict__)
 
 
+    def inactivate_account(self, account_id: int) -> AccountResponse:
+        account = self.account_repository.find_account_by_id(account_id)
+        if not account:
+            raise AccountNotFoundException(account_id=account_id)
+
+        updated = self.account_repository.update_status(account_id, AccountStatus.INACTIVE)
+        return AccountResponse(**updated.__dict__)
+
+
     def activate_account(self, account_id: int) -> AccountResponse:
         account = self.account_repository.find_account_by_id(account_id)
         if not account:

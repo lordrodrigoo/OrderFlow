@@ -93,3 +93,10 @@ class AddressUsecase:
         if not self.address_repository.find_address_by_id(address_id):
             raise AddressNotFoundException(address_id=address_id)
         return self.address_repository.delete_address(address_id)
+
+
+    def set_default_address(self, address_id: int, user_id: int) -> AddressResponse:
+        address = self.address_repository.set_default_address(address_id, user_id)
+        if not address:
+            raise AddressNotFoundException(address_id=address_id)
+        return AddressResponse(**address.__dict__)

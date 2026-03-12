@@ -31,3 +31,6 @@ class AddressRepositoryInterface(ABC):
 
     @abstractmethod
     def delete_address(self, address_id: int) -> bool: pass
+
+    @abstractmethod
+    def set_default_address(self, address_id: int, user_id: int) -> Optional[Address]: pass

@@ -2,9 +2,11 @@ import os
 from typing import List
 from dotenv import load_dotenv
 from fastapi import APIRouter, Response, status, Depends
-from src.api.dependencies import get_address_usecase
+from src.api.dependencies import get_address_usecase, get_current_user
+from src.dto.response.user_response import UserResponse
 from src.dto.request.address_request import AddressRequest
 from src.dto.response.address_response import AddressResponse
+from src.usecases.address_usecase import AddressUsecase
 
 
 load_dotenv()
@@ -19,9 +21,11 @@ router = APIRouter(prefix=API_PREFIX, tags=[TAG])
 def create_address(
     address_request: AddressRequest,
     response: Response,
-    address_usecase = Depends(get_address_usecase)
+    address_usecase: AddressUsecase = Depends(get_address_usecase),
+    current_user: UserResponse = Depends(get_current_user)
 ):
-    """Endpoint to create a new address."""
+    """Endpoint to create a new address (apenas para o usuário autenticado)."""
+    address_request.user_id = current_user.id
     address = address_usecase.create_address(address_request)
     response.headers['Location'] = f"{API_PREFIX}/{address.id}"
     return address
@@ -31,7 +35,7 @@ def create_address(
 def find_address_by_id(
     address_id: int,
     response: Response,
-    address_usecase = Depends(get_address_usecase)
+    address_usecase: AddressUsecase = Depends(get_address_usecase)
 ):
     """Endpoint to get an address by address_id."""
     address = address_usecase.find_address_by_id(address_id)
@@ -41,7 +45,7 @@ def find_address_by_id(
 
 @router.get("/", response_model=List[AddressResponse], status_code=status.HTTP_200_OK)
 def find_all_addresses(
-    address_usecase = Depends(get_address_usecase)) -> List[AddressResponse]:
+    address_usecase: AddressUsecase = Depends(get_address_usecase)) -> List[AddressResponse]:
     """Endpoint to list all addresses."""
     addresses = address_usecase.find_all_addresses()
     return addresses
@@ -55,7 +59,7 @@ def find_all_addresses(
 def update_address(
     address_id: int,
     address_request: AddressRequest,
-    address_usecase = Depends(get_address_usecase)
+    address_usecase: AddressUsecase = Depends(get_address_usecase)
 ):
     """Endpoint to update an existing address."""
     updated_address = address_usecase.update_address(
@@ -69,7 +73,7 @@ def update_address(
 @router.delete("/{address_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_address(
     address_id: int,
-    address_usecase = Depends(get_address_usecase)):
+    address_usecase: AddressUsecase = Depends(get_address_usecase)):
 
     """Endpoint to delete an address."""
     address_usecase.delete_address(address_id)
@@ -79,7 +83,7 @@ def delete_address(
 @router.get("/user/{user_id}", response_model=List[AddressResponse], status_code=status.HTTP_200_OK)
 def find_addresses_by_user_id(
     user_id: int,
-    address_usecase = Depends(get_address_usecase)
+    address_usecase: AddressUsecase = Depends(get_address_usecase)
 )-> List[AddressResponse]:
 
     """Endpoint to get addresses by user_id."""

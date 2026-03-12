@@ -15,11 +15,11 @@ class AccountStatus(Enum):
 @dataclass
 class Account:
     """Entity of domain - it represents an account in the system."""
-    user_id: int
     username: str
     password_hash: str
     status: AccountStatus
     id: Optional[int] = None
+    user_id: Optional[int] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
@@ -30,10 +30,10 @@ class Account:
 
     @staticmethod
     def create_account(
-        user_id: int,
-        username: str,
-        password_hash: str,
-        status: AccountStatus,
+        user_id: Optional[int] = None,
+        username: str = "",
+        password_hash: str = "",
+        status: AccountStatus = AccountStatus.ACTIVE,
         id: Optional[int] = None,
     ) -> 'Account':
         """Factory method to create a new account instance."""
