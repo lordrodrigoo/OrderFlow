@@ -8,7 +8,7 @@ from src.infra.db.repositories.base_repository import BaseRepository
 
 class UserRepository(UserRepositoryInterface, BaseRepository[UserEntity]):
     def __init__(self, db_connection: DBConnectionHandler):
-        super().__init__(db_connection.get_session(), UserEntity)
+        super().__init__(db_connection.session, UserEntity)
 
     def create_user(self, user: Users) -> Users:
         entity = UserEntity(
@@ -18,7 +18,7 @@ class UserRepository(UserRepositoryInterface, BaseRepository[UserEntity]):
             email=user.email,
             phone=user.phone,
             is_active=user.is_active,
-            role=user.role,
+            role=user.role.value,
             created_at=user.created_at,
             updated_at=user.updated_at
         )

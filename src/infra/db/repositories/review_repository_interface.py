@@ -8,7 +8,7 @@ from src.infra.db.repositories.base_repository import BaseRepository
 
 class ReviewRepository(ReviewRepositoryInterface, BaseRepository[ReviewEntity]):
     def __init__(self, db_connection: DBConnectionHandler):
-        super().__init__(db_connection.get_session(), ReviewEntity)
+        super().__init__(db_connection.session, ReviewEntity)
 
     def create_review(self, review: Review) -> Review:
         entity = ReviewEntity(

@@ -1,13 +1,12 @@
 import os
 from typing import List, Optional
-from dotenv import load_dotenv
 from fastapi import APIRouter, Response, Query, status, Depends
 from src.usecases.order_usecases import OrderUsecase
 from src.dto.request.order_request import OrderRequest
 from src.dto.response.order_response import OrderResponse
 from src.api.dependencies import get_order_usecase
 
-load_dotenv()
+
 API_PREFIX = os.getenv("API_V1_ORDER")
 TAG = os.getenv("TAG_ORDER")
 

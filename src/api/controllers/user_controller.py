@@ -1,6 +1,5 @@
 import os
 from typing import List, Optional
-from dotenv import load_dotenv
 from fastapi import APIRouter, Response, Query, status, Depends
 from src.usecases.address_usecase import AddressUsecase
 from src.usecases.user_usecases import UserUsecase
@@ -12,7 +11,7 @@ from src.dto.response.user_response import UserResponse
 from src.api.dependencies import get_user_usecase, get_current_user
 
 
-load_dotenv()
+
 API_PREFIX = os.getenv("API_V1_USER")
 TAG = os.getenv("TAG_USER")
 

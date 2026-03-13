@@ -1,6 +1,5 @@
 import os
 from typing import List, Optional
-from dotenv import load_dotenv
 from fastapi import APIRouter, Response, Query, status, Depends
 from src.usecases.review_usecases import ReviewUsecase
 from src.dto.request.review_request import ReviewRequest
@@ -8,7 +7,7 @@ from src.dto.response.review_response import ReviewResponse
 from src.api.dependencies import get_review_usecase
 
 
-load_dotenv()
+
 API_PREFIX = os.getenv("API_V1_REVIEW")
 TAG = os.getenv("TAG_REVIEW")
 

@@ -8,7 +8,7 @@ from src.infra.db.repositories.base_repository import BaseRepository
 
 class ProductRepository(ProductRepositoryInterface, BaseRepository[ProductEntity]):
     def __init__(self, db_connection: DBConnectionHandler):
-        super().__init__(db_connection.get_session(), ProductEntity)
+        super().__init__(db_connection.session, ProductEntity)
 
     def create_product(self, product: Product) -> Product:
         entity = ProductEntity(

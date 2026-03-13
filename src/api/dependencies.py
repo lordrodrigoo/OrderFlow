@@ -20,7 +20,8 @@ from src.infra.db.repositories.order_item_repository_interface import OrderItemR
 from src.infra.db.repositories.review_repository_interface import ReviewRepository
 
 from src.config.oauth2 import oauth2_scheme
-from src.config.security import verify_token, TokenPayload
+from src.config.security import verify_token
+from src.dto.response.token_response import TokenPayload
 from src.dto.response.user_response import UserResponse
 
 

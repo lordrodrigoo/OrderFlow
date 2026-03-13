@@ -9,7 +9,7 @@ from src.infra.db.repositories.base_repository import BaseRepository
 
 class AccountRepository(AccountRepositoryInterface, BaseRepository[AccountEntity]):
     def __init__(self, db_connection: DBConnectionHandler):
-        super().__init__(db_connection.get_session(), AccountEntity)
+        super().__init__(db_connection.session, AccountEntity)
 
     def create_account(self, account: Account) -> Account:
         now = datetime.now()

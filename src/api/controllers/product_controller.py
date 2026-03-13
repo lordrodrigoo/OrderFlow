@@ -1,6 +1,5 @@
 import os
 from typing import List, Optional
-from dotenv import load_dotenv
 from fastapi import APIRouter, Response, Query, status, Depends
 from src.usecases.product_usecases import ProductUsecase
 from src.dto.request.product_request import ProductRequest
@@ -8,7 +7,6 @@ from src.dto.response.product_response import ProductResponse
 from src.api.dependencies import get_product_usecase
 
 
-load_dotenv()
 API_PREFIX = os.getenv("API_V1_PRODUCT")
 TAG = os.getenv("TAG_PRODUCT")
 

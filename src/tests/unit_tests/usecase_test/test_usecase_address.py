@@ -118,18 +118,23 @@ def test_update_address_not_found(address_usecase, fake_address_repository_mock,
         address_usecase.update_address(999, request, fake_user)
 
 
-def test_delete_address_not_found(address_usecase, fake_address_repository_mock):
+def test_delete_address_not_found(
+        address_usecase,
+        fake_address_repository_mock,
+        fake_user
+    ):
     fake_address_repository_mock.find_address_by_id.return_value = None
     with pytest.raises(AddressNotFoundException):
-        address_usecase.delete_address(999)
+        address_usecase.delete_address(999, fake_user)
 
 
 def test_delete_address(
         address_usecase,
         fake_address_repository_mock,
-        fake_address_response_mock
+        fake_address_response_mock,
+        fake_user
     ):
     fake_address_repository_mock.find_address_by_id.return_value = fake_address_response_mock
     fake_address_repository_mock.delete_address.return_value = True
-    result = address_usecase.delete_address(1)
+    result = address_usecase.delete_address(1, fake_user)
     assert result is True

@@ -30,12 +30,9 @@ class UserUsecase:
         if self.user_repository.find_by_email(user_request.email):
             raise EmailAlreadyExistsException(email=user_request.email)
 
+        if self.account_repository.find_by_username(user_request.username):
+            raise UsernameAlreadyExistsException(username=user_request.username)
 
-        role = getattr(user_request, "role", UserRole.USER)
-        if isinstance(role, UserRole):
-            role_value = role.value
-        else:
-            role_value = str(role)
 
         user_entity = Users(
             first_name=user_request.first_name,
@@ -44,14 +41,9 @@ class UserUsecase:
             phone=user_request.phone,
             email=user_request.email,
             is_active=True,
-            role=role_value
+            role=user_request.role
         )
         created_user = self.user_repository.create_user(user_entity)
-
-        # Validations to account creation
-        if self.account_repository.find_by_username(user_request.username):
-            raise UsernameAlreadyExistsException(username=user_request.username)
-
 
         # Creating account vinculated to user
         account_entity = Account(
@@ -125,12 +117,7 @@ class UserUsecase:
         user.age = user_request.age
         user.phone = user_request.phone
         user.email = user_request.email
-        user.is_active = getattr(user_request, "is_active", user.is_active)
-
-        role = getattr(user_request, "role", user.role)
-        if isinstance(role, str):
-            role = UserRole(role)
-        user.role = role
+        user.role = user_request.role
 
         updated_user = self.user_repository.update_user(user)
         return UserResponse(**updated_user.__dict__)

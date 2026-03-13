@@ -9,7 +9,7 @@ from src.infra.db.repositories.base_repository import BaseRepository
 
 class CategoryRepository(CategoryRepositoryInterface, BaseRepository[CategoryEntity]):
     def __init__(self, db_connection: DBConnectionHandler):
-        super().__init__(db_connection.get_session(), CategoryEntity)
+        super().__init__(db_connection.session, CategoryEntity)
 
     def get_all_categories(self) -> List[Category]:
         return [Category.from_entity(entity) for entity in self.get_all()]

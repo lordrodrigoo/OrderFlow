@@ -1,6 +1,5 @@
 import os
 from typing import List
-from dotenv import load_dotenv
 from fastapi import APIRouter, Response, status, Depends
 from src.usecases.category_usecases import CategoryUsecase
 from src.dto.request.category_request import CategoryRequest
@@ -9,7 +8,6 @@ from src.api.dependencies import get_category_usecase
 
 
 
-load_dotenv()
 API_PREFIX = os.getenv("API_V1_CATEGORY")
 TAG = os.getenv("TAG_CATEGORY")
 

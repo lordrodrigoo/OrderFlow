@@ -22,9 +22,7 @@ class BaseRepository(Generic[T]):
         self.session.delete(entity)
 
     def save(self) -> None:
-        # In a real application, session management is often handled at a higher level (e.g., in a service layer or via context manager)
-        # to ensure all operations within a request/unit of work are in the same transaction
-        self.session.commit()
+        self.session.flush()
 
     def delete_by_id(self, entity_id: int) -> bool:
         entity = self.get_by_id(entity_id)

@@ -58,7 +58,7 @@ class AccountUsecase:
         token = create_access_token({
             "sub": str(user.email),
             "user_id": str(user.id),
-            "role": user.role
+            "role": user.role.value
         })
         return TokenResponse(access_token=token, token_type="bearer")
 

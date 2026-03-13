@@ -37,10 +37,13 @@ def db_engine():
 @pytest.fixture(scope="function")
 def db_session(db_engine):
     with db_engine.connect() as connection:
-        with connection.begin() as transaction:
-            session = Session(connection)
+        transaction = connection.begin()
+        session = Session(connection)
+        try:
             yield session
-            transaction.rollback()
+        finally:
+            if transaction.is_active:
+                transaction.rollback()
 
 
 @pytest.fixture

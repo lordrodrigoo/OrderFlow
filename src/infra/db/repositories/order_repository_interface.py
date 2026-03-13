@@ -9,7 +9,7 @@ from src.infra.db.repositories.base_repository import BaseRepository
 
 class OrderRepository(OrderRepositoryInterface, BaseRepository[OrderEntity]):
     def __init__(self, db_connection: DBConnectionHandler):
-        super().__init__(db_connection.get_session(), OrderEntity)
+        super().__init__(db_connection.session, OrderEntity)
 
     def create_order(self, order: Order) -> Order:
         entity = OrderEntity(

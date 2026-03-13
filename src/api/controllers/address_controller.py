@@ -1,6 +1,5 @@
 import os
 from typing import List
-from dotenv import load_dotenv
 from fastapi import APIRouter, Response, status, Depends
 from src.api.dependencies import get_address_usecase, get_current_user
 from src.dto.response.user_response import UserResponse
@@ -9,7 +8,7 @@ from src.dto.response.address_response import AddressResponse
 from src.usecases.address_usecase import AddressUsecase
 
 
-load_dotenv()
+
 API_PREFIX = os.getenv("API_V1_ADDRESS")
 TAG = os.getenv("TAG_ADDRESS")
 router = APIRouter(prefix=API_PREFIX, tags=[TAG])
@@ -59,12 +58,14 @@ def find_all_addresses(
 def update_address(
     address_id: int,
     address_request: AddressRequest,
-    address_usecase: AddressUsecase = Depends(get_address_usecase)
+    address_usecase: AddressUsecase = Depends(get_address_usecase),
+    current_user: UserResponse = Depends(get_current_user)
 ):
     """Endpoint to update an existing address."""
     updated_address = address_usecase.update_address(
         address_id,
-        address_request
+        address_request,
+        current_user
     )
     return updated_address
 
@@ -73,10 +74,11 @@ def update_address(
 @router.delete("/{address_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_address(
     address_id: int,
-    address_usecase: AddressUsecase = Depends(get_address_usecase)):
-
+    address_usecase: AddressUsecase = Depends(get_address_usecase),
+    current_user: UserResponse = Depends(get_current_user)
+):
     """Endpoint to delete an address."""
-    address_usecase.delete_address(address_id)
+    address_usecase.delete_address(address_id, current_user)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 

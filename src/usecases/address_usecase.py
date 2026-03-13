@@ -89,9 +89,13 @@ class AddressUsecase:
         return [AddressResponse(**address.__dict__) for address in addresses]
 
 
-    def delete_address(self, address_id: int) -> bool:
-        if not self.address_repository.find_address_by_id(address_id):
+    def delete_address(self, address_id: int, current_user: Users) -> bool:
+        address = self.address_repository.find_address_by_id(address_id)
+        if not address:
             raise AddressNotFoundException(address_id=address_id)
+
+        if address.user_id != current_user.id:
+            raise AddressPermissionDeniedException(address_id=address_id)
         return self.address_repository.delete_address(address_id)
 
 
