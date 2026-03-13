@@ -1,6 +1,7 @@
 from fastapi import Depends
 
 from src.infra.db.settings.connection import DBConnectionHandler
+from src.usecases.auth_usecases import AuthUseCases
 from src.usecases.user_usecases import UserUsecase
 from src.usecases.account_usecases import AccountUsecase
 from src.usecases.address_usecase import AddressUsecase
@@ -84,3 +85,9 @@ def get_current_user(
 ) -> UserResponse:
     token_data: TokenPayload = verify_token(token)
     return user_usecase.get_user_by_email(token_data.sub)
+
+
+def get_auth_usecase(db=Depends(get_db)):
+    account_repository = AccountRepository(db)
+    user_repository = UserRepository(db)
+    return AuthUseCases(account_repository, user_repository)

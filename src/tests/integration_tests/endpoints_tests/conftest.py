@@ -7,3 +7,4 @@ from src.tests.fixtures.integration_fixtures.product_fixtures import *
 from src.tests.fixtures.integration_fixtures.order_fixtures import *
 from src.tests.fixtures.integration_fixtures.order_item_fixtures import *
 from src.tests.fixtures.integration_fixtures.account_fixtures import *
+from src.tests.fixtures.integration_fixtures.authorization_fixtures import *

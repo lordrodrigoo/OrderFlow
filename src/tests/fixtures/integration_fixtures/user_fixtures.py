@@ -4,6 +4,13 @@ from src.infra.db.entities.user import UserEntity
 
 
 @pytest.fixture
+def user_login_data(fake_account):
+    return {
+        "username": fake_account.username,
+        "password": "StrongPassword123!"
+    }
+
+@pytest.fixture
 def valid_user_data():
     return {
         "first_name": "Rodrigo",

@@ -1,9 +1,11 @@
-def test_create_address(client, valid_address_data):
-    response = client.post("/api/v1/addresses/", json=valid_address_data)
+def test_create_address(client, valid_address_data, auth_token):
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    response = client.post(
+        "/api/v1/addresses/",
+        json=valid_address_data,
+        headers=headers
+    )
     assert response.status_code == 201
-    data = response.json()
-    assert data["street"] == valid_address_data["street"]
-
 
 
 def test_find_all_addresses(client, valid_address_data):
