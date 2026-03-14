@@ -36,3 +36,15 @@ def test_find_by_zip_code(fake_address, db_session):
     found_addresses = address_repo.find_by_zip_code(fake_address.zip_code)
     assert isinstance(found_addresses, list)
     assert any(address.id == fake_address.id for address in found_addresses)
+
+
+
+def test_set_default_address_returns_none_when_address_does_not_belong_to_user(fake_address, db_session):
+    db_handler = FakeDBConnectionHandler(db_session)
+    address_repo = AddressRepository(db_handler)
+
+    wrong_user_id = fake_address.user_id + 999
+
+    result = address_repo.set_default_address(fake_address.id, wrong_user_id)
+
+    assert result is None

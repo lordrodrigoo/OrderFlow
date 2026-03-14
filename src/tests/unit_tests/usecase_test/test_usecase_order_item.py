@@ -10,6 +10,7 @@ from src.exceptions.exception_handlers_order_item import (
     InvalidOrderItemException,
     DuplicateOrderItemException
 )
+from src.exceptions.exception_handlers_order import OrderNotFoundException
 
 def test_create_order_item(
         order_item_usecase,
@@ -193,3 +194,83 @@ def test_subtotal_calculation(
     assert response.quantity == valid_order_item_data["quantity"]
     assert response.unit_price == Decimal(str(valid_order_item_data["unit_price"]))
     assert response.notes == valid_order_item_data["notes"]
+
+
+def test_delete_order_item_not_found(
+        order_item_usecase,
+        fake_order_item_repository_mock
+    ):
+    fake_order_item_repository_mock.get_order_item_by_id.return_value = None
+    with pytest.raises(OrderItemNotFoundException) as exc_info:
+        order_item_usecase.delete_order_item(999)
+    assert "Order item with ID: '999' not found." in str(exc_info.value)
+
+
+def test_delete_order_item_invalid_status(
+        order_item_usecase,
+        fake_order_item_repository_mock,
+        fake_order_repository_mock,
+        valid_order_item
+    ):
+    fake_order_item_repository_mock.get_order_item_by_id.return_value = valid_order_item
+    fake_order_repository_mock.get_order_by_id.return_value = Order(
+        id=1,
+        user_id=1,
+        address_id=1,
+        total_amount=Decimal("100.00"),
+        delivery_fee=Decimal("5.00"),
+        status=OrderStatus.DELIVERED
+    )
+    with pytest.raises(InvalidOrderItemException):
+        order_item_usecase.delete_order_item(1)
+
+
+def test_update_order_item_not_found(
+        order_item_usecase,
+        fake_order_item_repository_mock,
+        valid_order_item_data
+    ):
+    fake_order_item_repository_mock.get_order_item_by_id.return_value = None
+    with pytest.raises(OrderItemNotFoundException) as exc_info:
+        order_item_usecase.update_order_item(999, OrderItemRequest(**valid_order_item_data))
+    assert "Order item with ID: '999' not found." in str(exc_info.value)
+
+
+def test_update_order_item_invalid_status(
+        order_item_usecase,
+        fake_order_item_repository_mock,
+        fake_order_repository_mock,
+        valid_order_item_data,
+        valid_order_item
+    ):
+    fake_order_item_repository_mock.get_order_item_by_id.return_value = valid_order_item
+    fake_order_repository_mock.get_order_by_id.return_value = Order(
+        id=1,
+        user_id=1,
+        address_id=1,
+        total_amount=Decimal("100.00"),
+        delivery_fee=Decimal("5.00"),
+        status=OrderStatus.CANCELED
+    )
+    with pytest.raises(InvalidOrderItemException):
+        order_item_usecase.update_order_item(1, OrderItemRequest(**valid_order_item_data))
+
+
+def test_list_order_items_all(
+        order_item_usecase,
+        fake_order_item_repository_mock,
+        valid_order_item
+    ):
+    fake_order_item_repository_mock.get_all_order_items.return_value = [valid_order_item]
+    response = order_item_usecase.list_order_items()
+    assert isinstance(response, list)
+    assert len(response) == 1
+
+
+def test_list_order_items_order_not_found(
+        order_item_usecase,
+        fake_order_repository_mock
+    ):
+    fake_order_repository_mock.exists.return_value = False
+    with pytest.raises(OrderNotFoundException):
+        order_item_usecase.list_order_items(order_id=999)

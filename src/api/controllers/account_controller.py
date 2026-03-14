@@ -1,5 +1,4 @@
 import os
-from dotenv import load_dotenv
 from fastapi import APIRouter, Response, status, Depends
 from src.api.dependencies import get_account_usecase, get_current_user
 from src.dto.response.account_response import AccountResponse
@@ -14,7 +13,7 @@ from src.dto.request.account_request import (
 )
 
 
-load_dotenv()
+
 API_PREFIX = os.getenv("API_V1_ACCOUNT")
 TAG = os.getenv("TAG_ACCOUNT")
 
@@ -46,11 +45,11 @@ def create_account(
 @router.get("/{account_id}", response_model=AccountResponse, status_code=status.HTTP_200_OK)
 def get_account_by_id(
     account_id: int,
-    current_user: UserResponse = Depends(get_current_user),
-    account_usecase: AccountUsecase = Depends(get_account_usecase)
+    account_usecase: AccountUsecase = Depends(get_account_usecase),
+    _: UserResponse = Depends(get_current_user),
 ):
     """Endpoint to retrieve account details by ID."""
-    return account_usecase.get_account_by_id(account_id, current_user.id)
+    return account_usecase.get_account_by_id(account_id)
 
 
 @router.put("/{account_id}", response_model=AccountResponse, status_code=status.HTTP_200_OK)

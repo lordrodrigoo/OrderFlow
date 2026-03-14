@@ -64,3 +64,19 @@ def test_delete_account(fake_account, db_session):
     result = account_repo.delete_account(fake_account.id)
     assert result is True
     assert account_repo.find_account_by_id(fake_account.id) is None
+
+
+def test_update_password_not_found(db_session):
+    db_handler = FakeDBConnectionHandler(db_session)
+    account_repo = AccountRepository(db_handler)
+
+    result = account_repo.update_password(9999, "new_hash")
+    assert result is None
+
+
+def test_update_status_not_found(db_session):
+    db_handler = FakeDBConnectionHandler(db_session)
+    account_repo = AccountRepository(db_handler)
+
+    result = account_repo.update_status(9999, AccountStatus.INACTIVE)
+    assert result is None

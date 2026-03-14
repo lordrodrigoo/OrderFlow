@@ -51,5 +51,6 @@ class OrderItem:
             quantity=entity.quantity,
             unit_price=entity.unit_price,
             subtotal=entity.subtotal,
-            notes=entity.notes
+            notes=entity.notes,
+            created_at=entity.created_at
         )

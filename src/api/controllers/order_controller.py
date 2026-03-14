@@ -4,7 +4,7 @@ from fastapi import APIRouter, Response, Query, status, Depends
 from src.usecases.order_usecases import OrderUsecase
 from src.dto.request.order_request import OrderRequest
 from src.dto.response.order_response import OrderResponse
-from src.api.dependencies import get_order_usecase
+from src.api.dependencies import get_order_usecase, get_current_user
 
 
 API_PREFIX = os.getenv("API_V1_ORDER")
@@ -16,10 +16,11 @@ router = APIRouter(prefix=API_PREFIX, tags=[TAG])
 def create_order(
     order_request: OrderRequest,
     response: Response,
+    current_user=Depends(get_current_user),
     order_usecase: OrderUsecase = Depends(get_order_usecase)
 ):
     """Endpoint to create a new order."""
-    order = order_usecase.create_order(order_request)
+    order = order_usecase.create_order(order_request, current_user.id)
     response.headers['Location'] = f"{API_PREFIX}/{order.id}"
     return order
 

@@ -123,6 +123,21 @@ class UserUsecase:
         return UserResponse(**updated_user.__dict__)
 
 
+    def update_me(self, user_request: UserRequest, current_user: UserResponse) -> UserResponse:
+        user = self.user_repository.find_user_by_id(current_user.id)
+        if not user:
+            raise UserNotFoundException(user_id=current_user.id)
+
+        user.first_name = user_request.first_name
+        user.last_name = user_request.last_name
+        user.age = user_request.age
+        user.phone = user_request.phone
+        user.email = user_request.email
+
+        updated_user = self.user_repository.update_user(user)
+        return UserResponse(**updated_user.__dict__)
+
+
     def delete_user(self, user_id: int) -> bool:
         user = self.user_repository.find_user_by_id(user_id)
         if not user:

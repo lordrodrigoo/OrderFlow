@@ -38,7 +38,8 @@ from src.exceptions.exception_handlers_review import (
 from src.exceptions.exception_handlers_auth import (
     TokenExpiredException, token_expired_exception_handler,
     TokenInvalidException, token_invalid_exception_handler,
-    InvalidCredentialsException, invalid_credentials_exception_handler,
+    InvalidCredentialsException as AuthInvalidCredentialsException,
+    invalid_credentials_exception_handler as auth_invalid_credentials_exception_handler,
 )
 from src.exceptions.exception_handlers_account import (
     InvalidCredentialsException, invalid_credentials_exception_handler,
@@ -72,6 +73,7 @@ def register_exception_handlers(app: FastAPI):
     app.add_exception_handler(InvalidReviewException, invalid_review_exception_handler)
     app.add_exception_handler(TokenExpiredException, token_expired_exception_handler)
     app.add_exception_handler(TokenInvalidException, token_invalid_exception_handler)
+    app.add_exception_handler(AuthInvalidCredentialsException, auth_invalid_credentials_exception_handler)
     app.add_exception_handler(InvalidCredentialsException, invalid_credentials_exception_handler)
     app.add_exception_handler(AccountInactiveException, account_inactive_exception_handler)
     app.add_exception_handler(AccountNotFoundException, account_not_found_exception_handler)

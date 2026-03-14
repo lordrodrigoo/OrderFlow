@@ -27,6 +27,12 @@ def test_user_permission_denied_message():
     assert "user with ID: '1'" in exception.message
 
 
+def test_user_not_found_exception_with_email():
+    exception = UserNotFoundException(email="test@email.com")
+    assert exception.email == "test@email.com"
+    assert "test@email.com" in exception.message
+
+
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("exception, handler, expected_status", [

@@ -14,8 +14,9 @@ class OrderUsecase:
         self.order_repository = order_repository
 
 
-    def create_order(self, order_request: OrderRequest) -> OrderResponse:
+    def create_order(self, order_request: OrderRequest, user_id: int) -> OrderResponse:
         order_entity = Order(
+            user_id=user_id,
             address_id=order_request.address_id,
             total_amount=order_request.total_amount,
             delivery_fee=order_request.delivery_fee,
@@ -62,7 +63,7 @@ class OrderUsecase:
         orders = []
 
         if order_status:
-            orders = self.order_repository.find_orders_by_status(order_status.value)
+            orders = self.order_repository.find_orders_by_status(order_status)
         elif user_id:
             orders = self.order_repository.find_orders_by_user(user_id)
         elif min_amount is not None and max_amount is not None:
@@ -80,9 +81,6 @@ class OrderUsecase:
     def cancel_order(self, order_id: int) -> OrderResponse:
         order = self.order_repository.get_order_by_id(order_id)
         if order.is_canceled:
-            raise OrderAlreadyCanceledException(order_id=order_id)
-
-        if order.status == OrderStatus.CANCELED:
             raise OrderAlreadyCanceledException(order_id=order_id)
 
         order.status = OrderStatus.CANCELED

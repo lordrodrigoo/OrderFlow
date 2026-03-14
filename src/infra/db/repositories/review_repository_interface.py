@@ -37,8 +37,26 @@ class ReviewRepository(ReviewRepositoryInterface, BaseRepository[ReviewEntity]):
             self.model).filter(self.model.rating.between(min_rating, max_rating)).all()
         return [Review.from_entity(review) for review in entities]
 
-    def get_all_reviews(self) -> List[Review]:
-        return [Review.from_entity(review) for review in self.get_all()]
+    def get_all_reviews(
+        self,
+        product_id: int = None,
+        user_id: int = None,
+        min_rating: int = None,
+        max_rating: int = None,
+        skip: int = 0,
+        limit: int = 10
+    ) -> List[Review]:
+        query = self.session.query(self.model)
+        if product_id:
+            query = query.filter(self.model.product_id == product_id)
+        if user_id:
+            query = query.filter(self.model.user_id == user_id)
+        if min_rating is not None:
+            query = query.filter(self.model.rating >= min_rating)
+        if max_rating is not None:
+            query = query.filter(self.model.rating <= max_rating)
+        entities = query.offset(skip).limit(limit).all()
+        return [Review.from_entity(review) for review in entities]
 
     def delete_review(self, review_id: int) -> bool:
         return self.delete_by_id(review_id)

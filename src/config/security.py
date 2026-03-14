@@ -3,11 +3,14 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 from pwdlib import PasswordHash
 from jose import jwt, ExpiredSignatureError, JWTError
+from dotenv import load_dotenv
 from src.dto.response.token_response import TokenPayload
 from src.exceptions.exception_handlers_auth import (
     TokenExpiredException,
     TokenInvalidException,
 )
+
+load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")

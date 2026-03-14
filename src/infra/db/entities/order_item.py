@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Numeric
+from datetime import datetime
+from sqlalchemy import Column, Integer, String, ForeignKey, Numeric, DateTime
 from sqlalchemy.orm import relationship
 from src.infra.db.settings.base import Base
 
@@ -11,6 +12,7 @@ class OrderItemEntity(Base):
     unit_price = Column(Numeric(10, 2), nullable=False)
     subtotal = Column(Numeric(10, 2), nullable=False)
     notes = Column(String(255), nullable=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.now)
 
     "Bellow are foreign keys and relationships"
     order_id = Column(Integer, ForeignKey('orders.id'), nullable=False)

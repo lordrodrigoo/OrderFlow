@@ -29,3 +29,8 @@ def test_from_entity():
 def test_repr():
     category = CategoryEntity(id=1, name="Desserts")
     assert repr(category) == "CategoryEntity [id = 1, name = Desserts]"
+
+
+def test_category_model_repr():
+    category = Category(id=1, name="Desserts", description="Sweet treats")
+    assert repr(category) == "Category [id = 1, name = Desserts]"

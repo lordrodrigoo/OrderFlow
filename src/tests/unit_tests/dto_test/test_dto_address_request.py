@@ -24,6 +24,8 @@ def test_valid_address_request(valid_address_data):
         ("city", "s@a Paul(o", "city must contain only letters."),
         ("complement", "@@@@", "complement must contain letters, numbers, or hyphens."),
         ("state", "X@", "invalid Brazilian state (UF)."),
+        ("number", "@@@", "number must contain letters, numbers, or hyphens"),
+        ("number", "   ", "number must contain letters, numbers, or hyphens"),
     ]
 )
 def test_text_fields_validations(valid_address_data, field, value, expected_msg):

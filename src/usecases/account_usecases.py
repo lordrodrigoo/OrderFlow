@@ -81,14 +81,14 @@ class AccountUsecase:
     def update_account(self,
                     account_id: int,
                     account_request: UpdateAccountRequest,
-                    current_user: UserResponse
+                    current_user_id: int
     ) -> AccountResponse:
 
         account = self.account_repository.find_account_by_id(account_id)
         if not account:
             raise AccountNotFoundException(account_id=account_id)
 
-        if account.user_id != current_user.id:
+        if account.user_id != current_user_id:
             raise AccountPermissionDeniedException(account_id=account_id)
 
         if self.account_repository.find_by_username(account_request.username):
@@ -102,13 +102,13 @@ class AccountUsecase:
     def update_password(self,
                     account_id: int,
                     password_request: UpdatePasswordRequest,
-                    current_user: UserResponse
+                    current_user_id: int
     ) -> AccountResponse:
         account = self.account_repository.find_account_by_id(account_id)
         if not account:
             raise AccountNotFoundException(account_id=account_id)
 
-        if account.user_id != current_user.id:
+        if account.user_id != current_user_id:
             raise AccountPermissionDeniedException(account_id=account_id)
 
         if not verify_password(password_request.current_password, account.password_hash):
@@ -119,50 +119,59 @@ class AccountUsecase:
         return AccountResponse(**updated.__dict__)
 
 
-    def deactivate_account(self, account_id: int, current_user: UserResponse) -> AccountResponse:
+    def deactivate_account(self, account_id: int, current_user_id: int) -> AccountResponse:
         account = self.account_repository.find_account_by_id(account_id)
         if not account:
             raise AccountNotFoundException(account_id=account_id)
 
-        if account.user_id != current_user.id:
+        if account.user_id != current_user_id:
             raise AccountPermissionDeniedException(account_id=account_id)
         updated = self.account_repository.update_status(account_id, AccountStatus.INACTIVE)
         return AccountResponse(**updated.__dict__)
 
 
-    def suspend_account(self, account_id: int) -> AccountResponse:
+    def suspend_account(self, account_id: int, current_user_id: int) -> AccountResponse:
         account = self.account_repository.find_account_by_id(account_id)
         if not account:
             raise AccountNotFoundException(account_id=account_id)
+
+        if account.user_id != current_user_id:
+            raise AccountPermissionDeniedException(account_id=account_id)
 
         updated = self.account_repository.update_status(account_id, AccountStatus.SUSPENDED)
         return AccountResponse(**updated.__dict__)
 
 
-    def inactivate_account(self, account_id: int) -> AccountResponse:
+    def inactivate_account(self, account_id: int, current_user_id: int) -> AccountResponse:
         account = self.account_repository.find_account_by_id(account_id)
         if not account:
             raise AccountNotFoundException(account_id=account_id)
+
+        if account.user_id != current_user_id:
+            raise AccountPermissionDeniedException(account_id=account_id)
 
         updated = self.account_repository.update_status(account_id, AccountStatus.INACTIVE)
         return AccountResponse(**updated.__dict__)
 
 
-    def activate_account(self, account_id: int) -> AccountResponse:
+    def activate_account(self, account_id: int, current_user_id: int) -> AccountResponse:
         account = self.account_repository.find_account_by_id(account_id)
         if not account:
             raise AccountNotFoundException(account_id=account_id)
+
+        if account.user_id != current_user_id:
+            raise AccountPermissionDeniedException(account_id=account_id)
 
         updated = self.account_repository.update_status(account_id, AccountStatus.ACTIVE)
         return AccountResponse(**updated.__dict__)
 
 
-    def delete_account(self, account_id: int, current_user: UserResponse) -> AccountResponse:
+    def delete_account(self, account_id: int, current_user_id: int) -> AccountResponse:
         account = self.account_repository.find_account_by_id(account_id)
         if not account:
             raise AccountNotFoundException(account_id=account_id)
 
-        if account.user_id != current_user.id:
+        if account.user_id != current_user_id:
             raise AccountPermissionDeniedException(account_id=account_id)
 
         self.account_repository.delete_account(account_id)

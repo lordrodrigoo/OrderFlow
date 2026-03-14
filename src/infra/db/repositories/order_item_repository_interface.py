@@ -1,4 +1,5 @@
 from typing import List
+from datetime import datetime
 from src.infra.db.settings.connection import DBConnectionHandler
 from src.infra.db.entities.order_item import OrderItemEntity
 from src.domain.repositories.order_item_repository import OrderItemRepositoryInterface
@@ -18,6 +19,7 @@ class OrderItemRepository(OrderItemRepositoryInterface, BaseRepository[OrderItem
             unit_price = order_item.unit_price,
             subtotal = order_item.subtotal,
             notes = order_item.notes,
+            created_at = datetime.now(),
         )
         self.add(entity)
         self.save()

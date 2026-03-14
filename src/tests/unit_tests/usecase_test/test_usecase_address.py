@@ -1,10 +1,15 @@
 #pylint: disable=unused-argument
 from datetime import datetime
+from unittest.mock import MagicMock
 import pytest
 from pydantic import ValidationError
 from src.dto.request.address_request import AddressRequest
 from src.dto.response.address_response import AddressResponse
-from src.exceptions.exception_handlers_address import AddressNotFoundException
+from src.exceptions.exception_handlers_address import (
+    AddressNotFoundException,
+    AddressAlreadyExistsException,
+    AddressPermissionDeniedException
+)
 
 
 def test_create_address(
@@ -20,6 +25,17 @@ def test_create_address(
     assert response.city == valid_address_data["city"]
     assert response.state == valid_address_data["state"]
     assert response.zip_code == valid_address_data["zip_code"]
+
+
+def test_create_address_already_exists(
+        address_usecase,
+        fake_address_repository_mock,
+        valid_address_data
+    ):
+    fake_address_repository_mock.find_addresses_by_user_street_number.return_value = [object()]
+    with pytest.raises(AddressAlreadyExistsException) as exc_info:
+        address_usecase.create_address(AddressRequest(**valid_address_data))
+    assert valid_address_data["street"] in str(exc_info.value)
 
 
 def test_update_address(
@@ -138,3 +154,58 @@ def test_delete_address(
     fake_address_repository_mock.delete_address.return_value = True
     result = address_usecase.delete_address(1, fake_user)
     assert result is True
+
+
+def test_update_address_permission_denied(
+        address_usecase,
+        fake_address_repository_mock,
+        fake_address_response_mock,
+        valid_address_data
+    ):
+    other_user = MagicMock()
+    other_user.id = 999
+    fake_address_repository_mock.find_address_by_id.return_value = fake_address_response_mock
+    with pytest.raises(AddressPermissionDeniedException):
+        address_usecase.update_address(1, AddressRequest(**valid_address_data), other_user)
+
+
+def test_delete_address_permission_denied(
+        address_usecase,
+        fake_address_repository_mock,
+        fake_address_response_mock
+    ):
+    other_user = MagicMock()
+    other_user.id = 999
+    fake_address_repository_mock.find_address_by_id.return_value = fake_address_response_mock
+    with pytest.raises(AddressPermissionDeniedException):
+        address_usecase.delete_address(1, other_user)
+
+
+def test_find_addresses_by_user_id(
+        address_usecase,
+        fake_address_repository_mock,
+        fake_address_response_mock
+    ):
+    fake_address_repository_mock.find_addresses_by_user_id.return_value = [fake_address_response_mock]
+    response = address_usecase.find_addresses_by_user_id(1)
+    assert isinstance(response, list)
+    assert len(response) == 1
+    assert isinstance(response[0], AddressResponse)
+
+
+def test_find_addresses_by_user_id_not_found(
+        address_usecase,
+        fake_address_repository_mock
+    ):
+    fake_address_repository_mock.find_addresses_by_user_id.return_value = None
+    with pytest.raises(AddressNotFoundException):
+        address_usecase.find_addresses_by_user_id(999)
+
+
+def test_set_default_address_not_found(
+        address_usecase,
+        fake_address_repository_mock
+    ):
+    fake_address_repository_mock.set_default_address.return_value = None
+    with pytest.raises(AddressNotFoundException):
+        address_usecase.set_default_address(999, 1)

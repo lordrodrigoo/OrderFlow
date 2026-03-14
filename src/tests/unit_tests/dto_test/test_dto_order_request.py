@@ -52,3 +52,25 @@ def test_invalid_scheduled_date(valid_order_data):
     with pytest.raises(ValidationError) as exc_info:
         OrderRequest(**{**valid_order_data, "scheduled_date": past_date})
     assert "Scheduled date must be in the future" in str(exc_info.value)
+
+
+def test_order_request_notes_strip(valid_order_data):
+    data = valid_order_data.copy()
+    data["notes"] = "  My note  "
+    req = OrderRequest(**data)
+    assert req.notes == "My note"
+
+
+def test_order_request_notes_none(valid_order_data):
+    data = valid_order_data.copy()
+    data["notes"] = None
+    req = OrderRequest(**data)
+    assert req.notes is None
+
+
+def test_order_request_notes_empty_string(valid_order_data):
+    data = valid_order_data.copy()
+    data["notes"] = "   "
+    with pytest.raises(ValidationError) as exc_info:
+        OrderRequest(**data)
+    assert "Notes cannot be empty string" in str(exc_info.value)

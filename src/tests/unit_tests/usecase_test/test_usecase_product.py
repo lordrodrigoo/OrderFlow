@@ -1,6 +1,6 @@
 #pylint: disable=unused-argument
-from decimal import Decimal
 from datetime import datetime
+from decimal import Decimal
 import pytest
 from pydantic import ValidationError
 from src.dto.request.product_request import ProductRequest
@@ -11,7 +11,6 @@ from src.exceptions.exception_handlers_product import (
     ProductCategoryNotFoundException,
     InvalidPriceProductException
 )
-
 
 
 def test_create_product(
@@ -159,3 +158,122 @@ def test_get_product_by_id_not_found(
     fake_product_repository_mock.find_product_by_id.return_value = None
     with pytest.raises(ProductNotFoundException):
         product_usecase.get_product_by_id(999)
+
+
+def test_update_product_not_found(
+        product_usecase,
+        fake_product_repository_mock,
+        valid_product_data
+    ):
+    fake_product_repository_mock.find_product_by_id.return_value = None
+    with pytest.raises(ProductNotFoundException):
+        product_usecase.update_product(999, ProductRequest(**valid_product_data))
+
+
+def test_find_products_by_category(
+        product_usecase,
+        fake_product_repository_mock,
+        category_repository_mock,
+        fake_product_response_mock
+    ):
+    fake_product_repository_mock.find_products_by_category.return_value = [fake_product_response_mock]
+    response = product_usecase.find_products_by_category(1)
+    assert isinstance(response, list)
+    assert len(response) == 1
+
+
+def test_find_products_by_category_not_found(
+        product_usecase,
+        category_repository_mock
+    ):
+    category_repository_mock.get_category_by_id.return_value = None
+    with pytest.raises(ProductCategoryNotFoundException):
+        product_usecase.find_products_by_category(999)
+
+
+def test_count_products_by_category(
+        product_usecase,
+        fake_product_repository_mock,
+        category_repository_mock
+    ):
+    fake_product_repository_mock.count_products_by_category.return_value = 3
+    result = product_usecase.count_products_by_category(1)
+    assert result == 3
+
+
+def test_count_products_by_category_not_found(
+        product_usecase,
+        category_repository_mock
+    ):
+    category_repository_mock.get_category_by_id.return_value = None
+    with pytest.raises(ProductCategoryNotFoundException):
+        product_usecase.count_products_by_category(999)
+
+
+def test_list_products_by_category(
+        product_usecase,
+        fake_product_repository_mock,
+        fake_product_response_mock
+    ):
+    fake_product_repository_mock.find_products_by_category.return_value = [fake_product_response_mock]
+    response = product_usecase.list_products(category_id=1)
+    fake_product_repository_mock.find_products_by_category.assert_called_once_with(1)
+    assert len(response) == 1
+
+
+def test_list_products_by_availability(
+        product_usecase,
+        fake_product_repository_mock,
+        fake_product_response_mock
+    ):
+    fake_product_repository_mock.find_products_by_availability.return_value = [fake_product_response_mock]
+    response = product_usecase.list_products(is_available=True)
+    fake_product_repository_mock.find_products_by_availability.assert_called_once_with(True)
+    assert len(response) == 1
+
+
+def test_list_products_by_price_range(
+        product_usecase,
+        fake_product_repository_mock,
+        fake_product_response_mock
+    ):
+    fake_product_repository_mock.find_products_by_price_range.return_value = [fake_product_response_mock]
+    response = product_usecase.list_products(min_price=10.0, max_price=50.0)
+    fake_product_repository_mock.find_products_by_price_range.assert_called_once_with(10.0, 50.0)
+    assert len(response) == 1
+
+
+def test_delete_product_not_found(
+        product_usecase,
+        fake_product_repository_mock
+    ):
+    fake_product_repository_mock.find_product_by_id.return_value = None
+    with pytest.raises(ProductNotFoundException) as exc_info:
+        product_usecase.delete_product(999)
+    assert "999" in exc_info.value.message
+
+
+def test_update_product_already_exists(
+        product_usecase,
+        fake_product_repository_mock,
+        valid_product_data,
+        fake_product_response_mock
+    ):
+
+    duplicate = ProductResponse(
+        id=99,
+        name=valid_product_data["name"],
+        description=valid_product_data["description"],
+        category_id=valid_product_data["category_id"],
+        price=valid_product_data["price"],
+        is_available=valid_product_data["is_available"],
+        preparation_time=valid_product_data["preparation_time"],
+        created_at=datetime.now(),
+    )
+    fake_product_repository_mock.find_product_by_id.side_effect = [
+        fake_product_response_mock,
+        duplicate
+    ]
+    with pytest.raises(ProductAlreadyExistsException) as exc_info:
+        product_usecase.update_product(1, ProductRequest(**valid_product_data))
+    assert valid_product_data["name"] in exc_info.value.message
