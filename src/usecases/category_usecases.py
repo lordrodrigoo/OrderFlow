@@ -1,3 +1,4 @@
+import logging
 from src.domain.models.category import Category
 from src.dto.request.category_request import CategoryRequest
 from src.dto.response.category_response import CategoryResponse
@@ -7,6 +8,7 @@ from src.exceptions.exception_handlers_category import (
     CategoryAlreadyExistsException
 )
 
+logger = logging.getLogger(__name__)
 
 
 class CategoryUsecase:
@@ -15,6 +17,7 @@ class CategoryUsecase:
 
     def create_category(self, category_request: CategoryRequest) -> CategoryResponse:
         if self.category_repository.find_category_by_name(category_request.name):
+            logger.warning("Category already exists", extra={"category_name": category_request.name})
             raise CategoryAlreadyExistsException(category_name=category_request.name)
 
         category_entity = Category (
@@ -22,6 +25,7 @@ class CategoryUsecase:
             description=category_request.description,
         )
         created_category = self.category_repository.create_category(category_entity)
+        logger.info("Category created", extra={"category_id": created_category.id})
         return CategoryResponse(**created_category.__dict__)
 
 
@@ -52,6 +56,7 @@ class CategoryUsecase:
     def get_category_by_id(self, category_id: int) -> CategoryResponse:
         category = self.category_repository.get_category_by_id(category_id)
         if not category:
+            logger.warning("Category not found", extra={"category_id": category_id})
             raise CategoryNotFoundException(category_id)
         return CategoryResponse(**category.__dict__)
 
@@ -64,5 +69,7 @@ class CategoryUsecase:
 
     def delete_category(self, category_id: int) -> bool:
         if not self.category_repository.get_category_by_id(category_id):
+            logger.warning("Category not found for deletion", extra={"category_id": category_id})
             raise CategoryNotFoundException(category_id)
+        logger.info("Category deleted", extra={"category_id": category_id})
         return self.category_repository.delete_category(category_id)

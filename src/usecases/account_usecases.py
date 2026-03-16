@@ -1,3 +1,4 @@
+import logging
 from src.domain.repositories.account_repository import AccountRepositoryInterface
 from src.domain.models.account import Account, AccountStatus
 from src.dto.request.account_request import AccountRequest, UpdateAccountRequest, UpdatePasswordRequest
@@ -16,6 +17,9 @@ from src.exceptions.exception_handlers_account import (
     AccountPermissionDeniedException
 )
 
+logger = logging.getLogger(__name__)
+
+
 class AccountUsecase:
     def __init__(self,
                 account_repository: AccountRepositoryInterface,
@@ -26,6 +30,7 @@ class AccountUsecase:
 
     def create_account(self, account_request: AccountRequest) -> AccountResponse:
         if self.account_repository.find_by_username(account_request.username):
+            logger.warning("Username already exists", extra={"username": account_request.username})
             raise UsernameAlreadyExistsException(username=account_request.username)
 
         account_entity = Account(
@@ -35,6 +40,7 @@ class AccountUsecase:
             status=AccountStatus.ACTIVE
         )
         created_account = self.account_repository.create_account(account_entity)
+        logger.info("Account created", extra={"account_id": created_account.id})
         return AccountResponse(**created_account.__dict__)
 
 
@@ -43,16 +49,20 @@ class AccountUsecase:
 
         if not account:
             verify_password(login_request.password, DUMMY_HASH)
+            logger.warning("Login failed: account not found", extra={"username": login_request.username})
             raise InvalidCredentialsException()
 
         if account.status != AccountStatus.ACTIVE:
+            logger.warning("Login failed: account inactive", extra={"account_id": account.id})
             raise AccountInactiveException(account_id=account.id)
 
         if not verify_password(login_request.password, account.password_hash):
+            logger.warning("Login failed: invalid password", extra={"username": login_request.username})
             raise InvalidCredentialsException()
 
         user = self.user_repository.find_user_by_id(account.user_id)
         if not user:
+            logger.warning("Login failed: user not found for account", extra={"account_id": account.id})
             raise InvalidCredentialsException()
 
         token = create_access_token({
@@ -60,6 +70,7 @@ class AccountUsecase:
             "user_id": str(user.id),
             "role": user.role.value
         })
+        logger.info("Login successful", extra={"username": login_request.username})
         return TokenResponse(access_token=token, token_type="bearer")
 
 
@@ -73,6 +84,7 @@ class AccountUsecase:
     def get_account_by_id(self, account_id: int) -> AccountResponse:
         account = self.account_repository.find_account_by_id(account_id)
         if not account:
+            logger.warning("Account not found", extra={"account_id": account_id})
             raise AccountNotFoundException(account_id=account_id)
         return AccountResponse(**account.__dict__)
 
@@ -96,6 +108,7 @@ class AccountUsecase:
 
         account.username = account_request.username
         updated_account = self.account_repository.update_account(account)
+        logger.info("Account updated", extra={"account_id": account_id})
         return AccountResponse(**updated_account.__dict__)
 
 
@@ -112,10 +125,12 @@ class AccountUsecase:
             raise AccountPermissionDeniedException(account_id=account_id)
 
         if not verify_password(password_request.current_password, account.password_hash):
+            logger.warning("Invalid current password", extra={"account_id": account_id})
             raise InvalidCredentialsException()
 
         new_password_hash = hash_password(password_request.new_password)
         updated = self.account_repository.update_password(account_id, new_password_hash)
+        logger.info("Password updated", extra={"account_id": account_id})
         return AccountResponse(**updated.__dict__)
 
 
@@ -127,6 +142,7 @@ class AccountUsecase:
         if account.user_id != current_user_id:
             raise AccountPermissionDeniedException(account_id=account_id)
         updated = self.account_repository.update_status(account_id, AccountStatus.INACTIVE)
+        logger.info("Account deactivated", extra={"account_id": account_id})
         return AccountResponse(**updated.__dict__)
 
 
@@ -139,6 +155,7 @@ class AccountUsecase:
             raise AccountPermissionDeniedException(account_id=account_id)
 
         updated = self.account_repository.update_status(account_id, AccountStatus.SUSPENDED)
+        logger.info("Account suspended", extra={"account_id": account_id})
         return AccountResponse(**updated.__dict__)
 
 
@@ -151,6 +168,7 @@ class AccountUsecase:
             raise AccountPermissionDeniedException(account_id=account_id)
 
         updated = self.account_repository.update_status(account_id, AccountStatus.INACTIVE)
+        logger.info("Account inactivated", extra={"account_id": account_id})
         return AccountResponse(**updated.__dict__)
 
 
@@ -163,16 +181,20 @@ class AccountUsecase:
             raise AccountPermissionDeniedException(account_id=account_id)
 
         updated = self.account_repository.update_status(account_id, AccountStatus.ACTIVE)
+        logger.info("Account activated", extra={"account_id": account_id})
         return AccountResponse(**updated.__dict__)
 
 
     def delete_account(self, account_id: int, current_user_id: int) -> AccountResponse:
         account = self.account_repository.find_account_by_id(account_id)
         if not account:
+            logger.warning("Account not found for deletion", extra={"account_id": account_id})
             raise AccountNotFoundException(account_id=account_id)
 
         if account.user_id != current_user_id:
+            logger.warning("Permission denied to delete account", extra={"account_id": account_id})
             raise AccountPermissionDeniedException(account_id=account_id)
 
         self.account_repository.delete_account(account_id)
+        logger.info("Account deleted", extra={"account_id": account_id})
         return AccountResponse(**account.__dict__)

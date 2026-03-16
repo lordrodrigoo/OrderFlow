@@ -1,4 +1,5 @@
 import os
+import logging
 from typing import List, Optional
 from fastapi import APIRouter, Response, Query, status, Depends
 from src.usecases.address_usecase import AddressUsecase
@@ -16,6 +17,7 @@ API_PREFIX = os.getenv("API_V1_USER")
 TAG = os.getenv("TAG_USER")
 
 router = APIRouter(prefix=API_PREFIX, tags=[TAG])
+logger = logging.getLogger(__name__)
 
 
 @router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -25,6 +27,7 @@ def create_user(
     user_usecase: UserUsecase = Depends(get_user_usecase)
 ):
     """Endpoint to create a new user."""
+    logger.info("Creating user", extra={"email": user_request.email})
     user = user_usecase.create_user(user_request)
     response.headers['Location'] = f"{API_PREFIX}/{user.id}"
     return user
@@ -134,5 +137,6 @@ def set_default_address(
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(user_id: int, user_usecase: UserUsecase = Depends(get_user_usecase)):
     """Endpoint to delete a user."""
+    logger.info("Deleting user", extra={"user_id": user_id})
     user_usecase.delete_user(user_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

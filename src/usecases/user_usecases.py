@@ -1,3 +1,4 @@
+import logging
 from src.domain.models.user import Users, UserRole
 from src.dto.request.user_request import UserRequest
 from src.dto.response.user_response import UserResponse
@@ -15,6 +16,7 @@ from src.exceptions.exception_handlers_account import (
     UsernameAlreadyExistsException,
 )
 
+logger = logging.getLogger(__name__)
 
 
 class UserUsecase:
@@ -28,9 +30,11 @@ class UserUsecase:
 
     def create_user(self, user_request: UserRequest) -> UserResponse:
         if self.user_repository.find_by_email(user_request.email):
+            logger.warning("Email already exists", extra={"email": user_request.email})
             raise EmailAlreadyExistsException(email=user_request.email)
 
         if self.account_repository.find_by_username(user_request.username):
+            logger.warning("Username already exists", extra={"username": user_request.username})
             raise UsernameAlreadyExistsException(username=user_request.username)
 
 
@@ -53,12 +57,14 @@ class UserUsecase:
             status=AccountStatus.ACTIVE
         )
         self.account_repository.create_account(account_entity)
+        logger.info("User created successfully", extra={"user_id": created_user.id})
         return UserResponse(**created_user.__dict__)
 
 
     def get_user_by_id(self, user_id: int) -> UserResponse:
         user = self.user_repository.find_user_by_id(user_id)
         if not user:
+            logger.warning("User not found", extra={"user_id": user_id})
             raise UserNotFoundException(user_id=user_id)
         return UserResponse(**user.__dict__)
 
@@ -66,6 +72,7 @@ class UserUsecase:
     def get_user_by_email(self, email: str) -> UserResponse:
         user = self.user_repository.find_by_email(email)
         if not user:
+            logger.warning("User not found", extra={"email": email})
             raise UserNotFoundException(email=email)
         return UserResponse(**user.__dict__)
 
@@ -106,10 +113,12 @@ class UserUsecase:
     ) -> UserResponse:
 
         if current_user.id != user_id and current_user.role != UserRole.ADMIN:
+            logger.warning("Permission denied to update user", extra={"user_id": user_id, "requester_id": current_user.id})
             raise UserPermissionDeniedException(user_id=user_id)
 
         user = self.user_repository.find_user_by_id(user_id)
         if not user:
+            logger.warning("User not found for update", extra={"user_id": user_id})
             raise UserNotFoundException(user_id=user_id)
 
         user.first_name = user_request.first_name
@@ -120,6 +129,7 @@ class UserUsecase:
         user.role = user_request.role
 
         updated_user = self.user_repository.update_user(user)
+        logger.info("User updated successfully", extra={"user_id": user_id})
         return UserResponse(**updated_user.__dict__)
 
 
@@ -141,6 +151,8 @@ class UserUsecase:
     def delete_user(self, user_id: int) -> bool:
         user = self.user_repository.find_user_by_id(user_id)
         if not user:
+            logger.warning("User not found for deletion", extra={"user_id": user_id})
             raise UserNotFoundException(user_id=user_id)
         self.user_repository.delete_user(user_id)
+        logger.info("User deleted successfully", extra={"user_id": user_id})
         return True

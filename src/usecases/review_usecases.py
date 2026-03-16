@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 from src.domain.models.review import Review
 from src.dto.request.review_request import ReviewRequest
@@ -11,6 +12,8 @@ from src.exceptions.exception_handlers_review import (
 )
 from src.exceptions.exception_handlers_user import UserNotFoundException
 from src.exceptions.exception_handlers_product import ProductNotFoundException
+
+logger = logging.getLogger(__name__)
 
 
 class ReviewUsecase:
@@ -29,10 +32,12 @@ class ReviewUsecase:
         user = self.user_repository.find_user_by_id(review_request.user_id)
 
         if not user:
+            logger.warning("User not found", extra={"user_id": review_request.user_id})
             raise UserNotFoundException(user_id=review_request.user_id)
 
         product = self.product_repository.find_product_by_id(review_request.product_id)
         if not product:
+            logger.warning("Product not found", extra={"product_id": review_request.product_id})
             raise ProductNotFoundException(product_id=review_request.product_id)
 
         review_entity = Review(
@@ -42,6 +47,7 @@ class ReviewUsecase:
             comment=review_request.comment
         )
         created_review = self.review_repository.create_review(review_entity)
+        logger.info("Review created", extra={"review_id": created_review.id})
         return ReviewResponse(**created_review.__dict__)
 
 
@@ -50,6 +56,7 @@ class ReviewUsecase:
     def get_review_by_id(self, review_id: int) -> ReviewResponse:
         review = self.review_repository.get_review_by_id(review_id)
         if not review:
+            logger.warning("Review not found", extra={"review_id": review_id})
             raise ReviewNotFoundException(review_id=review_id)
         return ReviewResponse(**review.__dict__)
 
@@ -90,5 +97,7 @@ class ReviewUsecase:
     def delete_review(self, review_id: int) -> None:
         review = self.review_repository.get_review_by_id(review_id)
         if not review:
+            logger.warning("Review not found for deletion", extra={"review_id": review_id})
             raise ReviewNotFoundException(review_id=review_id)
         self.review_repository.delete_review(review_id)
+        logger.info("Review deleted", extra={"review_id": review_id})

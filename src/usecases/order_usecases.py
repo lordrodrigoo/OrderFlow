@@ -1,3 +1,4 @@
+import logging
 from decimal import Decimal
 from src.domain.models.order import Order, OrderStatus
 from src.dto.request.order_request import OrderRequest
@@ -7,6 +8,8 @@ from src.exceptions.exception_handlers_order import (
     OrderNotFoundException,
     OrderAlreadyCanceledException
 )
+
+logger = logging.getLogger(__name__)
 
 
 class OrderUsecase:
@@ -25,6 +28,7 @@ class OrderUsecase:
             status=OrderStatus.PENDING
         )
         created_order = self.order_repository.create_order(order_entity)
+        logger.info("Order created", extra={"order_id": created_order.id, "user_id": user_id})
         return OrderResponse(**created_order.__dict__)
 
 
@@ -32,6 +36,7 @@ class OrderUsecase:
     def update_order(self, order_id: int, order_request: OrderRequest) -> OrderResponse:
         order = self.order_repository.get_order_by_id(order_id)
         if not order:
+            logger.warning("Order not found", extra={"order_id": order_id})
             raise OrderNotFoundException(order_id=order_id)
 
         order.address_id = order_request.address_id
@@ -47,6 +52,7 @@ class OrderUsecase:
     def get_order_by_id(self, order_id: int) -> OrderResponse:
         order = self.order_repository.get_order_by_id(order_id)
         if not order:
+            logger.warning("Order not found", extra={"order_id": order_id})
             raise OrderNotFoundException(order_id=order_id)
         return OrderResponse(**order.__dict__)
 
@@ -81,16 +87,19 @@ class OrderUsecase:
     def cancel_order(self, order_id: int) -> OrderResponse:
         order = self.order_repository.get_order_by_id(order_id)
         if order.is_canceled:
+            logger.warning("Order already canceled", extra={"order_id": order_id})
             raise OrderAlreadyCanceledException(order_id=order_id)
 
         order.status = OrderStatus.CANCELED
         self.order_repository.update_order(order)
+        logger.info("Order canceled", extra={"order_id": order_id})
         return OrderResponse(**order.__dict__)
 
 
     def delete_order(self, order_id: int) -> bool:
         order = self.order_repository.get_order_by_id(order_id)
         if not order:
+            logger.warning("Order not found for deletion", extra={"order_id": order_id})
             raise OrderNotFoundException(order_id=order_id)
-
+        logger.info("Order deleted", extra={"order_id": order_id})
         return self.order_repository.delete_order(order_id)

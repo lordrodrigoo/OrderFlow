@@ -1,3 +1,4 @@
+import logging
 from src.domain.models.product import Product
 from src.dto.request.product_request import ProductRequest
 from src.dto.response.product_response import ProductResponse
@@ -10,7 +11,7 @@ from src.exceptions.exception_handlers_product import (
 )
 from src.infra.db.repositories.category_repository_interface import CategoryRepositoryInterface
 
-
+logger = logging.getLogger(__name__)
 
 class ProductUsecase:
     def __init__(self, product_repository: ProductRepositoryInterface, category_repository: CategoryRepositoryInterface):
@@ -40,6 +41,7 @@ class ProductUsecase:
         )
 
         created_product = self.product_repository.create_product(product_entity)
+        logger.info("Product created", extra={"product_id": created_product.id})
         return ProductResponse(**created_product.__dict__)
 
     def update_product(
@@ -49,10 +51,12 @@ class ProductUsecase:
         ) -> ProductResponse:
 
         if not self.product_repository.find_product_by_id(product_id):
-            raise ProductNotFoundException(product_id)
+            logger.warning("Product not found", extra={"product_id": product_id})
+            raise ProductNotFoundException(product_id=product_id)
 
         existing = self.product_repository.find_product_by_id(product_id)
         if existing and existing.id != product_id and existing.name == product_request.name:
+            logger.warning("Product already exists", extra={"product_name": product_request.name})
             raise ProductAlreadyExistsException(product_name=product_request.name)
 
         product_entity = Product (
@@ -72,12 +76,14 @@ class ProductUsecase:
     def get_product_by_id(self, product_id: int) -> ProductResponse:
         product = self.product_repository.find_product_by_id(product_id)
         if not product:
+            logger.warning("Product not found", extra={"product_id": product_id})
             raise ProductNotFoundException(product_id=product_id)
         return ProductResponse(**product.__dict__)
 
 
     def find_products_by_category(self, category_id: int) -> list[ProductResponse]:
         if not self.category_repository.get_category_by_id(category_id):
+            logger.warning("Product category not found", extra={"category_id": category_id})
             raise ProductCategoryNotFoundException(category_id=category_id)
 
         products = self.product_repository.find_products_by_category(category_id)
@@ -86,6 +92,7 @@ class ProductUsecase:
 
     def count_products_by_category(self, category_id: int) -> int:
         if not self.category_repository.get_category_by_id(category_id):
+            logger.warning("Product category not found", extra={"category_id": category_id})
             raise ProductCategoryNotFoundException(category_id=category_id)
 
         return self.product_repository.count_products_by_category(category_id)
@@ -122,5 +129,7 @@ class ProductUsecase:
 
     def delete_product(self, product_id: int) -> bool:
         if not self.product_repository.find_product_by_id(product_id):
+            logger.warning("Product not found for deletion", extra={"product_id": product_id})
             raise ProductNotFoundException(product_id=product_id)
+        logger.info("Product deleted", extra={"product_id": product_id})
         return self.product_repository.delete_product(product_id)

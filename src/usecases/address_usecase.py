@@ -1,3 +1,4 @@
+import logging
 from src.dto.request.address_request import AddressRequest
 from src.dto.response.address_response import AddressResponse
 from src.domain.models.address import Address
@@ -8,6 +9,8 @@ from src.exceptions.exception_handlers_address import (
     AddressAlreadyExistsException,
     AddressPermissionDeniedException
 )
+
+logger = logging.getLogger(__name__)
 
 
 class AddressUsecase:
@@ -21,6 +24,7 @@ class AddressUsecase:
             address_request.street,
             address_request.number
             ):
+            logger.warning("Address already exists", extra={"street": address_request.street})
             raise AddressAlreadyExistsException(address=address_request.street)
 
         address_entity = Address(
@@ -35,6 +39,7 @@ class AddressUsecase:
             complement=address_request.complement,
         )
         created_address = self.address_repository.create_address(address_entity)
+        logger.info("Address created", extra={"address_id": created_address.id})
         return AddressResponse(**created_address.__dict__)
 
 
@@ -47,9 +52,11 @@ class AddressUsecase:
 
         address = self.address_repository.find_address_by_id(address_id)
         if not address:
+            logger.warning("Address not found", extra={"address_id": address_id})
             raise AddressNotFoundException(address_id=address_id)
 
         if address.user_id != current_user.id:
+            logger.warning("Permission denied to update address", extra={"address_id": address_id})
             raise AddressPermissionDeniedException(address_id=address_id)
 
         address_entity = Address(
@@ -65,6 +72,7 @@ class AddressUsecase:
             complement=address_request.complement,
         )
         updated_address = self.address_repository.update_address(address_entity)
+        logger.info("Address updated", extra={"address_id": address_id})
         return AddressResponse(**updated_address.__dict__)
 
 
@@ -92,10 +100,13 @@ class AddressUsecase:
     def delete_address(self, address_id: int, current_user: Users) -> bool:
         address = self.address_repository.find_address_by_id(address_id)
         if not address:
+            logger.warning("Address not found for deletion", extra={"address_id": address_id})
             raise AddressNotFoundException(address_id=address_id)
 
         if address.user_id != current_user.id:
+            logger.warning("Permission denied to delete address", extra={"address_id": address_id})
             raise AddressPermissionDeniedException(address_id=address_id)
+        logger.info("Address deleted", extra={"address_id": address_id})
         return self.address_repository.delete_address(address_id)
 
 

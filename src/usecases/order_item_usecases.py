@@ -1,3 +1,4 @@
+import logging
 from src.domain.models.order_item import OrderItem
 from src.dto.request.order_item_request import OrderItemRequest
 from src.dto.response.order_item_response import OrderItemResponse
@@ -12,6 +13,8 @@ from src.exceptions.exception_handlers_order_item import (
 )
 from src.exceptions.exception_handlers_order import OrderNotFoundException
 from src.exceptions.exception_handlers_product import ProductNotFoundException
+
+logger = logging.getLogger(__name__)
 
 
 class OrderItemUsecase:
@@ -32,16 +35,20 @@ class OrderItemUsecase:
 
         order = self.order_repository.get_order_by_id(order_id)
         if not order:
+            logger.warning("Order not found", extra={"order_id": order_id})
             raise OrderNotFoundException(order_id=order_id)
 
         product = self.product_repository.find_product_by_id(product_id)
         if not product:
+            logger.warning("Product not found", extra={"product_id": product_id})
             raise ProductNotFoundException(product_id=product_id)
 
         if order.status in (OrderStatus.DELIVERED, OrderStatus.CANCELED):
+            logger.warning("Cannot add item to order", extra={"order_id": order_id, "status": order.status.value})
             raise InvalidOrderItemException(order_id=order_id, status=order.status.value)
 
         if self.order_item_repository.exists(order_id, product_id):
+            logger.warning("Duplicate order item", extra={"order_id": order_id, "product_id": product_id})
             raise DuplicateOrderItemException(order_id=order_id, product_id=product_id)
 
         order_item = OrderItem.create_order_item(
@@ -52,6 +59,7 @@ class OrderItemUsecase:
             notes=order_item_request.notes
         )
         created_order_item = self.order_item_repository.create_order_item(order_item)
+        logger.info("Order item created", extra={"order_item_id": created_order_item.id})
         return OrderItemResponse(**created_order_item.__dict__)
 
 
@@ -77,6 +85,7 @@ class OrderItemUsecase:
     def get_order_item_by_id(self, order_item_id: int) -> OrderItemResponse:
         order_item_entity = self.order_item_repository.get_order_item_by_id(order_item_id)
         if not order_item_entity:
+            logger.warning("Order item not found", extra={"order_item_id": order_item_id})
             raise OrderItemNotFoundException(order_item_id=order_item_id)
         return OrderItemResponse(**order_item_entity.__dict__)
 

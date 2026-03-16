@@ -1,3 +1,4 @@
+import logging
 from src.domain.models.account import AccountStatus
 from src.infra.db.repositories.account_user_repository_interface import AccountRepository
 from src.infra.db.repositories.user_repository_interface import UserRepository
@@ -15,6 +16,9 @@ from src.exceptions.exception_handlers_account import (
     AccountInactiveException
 )
 
+logger = logging.getLogger(__name__)
+
+
 class AuthUseCases:
     def __init__(
             self,
@@ -30,12 +34,15 @@ class AuthUseCases:
 
         if not account:
             verify_password(password, DUMMY_HASH)
+            logger.warning("Login failed: account not found", extra={"username": username})
             raise InvalidCredentialsException()
 
         if account.status != AccountStatus.ACTIVE:
+            logger.warning("Login failed: account inactive", extra={"account_id": account.id})
             raise AccountInactiveException(account_id=account.id)
 
         if not verify_password(password, account.password_hash):
+            logger.warning("Login failed: invalid password", extra={"username": username})
             raise InvalidCredentialsException()
 
         user = self.user_repository.find_user_by_id(account.user_id)
@@ -50,6 +57,7 @@ class AuthUseCases:
 
         access_token = create_access_token(payload)
         refresh_token = create_refresh_token(payload)
+        logger.info("Login successful", extra={"username": username})
 
         return TokenResponse(
             access_token=access_token,
