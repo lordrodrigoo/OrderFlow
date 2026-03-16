@@ -1,4 +1,5 @@
 import os
+import logging
 from typing import List, Optional
 from fastapi import APIRouter, Response, Query, status, Depends
 from src.usecases.review_usecases import ReviewUsecase
@@ -12,6 +13,8 @@ API_PREFIX = os.getenv("API_V1_REVIEW")
 TAG = os.getenv("TAG_REVIEW")
 
 router = APIRouter(prefix=API_PREFIX, tags=[TAG])
+logger = logging.getLogger(__name__)
+
 
 @router.post("/", response_model=ReviewResponse, status_code=status.HTTP_201_CREATED)
 def create_review(
@@ -20,6 +23,7 @@ def create_review(
     review_usecase: ReviewUsecase = Depends(get_review_usecase)
 ):
     """Endpoint to create a new review."""
+    logger.info("Creating review", extra={"product_id": review_request.product_id})
     review = review_usecase.create_review(review_request)
     response.headers['Location'] = f"{API_PREFIX}/{review.id}"
     return review

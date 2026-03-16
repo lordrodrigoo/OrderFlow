@@ -1,0 +1,34 @@
+services:
+
+  db:
+    image: postgres:16-alpine
+    container_name: orderflow_db
+    environment:
+      POSTGRES_USER: rodrigo
+      POSTGRES_PASSWORD: rodrigo2944508
+      POSTGRES_DB: delivery_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rodrigo -d delivery_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: orderflow_app
+    env_file: .env
+    environment:
+      # Override DB_HOST to point to the db service instead of localhost
+      DB_HOST: db
+      DB_URL: postgresql+psycopg2://rodrigo:rodrigo2944508@db:5432/delivery_db
+      LOG_FORMAT: json
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

@@ -1,11 +1,10 @@
 import os
+import logging
 from fastapi import APIRouter, Response, status, Depends
 from src.api.dependencies import get_account_usecase, get_current_user
 from src.dto.response.account_response import AccountResponse
 from src.dto.response.user_response import UserResponse
 from src.usecases.account_usecases import AccountUsecase
-from src.dto.response.token_response import TokenResponse
-from src.dto.request.login_request import LoginRequest
 from src.dto.request.account_request import (
     AccountRequest,
     UpdateAccountRequest,
@@ -18,16 +17,7 @@ API_PREFIX = os.getenv("API_V1_ACCOUNT")
 TAG = os.getenv("TAG_ACCOUNT")
 
 router = APIRouter(prefix=API_PREFIX, tags=[TAG])
-
-
-
-@router.post("/login", response_model=TokenResponse, status_code=status.HTTP_200_OK)
-def login(
-    login_request: LoginRequest,
-    account_usecase: AccountUsecase = Depends(get_account_usecase)
-):
-    """Endpoint to authenticate a user and return a token."""
-    return account_usecase.login(login_request)
+logger = logging.getLogger(__name__)
 
 
 @router.post("/", response_model=AccountResponse, status_code=status.HTTP_201_CREATED)
@@ -37,6 +27,7 @@ def create_account(
     account_usecase: AccountUsecase = Depends(get_account_usecase)
 ):
     """Endpoint to create a new user account."""
+    logger.info("Creating account", extra={"username": account_request.username})
     account = account_usecase.create_account(account_request)
     response.headers['Location'] = f"{API_PREFIX}/{account.id}"
     return account
@@ -124,5 +115,6 @@ def delete_account(
     account_usecase: AccountUsecase = Depends(get_account_usecase)
 ):
     """Endpoint to delete an account."""
+    logger.info("Deleting account", extra={"account_id": account_id})
     account_usecase.delete_account(account_id, current_user.id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

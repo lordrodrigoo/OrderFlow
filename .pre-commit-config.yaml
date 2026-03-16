@@ -1,23 +1,29 @@
 repos:
   - repo: local
     hooks:
-     - id: pylint
-       name: pylint
-       entry: pylint
-       language: system
-       types: [python]
-       args:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
+        args:
           [
-            "-rn", # Only display messages 
-            "-sn", # Don't display score
-            "--rcfile=.pylintrc", # Use custom pylintrc file
-            "--load-plugins=pylint.extensions.docparams", # Load an extension
+            "-rn",
+            "-sn",
+            "--rcfile=.pylintrc",
+            "--load-plugins=pylint.extensions.docparams",
           ]
-  - repo: local
-    hooks:
-     - id: requirements
-       name: requirements
-       entry: bash -c 'venv/bin/pip freeze > requirements.txt; git add requirements.txt'
-       language: system
-       pass_filenames: false
-       stages: [pre-commit]
+
+      - id: unit-tests
+        name: unit tests
+        entry: bash -c 'python -m pytest src/tests/unit_tests/ -q --tb=short'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: requirements
+        name: requirements
+        entry: bash -c 'venv/bin/pip freeze > requirements.txt; git add requirements.txt'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]

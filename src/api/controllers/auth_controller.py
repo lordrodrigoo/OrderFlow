@@ -1,4 +1,5 @@
 import os
+import logging
 from fastapi import APIRouter, Depends, status
 from src.dto.request.refresh_token_request import RefreshTokenRequest
 from src.dto.request.login_request import LoginRequest
@@ -8,10 +9,11 @@ from src.api.dependencies import get_auth_usecase
 
 
 
-API_PREFIX = os.getenv("API_V1_LOGIN")
-TAG = os.getenv("TAG_LOGIN")
+API_PREFIX = os.getenv("API_V1_AUTH")
+TAG = os.getenv("TAG_AUTH")
 
 router = APIRouter(prefix=API_PREFIX, tags=[TAG])
+logger = logging.getLogger(__name__)
 
 
 @router.post("/", response_model=TokenResponse, status_code=status.HTTP_200_OK)
@@ -20,6 +22,7 @@ def login(
     auth_usecase: AuthUseCases = Depends(get_auth_usecase)
 ):
     """Endpoint to authenticate a user and return a token."""
+    logger.info("Login attempt", extra={"username": login_request.username})
     return auth_usecase.login(login_request.username, login_request.password)
 
 

@@ -1,4 +1,5 @@
 import os
+import logging
 from typing import List, Optional
 from fastapi import APIRouter, Response, Query, status, Depends
 from src.usecases.order_usecases import OrderUsecase
@@ -11,6 +12,7 @@ API_PREFIX = os.getenv("API_V1_ORDER")
 TAG = os.getenv("TAG_ORDER")
 
 router = APIRouter(prefix=API_PREFIX, tags=[TAG])
+logger = logging.getLogger(__name__)
 
 @router.post("/", response_model=OrderResponse, status_code=status.HTTP_201_CREATED)
 def create_order(
@@ -20,6 +22,7 @@ def create_order(
     order_usecase: OrderUsecase = Depends(get_order_usecase)
 ):
     """Endpoint to create a new order."""
+    logger.info("Creating order", extra={"user_id": current_user.id})
     order = order_usecase.create_order(order_request, current_user.id)
     response.headers['Location'] = f"{API_PREFIX}/{order.id}"
     return order
@@ -81,6 +84,7 @@ def delete_order(
     order_usecase: OrderUsecase = Depends(get_order_usecase)
 ):
     """Endpoint to delete an order."""
+    logger.info("Deleting order", extra={"order_id": order_id})
     order_usecase.delete_order(order_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -92,6 +96,7 @@ def cancel_order(
     order_usecase: OrderUsecase = Depends(get_order_usecase)
 ):
     """Endpoint to cancel an order."""
+    logger.info("Canceling order", extra={"order_id": order_id})
     canceled_order = order_usecase.cancel_order(order_id)
     response.headers['Location'] = f"{API_PREFIX}/{canceled_order.id}"
     return canceled_order

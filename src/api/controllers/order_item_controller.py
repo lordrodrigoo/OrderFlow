@@ -1,4 +1,5 @@
 import os
+import logging
 from typing import List, Optional
 from fastapi import APIRouter, Response, Query, status, Depends
 from src.usecases.order_item_usecases import OrderItemUsecase
@@ -12,6 +13,8 @@ API_PREFIX = os.getenv("API_V1_ORDER_ITEM")
 TAG = os.getenv("TAG_ORDER_ITEM")
 
 router = APIRouter(prefix=API_PREFIX, tags=[TAG])
+logger = logging.getLogger(__name__)
+
 
 @router.post("/", response_model=OrderItemResponse, status_code=status.HTTP_201_CREATED)
 def create_order_item(
@@ -20,6 +23,7 @@ def create_order_item(
     order_item_usecase: OrderItemUsecase = Depends(get_order_item_usecase)
 ):
     """Endpoint to create a new order item."""
+    logger.info("Creating order item", extra={"order_id": order_item_request.order_id})
     order_item = order_item_usecase.create_order_item(order_item_request)
     response.headers['Location'] = f"{API_PREFIX}/{order_item.id}"
     return order_item
@@ -44,6 +48,7 @@ def delete_order_item(
     order_item_usecase: OrderItemUsecase = Depends(get_order_item_usecase)
 ):
     """Endpoint to delete an order item."""
+    logger.info("Deleting order item", extra={"order_item_id": order_item_id})
     order_item_usecase.delete_order_item(order_item_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 

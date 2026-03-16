@@ -1,4 +1,5 @@
 import os
+import logging
 from typing import List
 from fastapi import APIRouter, Response, status, Depends
 from src.usecases.category_usecases import CategoryUsecase
@@ -12,7 +13,7 @@ API_PREFIX = os.getenv("API_V1_CATEGORY")
 TAG = os.getenv("TAG_CATEGORY")
 
 router = APIRouter(prefix=API_PREFIX, tags=[TAG])
-
+logger = logging.getLogger(__name__)
 
 @router.post("/", response_model=CategoryResponse, status_code=status.HTTP_201_CREATED)
 def create_category(
@@ -21,6 +22,7 @@ def create_category(
     category_usecase: CategoryUsecase = Depends(get_category_usecase)
 ):
     """Endpoint to create a new category."""
+    logger.info("Creating category", extra={"category_name": category_request.name})
     category = category_usecase.create_category(category_request)
     response.headers['Location'] = f"{API_PREFIX}/{category.id}"
     return category
@@ -68,5 +70,6 @@ def delete_category(
     category_usecase: CategoryUsecase = Depends(get_category_usecase)
 ):
     """Endpoint to delete a category by category_id."""
+    logger.info("Deleting category", extra={"category_id": category_id})
     category_usecase.delete_category(category_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

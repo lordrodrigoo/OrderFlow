@@ -1,4 +1,5 @@
 import os
+import logging
 from typing import List
 from fastapi import APIRouter, Response, status, Depends
 from src.api.dependencies import get_address_usecase, get_current_user
@@ -12,6 +13,7 @@ from src.usecases.address_usecase import AddressUsecase
 API_PREFIX = os.getenv("API_V1_ADDRESS")
 TAG = os.getenv("TAG_ADDRESS")
 router = APIRouter(prefix=API_PREFIX, tags=[TAG])
+logger = logging.getLogger(__name__)
 
 
 
@@ -78,6 +80,7 @@ def delete_address(
     current_user: UserResponse = Depends(get_current_user)
 ):
     """Endpoint to delete an address."""
+    logger.info("Deleting address", extra={"address_id": address_id})
     address_usecase.delete_address(address_id, current_user)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 

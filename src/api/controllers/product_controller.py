@@ -1,4 +1,5 @@
 import os
+import logging
 from typing import List, Optional
 from fastapi import APIRouter, Response, Query, status, Depends
 from src.usecases.product_usecases import ProductUsecase
@@ -11,6 +12,7 @@ API_PREFIX = os.getenv("API_V1_PRODUCT")
 TAG = os.getenv("TAG_PRODUCT")
 
 router = APIRouter(prefix=API_PREFIX, tags=[TAG])
+logger = logging.getLogger(__name__)
 
 @router.post("/", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
 def create_product(
@@ -19,6 +21,7 @@ def create_product(
     product_usecase: ProductUsecase = Depends(get_product_usecase)
 ):
     """Endpoint to create a new product."""
+    logger.info("Creating product", extra={"product_name": product_request.name})
     product = product_usecase.create_product(product_request)
     response.headers['Location'] = f"{API_PREFIX}/{product.id}"
     return product
@@ -103,4 +106,5 @@ def delete_product(
     product_id: int,
     product_usecase: ProductUsecase = Depends(get_product_usecase)):
     """Endpoint to delete a product by product_id."""
+    logger.info("Deleting product", extra={"product_id": product_id})
     product_usecase.delete_product(product_id)
