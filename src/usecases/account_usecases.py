@@ -5,14 +5,11 @@ from src.dto.request.account_request import AccountRequest, UpdateAccountRequest
 from src.dto.response.account_response import AccountResponse
 from src.dto.response.user_response import UserResponse
 from src.domain.repositories.user_repository import UserRepositoryInterface
-from src.config.security import hash_password, verify_password, create_access_token, DUMMY_HASH
-from src.dto.request.login_request import LoginRequest
-from src.dto.response.token_response import TokenResponse
+from src.config.security import hash_password, verify_password
 
 from src.exceptions.exception_handlers_account import (
     UsernameAlreadyExistsException,
     InvalidCredentialsException,
-    AccountInactiveException,
     AccountNotFoundException,
     AccountPermissionDeniedException
 )
@@ -42,36 +39,6 @@ class AccountUsecase:
         created_account = self.account_repository.create_account(account_entity)
         logger.info("Account created", extra={"account_id": created_account.id})
         return AccountResponse(**created_account.__dict__)
-
-
-    def login(self, login_request: LoginRequest) -> TokenResponse:
-        account = self.account_repository.find_by_username(login_request.username)
-
-        if not account:
-            verify_password(login_request.password, DUMMY_HASH)
-            logger.warning("Login failed: account not found", extra={"username": login_request.username})
-            raise InvalidCredentialsException()
-
-        if account.status != AccountStatus.ACTIVE:
-            logger.warning("Login failed: account inactive", extra={"account_id": account.id})
-            raise AccountInactiveException(account_id=account.id)
-
-        if not verify_password(login_request.password, account.password_hash):
-            logger.warning("Login failed: invalid password", extra={"username": login_request.username})
-            raise InvalidCredentialsException()
-
-        user = self.user_repository.find_user_by_id(account.user_id)
-        if not user:
-            logger.warning("Login failed: user not found for account", extra={"account_id": account.id})
-            raise InvalidCredentialsException()
-
-        token = create_access_token({
-            "sub": str(user.email),
-            "user_id": str(user.id),
-            "role": user.role.value
-        })
-        logger.info("Login successful", extra={"username": login_request.username})
-        return TokenResponse(access_token=token, token_type="bearer")
 
 
     def get_authenticated_user(self, email: str) -> UserResponse:
@@ -131,18 +98,6 @@ class AccountUsecase:
         new_password_hash = hash_password(password_request.new_password)
         updated = self.account_repository.update_password(account_id, new_password_hash)
         logger.info("Password updated", extra={"account_id": account_id})
-        return AccountResponse(**updated.__dict__)
-
-
-    def deactivate_account(self, account_id: int, current_user_id: int) -> AccountResponse:
-        account = self.account_repository.find_account_by_id(account_id)
-        if not account:
-            raise AccountNotFoundException(account_id=account_id)
-
-        if account.user_id != current_user_id:
-            raise AccountPermissionDeniedException(account_id=account_id)
-        updated = self.account_repository.update_status(account_id, AccountStatus.INACTIVE)
-        logger.info("Account deactivated", extra={"account_id": account_id})
         return AccountResponse(**updated.__dict__)
 
 

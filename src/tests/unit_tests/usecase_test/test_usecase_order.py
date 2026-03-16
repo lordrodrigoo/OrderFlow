@@ -35,7 +35,7 @@ def test_order_not_found(
     ):
     fake_order_repository_mock.get_order_by_id.return_value = None
     with pytest.raises(OrderNotFoundException) as exc_info:
-        order_usecase.get_order_by_id(999)
+        order_usecase.get_order_by_id(999, 1)
     assert "Order with ID: '999' not found." in exc_info.value.message
 
 
@@ -88,7 +88,7 @@ def test_order_already_canceled(
         created_at=datetime.now()
     )
     with pytest.raises(OrderAlreadyCanceledException) as exc_info:
-        order_usecase.cancel_order(1)
+        order_usecase.cancel_order(1, 1)
     assert "Order with ID: '1' is already canceled." in exc_info.value.message
 
 
@@ -131,7 +131,7 @@ def test_get_order_by_id(
         valid_order
     ):
     fake_order_repository_mock.get_order_by_id.return_value = valid_order
-    response = order_usecase.get_order_by_id(1)
+    response = order_usecase.get_order_by_id(1, 1)
     assert isinstance(response, OrderResponse)
     assert response.id == valid_order.id
     assert response.user_id == valid_order.user_id

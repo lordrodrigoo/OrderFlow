@@ -52,14 +52,6 @@ def test_update_password(client, fake_account, auth_token):
     assert response.status_code == 200
 
 
-def test_deactivate_account(client, fake_account, auth_token):
-    response = client.patch(
-        f"/api/v1/accounts/{fake_account.id}/deactivate",
-        headers={"Authorization": f"Bearer {auth_token}"}
-    )
-    assert response.status_code == 200
-
-
 def test_suspend_account(client, fake_account, auth_token):
     response = client.patch(
         f"/api/v1/accounts/{fake_account.id}/suspended",

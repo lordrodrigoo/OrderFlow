@@ -19,8 +19,8 @@ class AddressEntity(Base):
     state = Column(String(2), nullable=False)
     zip_code = Column(String(10), nullable=False)
     is_default = Column(Boolean, default=False)
-    created_at = Column(DateTime, nullable=False, default=datetime.now())
-    updated_at = Column(DateTime, nullable=True, default=None, onupdate=datetime.now())
+    created_at = Column(DateTime, nullable=False, default=datetime.now)
+    updated_at = Column(DateTime, nullable=True, default=None, onupdate=datetime.now)
 
     user = relationship('UserEntity', back_populates='addresses')
 

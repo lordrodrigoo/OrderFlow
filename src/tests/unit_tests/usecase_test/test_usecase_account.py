@@ -1,16 +1,12 @@
 #pylint: disable=unused-argument
 from unittest.mock import MagicMock, patch
 import pytest
-from src.domain.models.account import AccountStatus
 from src.dto.request.account_request import AccountRequest, UpdateAccountRequest, UpdatePasswordRequest
-from src.dto.request.login_request import LoginRequest
 from src.dto.response.account_response import AccountResponse
-from src.dto.response.token_response import TokenResponse
 from src.dto.response.user_response import UserResponse
 from src.exceptions.exception_handlers_account import (
     UsernameAlreadyExistsException,
     InvalidCredentialsException,
-    AccountInactiveException,
     AccountNotFoundException,
     AccountPermissionDeniedException,
 )
@@ -31,47 +27,6 @@ def test_create_account_username_exists(account_usecase, account_repository_mock
     account_repository_mock.find_by_username.return_value = MagicMock()
     with pytest.raises(UsernameAlreadyExistsException):
         account_usecase.create_account(AccountRequest(user_id=1, username="john_doe", password="P@ssw0rd1"))
-
-
-# ──────────── login ────────────
-
-@patch("src.usecases.account_usecases.create_access_token", return_value="tok123")
-@patch("src.usecases.account_usecases.verify_password", return_value=True)
-def test_login_success(mock_verify, mock_token, account_usecase, account_repository_mock, user_repository_mock, fake_account):
-    account_repository_mock.find_by_username.return_value = fake_account
-    user_repository_mock.find_user_by_id.return_value = MagicMock()
-    result = account_usecase.login(LoginRequest(username="john_doe", password="P@ssw0rd1"))
-    assert isinstance(result, TokenResponse)
-    assert result.access_token == "tok123"
-
-
-@patch("src.usecases.account_usecases.verify_password", return_value=False)
-def test_login_account_not_found(mock_verify, account_usecase, account_repository_mock):
-    account_repository_mock.find_by_username.return_value = None
-    with pytest.raises(InvalidCredentialsException):
-        account_usecase.login(LoginRequest(username="unknown", password="P@ssw0rd1"))
-
-
-def test_login_account_inactive(account_usecase, account_repository_mock, fake_account):
-    fake_account.status = AccountStatus.INACTIVE
-    account_repository_mock.find_by_username.return_value = fake_account
-    with pytest.raises(AccountInactiveException):
-        account_usecase.login(LoginRequest(username="john_doe", password="P@ssw0rd1"))
-
-
-@patch("src.usecases.account_usecases.verify_password", return_value=False)
-def test_login_wrong_password(mock_verify, account_usecase, account_repository_mock, fake_account):
-    account_repository_mock.find_by_username.return_value = fake_account
-    with pytest.raises(InvalidCredentialsException):
-        account_usecase.login(LoginRequest(username="john_doe", password="WrongP@ss1"))
-
-
-@patch("src.usecases.account_usecases.verify_password", return_value=True)
-def test_login_user_not_found(mock_verify, account_usecase, account_repository_mock, user_repository_mock, fake_account):
-    account_repository_mock.find_by_username.return_value = fake_account
-    user_repository_mock.find_user_by_id.return_value = None
-    with pytest.raises(InvalidCredentialsException):
-        account_usecase.login(LoginRequest(username="john_doe", password="P@ssw0rd1"))
 
 
 # ──────────── get_authenticated_user ────────────
@@ -176,27 +131,6 @@ def test_update_password_wrong_current(mock_verify, account_usecase, account_rep
             UpdatePasswordRequest(current_password="WrongP@ss1", new_password="NewP@ss1"),
             current_user_id=1
         )
-
-
-# ──────────── deactivate_account ────────────
-
-def test_deactivate_account_success(account_usecase, account_repository_mock, fake_account):
-    account_repository_mock.find_account_by_id.return_value = fake_account
-    account_repository_mock.update_status.return_value = fake_account
-    response = account_usecase.deactivate_account(1, current_user_id=1)
-    assert isinstance(response, AccountResponse)
-
-
-def test_deactivate_account_not_found(account_usecase, account_repository_mock):
-    account_repository_mock.find_account_by_id.return_value = None
-    with pytest.raises(AccountNotFoundException):
-        account_usecase.deactivate_account(999, current_user_id=1)
-
-
-def test_deactivate_account_permission_denied(account_usecase, account_repository_mock, fake_account):
-    account_repository_mock.find_account_by_id.return_value = fake_account
-    with pytest.raises(AccountPermissionDeniedException):
-        account_usecase.deactivate_account(1, current_user_id=999)
 
 
 # ──────────── suspend_account ────────────

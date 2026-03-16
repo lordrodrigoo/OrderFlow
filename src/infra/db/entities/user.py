@@ -18,8 +18,8 @@ class UserEntity(Base):
     phone = Column(String(20), nullable=True)
     is_active = Column(Boolean, default=True)
     role = Column(String(20), nullable=False, default=UserRole.USER.value)
-    created_at = Column(DateTime, nullable=False, default=datetime.now())
-    updated_at = Column(DateTime, nullable=True, default=None, onupdate=datetime.now())
+    created_at = Column(DateTime, nullable=False, default=datetime.now)
+    updated_at = Column(DateTime, nullable=True, default=None, onupdate=datetime.now)
 
     accounts = relationship('AccountEntity', back_populates='user', cascade='all, delete-orphan')
     addresses = relationship('AddressEntity', back_populates='user')

@@ -33,9 +33,9 @@ class OrderUsecase:
 
 
 
-    def update_order(self, order_id: int, order_request: OrderRequest) -> OrderResponse:
+    def update_order(self, order_id: int, order_request: OrderRequest, current_user_id: int) -> OrderResponse:
         order = self.order_repository.get_order_by_id(order_id)
-        if not order:
+        if not order or order.user_id != current_user_id:
             logger.warning("Order not found", extra={"order_id": order_id})
             raise OrderNotFoundException(order_id=order_id)
 
@@ -49,9 +49,9 @@ class OrderUsecase:
         return OrderResponse(**order.__dict__)
 
 
-    def get_order_by_id(self, order_id: int) -> OrderResponse:
+    def get_order_by_id(self, order_id: int, current_user_id: int) -> OrderResponse:
         order = self.order_repository.get_order_by_id(order_id)
-        if not order:
+        if not order or order.user_id != current_user_id:
             logger.warning("Order not found", extra={"order_id": order_id})
             raise OrderNotFoundException(order_id=order_id)
         return OrderResponse(**order.__dict__)
@@ -84,8 +84,11 @@ class OrderUsecase:
 
 
 
-    def cancel_order(self, order_id: int) -> OrderResponse:
+    def cancel_order(self, order_id: int, current_user_id: int) -> OrderResponse:
         order = self.order_repository.get_order_by_id(order_id)
+        if not order or order.user_id != current_user_id:
+            logger.warning("Order not found", extra={"order_id": order_id})
+            raise OrderNotFoundException(order_id=order_id)
         if order.is_canceled:
             logger.warning("Order already canceled", extra={"order_id": order_id})
             raise OrderAlreadyCanceledException(order_id=order_id)
@@ -96,9 +99,9 @@ class OrderUsecase:
         return OrderResponse(**order.__dict__)
 
 
-    def delete_order(self, order_id: int) -> bool:
+    def delete_order(self, order_id: int, current_user_id: int) -> bool:
         order = self.order_repository.get_order_by_id(order_id)
-        if not order:
+        if not order or order.user_id != current_user_id:
             logger.warning("Order not found for deletion", extra={"order_id": order_id})
             raise OrderNotFoundException(order_id=order_id)
         logger.info("Order deleted", extra={"order_id": order_id})

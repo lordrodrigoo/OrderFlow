@@ -32,10 +32,11 @@ def create_order(
 def get_order_by_id(
     order_id: int,
     response: Response,
+    current_user=Depends(get_current_user),
     order_usecase: OrderUsecase = Depends(get_order_usecase)
 ):
     """Endpoint to get an order by order_id."""
-    order = order_usecase.get_order_by_id(order_id)
+    order = order_usecase.get_order_by_id(order_id, current_user.id)
     response.headers['Location'] = f"{API_PREFIX}/{order.id}"
     return order
 
@@ -49,11 +50,12 @@ def list_orders(
     skip: int = Query(0, description="Number of records to skip for pagination"),
     limit: int = Query(10, description="Maximum number of records to return"),
     response: Response = None,
+    current_user=Depends(get_current_user),
     order_usecase: OrderUsecase = Depends(get_order_usecase)
 ):
     """Endpoint to list orders with optional filters and pagination."""
     orders = order_usecase.list_orders(
-        user_id=user_id,
+        user_id=user_id if user_id is not None else current_user.id,
         order_status=order_status,
         min_amount=min_amount,
         max_amount=max_amount,
@@ -70,10 +72,11 @@ def update_order(
     order_id: int,
     order_request: OrderRequest,
     response: Response,
+    current_user=Depends(get_current_user),
     order_usecase: OrderUsecase = Depends(get_order_usecase)
 ):
     """Endpoint to update an existing order."""
-    updated_order = order_usecase.update_order(order_id, order_request)
+    updated_order = order_usecase.update_order(order_id, order_request, current_user.id)
     response.headers['Location'] = f"{API_PREFIX}/{updated_order.id}"
     return updated_order
 
@@ -81,11 +84,12 @@ def update_order(
 @router.delete("/{order_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_order(
     order_id: int,
+    current_user=Depends(get_current_user),
     order_usecase: OrderUsecase = Depends(get_order_usecase)
 ):
     """Endpoint to delete an order."""
     logger.info("Deleting order", extra={"order_id": order_id})
-    order_usecase.delete_order(order_id)
+    order_usecase.delete_order(order_id, current_user.id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -93,10 +97,11 @@ def delete_order(
 def cancel_order(
     order_id: int,
     response: Response,
+    current_user=Depends(get_current_user),
     order_usecase: OrderUsecase = Depends(get_order_usecase)
 ):
     """Endpoint to cancel an order."""
     logger.info("Canceling order", extra={"order_id": order_id})
-    canceled_order = order_usecase.cancel_order(order_id)
+    canceled_order = order_usecase.cancel_order(order_id, current_user.id)
     response.headers['Location'] = f"{API_PREFIX}/{canceled_order.id}"
     return canceled_order

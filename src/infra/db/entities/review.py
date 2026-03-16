@@ -10,7 +10,7 @@ class ReviewEntity(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     rating = Column(Numeric(2, 1), nullable=False)
     comment = Column(String(500), nullable=True)
-    created_at = Column(DateTime, nullable=False, default=datetime.now())
+    created_at = Column(DateTime, nullable=False, default=datetime.now)
 
 
     "Bellow are foreign keys and relationships"

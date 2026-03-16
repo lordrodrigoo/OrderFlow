@@ -26,7 +26,7 @@ def test_valid_review_request(valid_review_data):
     ("product_id", -1, "Input should be greater than 0"),
     # rating
     ("rating", "abc", "Input should be a valid integer"),
-    ("rating", -1, "Input should be greater than or equal to 0"),
+    ("rating", -1, "Input should be greater than or equal to 1"),
     ("rating", 6, "Input should be less than or equal to 5"),
     # comment
     ("comment", "   ", "Comment cannot be empty string"),

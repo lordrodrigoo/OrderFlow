@@ -7,9 +7,9 @@ class ReviewRequest(BaseModel):
     product_id: int = Field(..., gt=0, description='ID of the product being reviewed')
     rating: int | None = Field(
         None,
-        ge=0,
+        ge=1,
         le=5,
-        description="Rating should be between 0 and 5"
+        description="Rating should be between 1 and 5"
     )
     comment: str | None = Field(
         None,

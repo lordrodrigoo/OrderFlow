@@ -69,16 +69,6 @@ def update_password(
     return account_usecase.update_password(account_id, password_request, current_user.id)
 
 
-@router.patch("/{account_id}/deactivate", response_model=AccountResponse, status_code=status.HTTP_200_OK)
-def deactivate_account(
-    account_id: int,
-    current_user: UserResponse = Depends(get_current_user),
-    account_usecase: AccountUsecase = Depends(get_account_usecase)
-):
-    """Endpoint to deactivate an account."""
-    return account_usecase.deactivate_account(account_id, current_user.id)
-
-
 @router.patch("/{account_id}/suspended", response_model=AccountResponse, status_code=status.HTTP_200_OK)
 def suspend_account(
     account_id: int,

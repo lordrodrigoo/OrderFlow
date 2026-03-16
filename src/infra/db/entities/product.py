@@ -15,8 +15,8 @@ class ProductEntity(Base):
     image_url = Column(String, nullable=True)
     is_available = Column(Boolean, default=True)
     preparation_time = Column(Integer, nullable=True)
-    created_at = Column(DateTime, nullable=False, default=datetime.now())
-    updated_at = Column(DateTime, nullable=True, default=None, onupdate=datetime.now())
+    created_at = Column(DateTime, nullable=False, default=datetime.now)
+    updated_at = Column(DateTime, nullable=True, default=None, onupdate=datetime.now)
 
     "Bellow are foreign keys and relationships"
     category_id = Column(Integer, ForeignKey('categories.id'), nullable=False)
