@@ -1,10 +1,8 @@
 from typing import Optional
-from pydantic import BaseModel
+from src.dto.base import BaseResponse
 
 
-class CategoryResponse(BaseModel):
+class CategoryResponse(BaseResponse):
     id: int
     name: str
     description: Optional[str] = None
-
-    model_config = {"from_attributes": True}

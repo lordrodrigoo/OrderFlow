@@ -26,7 +26,13 @@ class DBConnectionHandler:
         self.session = None
 
     def __create_database_engine(self):
-        engine = create_engine(self.__connection_string)
+        engine = create_engine(
+            self.__connection_string,
+            pool_size=10,
+            max_overflow=20,
+            pool_pre_ping=True,
+            pool_recycle=3600,
+        )
         return engine
 
     def get_engine(self):

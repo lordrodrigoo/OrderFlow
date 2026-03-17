@@ -1,9 +1,10 @@
 from datetime import datetime
-from pydantic import BaseModel, EmailStr
+from pydantic import EmailStr
+from src.dto.base import BaseResponse
 from src.domain.models.user import UserRole
 
 
-class UserResponse(BaseModel):
+class UserResponse(BaseResponse):
     id: int
     first_name: str
     last_name: str
@@ -13,5 +14,3 @@ class UserResponse(BaseModel):
     is_active: bool
     role: UserRole
     created_at: datetime
-
-    model_config = {"from_attributes": True}

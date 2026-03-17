@@ -1,10 +1,10 @@
 from datetime import datetime
 from decimal import Decimal
 from typing import Optional
-from pydantic import BaseModel
+from src.dto.base import BaseResponse
 
 
-class OrderItemResponse(BaseModel):
+class OrderItemResponse(BaseResponse):
     id: int
     order_id: int
     product_id: int
@@ -13,5 +13,3 @@ class OrderItemResponse(BaseModel):
     subtotal: Decimal
     notes: Optional[str] = None
     created_at: datetime
-
-    model_config = {"from_attributes": True}

@@ -1,11 +1,9 @@
 from datetime import datetime
-from pydantic import BaseModel
+from src.dto.base import BaseResponse
 
 
-class AccountResponse(BaseModel):
+class AccountResponse(BaseResponse):
     id: int
     username: str
     status: str
     created_at: datetime
-
-    model_config = {"from_attributes": True}

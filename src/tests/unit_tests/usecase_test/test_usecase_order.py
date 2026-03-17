@@ -141,3 +141,29 @@ def test_get_order_by_id(
     assert response.notes == valid_order.notes
     assert response.scheduled_date == valid_order.scheduled_date
     assert response.status == valid_order.status
+
+
+def test_cancel_order_not_found(
+        order_usecase,
+        fake_order_repository_mock
+    ):
+    fake_order_repository_mock.get_order_by_id.return_value = None
+    with pytest.raises(OrderNotFoundException) as exc_info:
+        order_usecase.cancel_order(999, 1)
+    assert "Order with ID: '999' not found." in exc_info.value.message
+
+
+def test_list_orders_filter_by_amount(
+        order_usecase,
+        fake_order_repository_mock,
+        valid_order
+    ):
+    fake_order_repository_mock.find_orders_by_total_amount.return_value = [valid_order]
+    response = order_usecase.list_orders(
+        min_amount=Decimal("50.00"),
+        max_amount=Decimal("100.00")
+    )
+    assert isinstance(response, list)
+    assert len(response) == 1
+    assert isinstance(response[0], OrderResponse)
+    assert response[0].id == valid_order.id

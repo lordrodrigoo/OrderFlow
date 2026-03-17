@@ -1,9 +1,9 @@
 from datetime import datetime
 from decimal import Decimal
-from pydantic import BaseModel
+from src.dto.base import BaseResponse
 
 
-class ProductResponse(BaseModel):
+class ProductResponse(BaseResponse):
     id: int
     category_id: int
     name: str
@@ -12,5 +12,3 @@ class ProductResponse(BaseModel):
     is_available: bool
     preparation_time: int
     created_at: datetime
-
-    model_config = {"from_attributes": True}

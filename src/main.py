@@ -1,4 +1,5 @@
 #pylint: disable=unused-import
+import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from src.middlewares.middlewares import setup_middlewares
@@ -11,7 +12,15 @@ from src.config.logger import setup_logging
 load_dotenv()
 setup_logging()
 
-app = FastAPI(title=Settings.API_TITLE, version=Settings.API_VERSION)
+_env = os.getenv("ENV", "production")
+
+app = FastAPI(
+    title=Settings.API_TITLE,
+    version=Settings.API_VERSION,
+    docs_url="/docs" if _env != "production" else None,
+    redoc_url="/redoc" if _env != "production" else None,
+    openapi_url="/openapi.json" if _env != "production" else None,
+)
 
 
 # MIDDLEWARE

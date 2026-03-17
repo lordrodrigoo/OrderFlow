@@ -1,8 +1,9 @@
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import Field
+from src.dto.base import BaseResponse
 
 
-class ReviewResponse(BaseModel):
+class ReviewResponse(BaseResponse):
     id: int
     rating: int | None = Field(
         None,
@@ -18,5 +19,3 @@ class ReviewResponse(BaseModel):
     created_at: datetime
     user_id: int
     product_id: int
-
-    model_config = {"from_attributes": True}
