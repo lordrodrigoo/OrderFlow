@@ -4,7 +4,7 @@ from unittest.mock import patch
 from fastapi.testclient import TestClient
 from src.main import app
 
-client = TestClient(app)
+client = TestClient(app, base_url="http://localhost", raise_server_exceptions=False)
 
 
 # ─── CorrelationIdMiddleware ──────────────────────────────────────────────────

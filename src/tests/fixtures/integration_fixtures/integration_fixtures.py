@@ -12,13 +12,21 @@ from src.api.dependencies import get_db
 from src.infra.db.settings.base import Base
 from src.infra.db.entities.review import ReviewEntity
 from src.tests.helpers import FakeDBConnectionHandler
+from src.config.limiter import reset_limiter
+
+
+@pytest.fixture(autouse=True)
+def reset_rate_limiter():
+    reset_limiter()
+    yield
+    reset_limiter()
 
 
 @pytest.fixture
 def client(db_session):
     fake_db = FakeDBConnectionHandler(db_session)
     app.dependency_overrides[get_db] = lambda: fake_db
-    with TestClient(app) as test_client:
+    with TestClient(app, base_url="http://localhost") as test_client:
         yield test_client
     app.dependency_overrides.clear()
 

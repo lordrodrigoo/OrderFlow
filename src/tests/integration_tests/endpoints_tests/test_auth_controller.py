@@ -52,3 +52,15 @@ def test_refresh_token_invalid(client):
 def test_refresh_token_missing_field(client):
     response = client.post("/api/v1/auth/refresh", json={})
     assert response.status_code == 422
+
+
+# ─── Rate Limiting ─────────────────────────────────────────────────────────────
+
+def test_login_rate_limit_exceeded(client):
+    """Should return 429 after exceeding 5 requests per minute on /login."""
+    payload = {"username": "any_user", "password": "AnyPassword123!"}
+    for _ in range(5):
+        client.post("/api/v1/auth/", json=payload)
+
+    response = client.post("/api/v1/auth/", json=payload)
+    assert response.status_code == 429

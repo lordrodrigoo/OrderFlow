@@ -1,6 +1,8 @@
+# pylint: disable=unused-argument
 import os
 import logging
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
+from src.config.limiter import limiter
 from src.dto.request.refresh_token_request import RefreshTokenRequest
 from src.dto.request.login_request import LoginRequest
 from src.dto.response.token_response import TokenResponse
@@ -17,7 +19,9 @@ logger = logging.getLogger(__name__)
 
 
 @router.post("/", response_model=TokenResponse, status_code=status.HTTP_200_OK)
+@limiter.limit("5/minute")
 def login(
+    request: Request,
     login_request: LoginRequest,
     auth_usecase: AuthUseCases = Depends(get_auth_usecase)
 ):
