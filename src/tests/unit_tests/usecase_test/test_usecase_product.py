@@ -277,3 +277,16 @@ def test_update_product_already_exists(
     with pytest.raises(ProductAlreadyExistsException) as exc_info:
         product_usecase.update_product(1, ProductRequest(**valid_product_data))
     assert valid_product_data["name"] in exc_info.value.message
+
+
+def test_get_total_products(
+        product_usecase,
+        fake_product_repository_mock,
+        fake_product_response_mock
+    ):
+    fake_product_repository_mock.get_all_products.return_value = [
+        fake_product_response_mock,
+        fake_product_response_mock
+    ]
+    total = product_usecase.get_total_products()
+    assert total == 2

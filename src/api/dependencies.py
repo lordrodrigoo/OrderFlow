@@ -28,6 +28,7 @@ from src.dto.response.user_response import UserResponse
 
 
 
+
 def get_db():
     with DBConnectionHandler() as db:
         yield db
@@ -86,6 +87,13 @@ def get_current_user(
 ) -> UserResponse:
     token_data: TokenPayload = verify_token(token)
     return user_usecase.get_user_by_email(token_data.sub)
+
+
+def get_current_admin(
+    current_user: UserResponse = Depends(get_current_user),
+    user_usecase: UserUsecase = Depends(get_user_usecase)
+) -> UserResponse:
+    return user_usecase.verify_admin(current_user)
 
 
 def get_auth_usecase(db=Depends(get_db)):

@@ -15,6 +15,7 @@ from src.exceptions.exception_handlers_user import (
 from src.exceptions.exception_handlers_account import (
     UsernameAlreadyExistsException,
 )
+from src.exceptions.exception_handlers_auth import AdminForbiddenException
 
 logger = logging.getLogger(__name__)
 
@@ -156,3 +157,13 @@ class UserUsecase:
         self.user_repository.delete_user(user_id)
         logger.info("User deleted successfully", extra={"user_id": user_id})
         return True
+
+
+    def verify_admin(self, user: UserResponse) -> UserResponse:
+        if user.role != UserRole.ADMIN:
+            raise AdminForbiddenException()
+        return user
+
+
+    def get_total_users(self) -> int:
+        return len(self.user_repository.find_all_users())

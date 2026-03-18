@@ -5,7 +5,7 @@ from fastapi import APIRouter, Response, status, Depends
 from src.usecases.category_usecases import CategoryUsecase
 from src.dto.request.category_request import CategoryRequest
 from src.dto.response.category_response import CategoryResponse
-from src.api.dependencies import get_category_usecase
+from src.api.dependencies import get_category_usecase, get_current_admin
 
 
 
@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 def create_category(
     category_request: CategoryRequest,
     response: Response,
+    _=Depends(get_current_admin),
     category_usecase: CategoryUsecase = Depends(get_category_usecase)
 ):
     """Endpoint to create a new category."""
@@ -56,6 +57,7 @@ def update_category(
     category_id: int,
     category_request: CategoryRequest,
     response: Response,
+    _=Depends(get_current_admin),
     category_usecase: CategoryUsecase = Depends(get_category_usecase)
 ):
     """Endpoint to update a category by category_id."""
@@ -67,6 +69,7 @@ def update_category(
 @router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_category(
     category_id: int,
+    _=Depends(get_current_admin),
     category_usecase: CategoryUsecase = Depends(get_category_usecase)
 ):
     """Endpoint to delete a category by category_id."""

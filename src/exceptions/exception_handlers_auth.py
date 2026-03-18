@@ -40,3 +40,16 @@ async def invalid_credentials_exception_handler(request: Request, exc: InvalidCr
         status_code=status.HTTP_401_UNAUTHORIZED,
         content={"message": exc.message}
     )
+
+
+class AdminForbiddenException(Exception):
+    def __init__(self, message: str = "Admin access required"):
+        self.message = message
+        super().__init__(message)
+
+
+async def admin_forbidden_exception_handler(request: Request, exc: AdminForbiddenException):
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN,
+        content={"message": exc.message}
+    )

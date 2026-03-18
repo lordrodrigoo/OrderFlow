@@ -5,7 +5,7 @@ from fastapi import APIRouter, Response, Query, status, Depends
 from src.usecases.product_usecases import ProductUsecase
 from src.dto.request.product_request import ProductRequest
 from src.dto.response.product_response import ProductResponse
-from src.api.dependencies import get_product_usecase
+from src.api.dependencies import get_product_usecase, get_current_admin
 
 
 API_PREFIX = os.getenv("API_V1_PRODUCT")
@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 def create_product(
     product_request: ProductRequest,
     response: Response,
+    _=Depends(get_current_admin),
     product_usecase: ProductUsecase = Depends(get_product_usecase)
 ):
     """Endpoint to create a new product."""
@@ -93,6 +94,7 @@ def update_product(
     product_id: int,
     product_request: ProductRequest,
     response: Response,
+    _=Depends(get_current_admin),
     product_usecase: ProductUsecase = Depends(get_product_usecase)
 ):
     """Endpoint to update a product by product_id."""
@@ -104,6 +106,7 @@ def update_product(
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_product(
     product_id: int,
+    _=Depends(get_current_admin),
     product_usecase: ProductUsecase = Depends(get_product_usecase)):
     """Endpoint to delete a product by product_id."""
     logger.info("Deleting product", extra={"product_id": product_id})

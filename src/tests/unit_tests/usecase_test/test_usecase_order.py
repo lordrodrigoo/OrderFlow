@@ -6,6 +6,7 @@ from pydantic import ValidationError
 from src.domain.models.order import OrderStatus, Order
 from src.dto.request.order_request import OrderRequest
 from src.dto.response.order_response import OrderResponse
+from src.dto.response.dashboard_response import DashboardResponse
 from src.exceptions.exception_handlers_order import (
     OrderNotFoundException,
     OrderAlreadyCanceledException
@@ -167,3 +168,86 @@ def test_list_orders_filter_by_amount(
     assert len(response) == 1
     assert isinstance(response[0], OrderResponse)
     assert response[0].id == valid_order.id
+
+
+def test_admin_update_order_status(
+        order_usecase,
+        fake_order_repository_mock,
+        valid_order
+    ):
+    fake_order_repository_mock.get_order_by_id.return_value = valid_order
+    response = order_usecase.admin_update_order_status(1, OrderStatus.PAID)
+    assert isinstance(response, OrderResponse)
+    assert response.status == OrderStatus.PAID
+
+
+def test_admin_update_order_status_not_found(
+        order_usecase,
+        fake_order_repository_mock
+    ):
+    fake_order_repository_mock.get_order_by_id.return_value = None
+    with pytest.raises(OrderNotFoundException):
+        order_usecase.admin_update_order_status(999, OrderStatus.PAID)
+
+
+def test_admin_get_all_orders(
+        order_usecase,
+        fake_order_repository_mock,
+        valid_order
+    ):
+    fake_order_repository_mock.get_all_orders.return_value = [valid_order]
+    response = order_usecase.admin_get_all_orders()
+    assert isinstance(response, list)
+    assert len(response) == 1
+    assert isinstance(response[0], OrderResponse)
+
+
+def test_admin_get_all_orders_filter_by_status(
+        order_usecase,
+        fake_order_repository_mock,
+        valid_order
+    ):
+    fake_order_repository_mock.find_orders_by_status.return_value = [valid_order]
+    response = order_usecase.admin_get_all_orders(order_status="pending")
+    assert len(response) == 1
+    fake_order_repository_mock.find_orders_by_status.assert_called_once_with("pending")
+
+
+def test_admin_get_all_orders_filter_by_user(
+        order_usecase,
+        fake_order_repository_mock,
+        valid_order
+    ):
+    fake_order_repository_mock.find_orders_by_user.return_value = [valid_order]
+    response = order_usecase.admin_get_all_orders(user_id=1)
+    assert len(response) == 1
+    fake_order_repository_mock.find_orders_by_user.assert_called_once_with(1)
+
+
+def test_get_dashboard_stats(
+        order_usecase,
+        fake_order_repository_mock,
+        valid_order
+    ):
+    fake_order_repository_mock.get_all_orders.return_value = [valid_order]
+    response = order_usecase.get_dashboard_stats(total_users=5, total_products=10)
+    assert isinstance(response, DashboardResponse)
+    assert response.total_orders == 1
+    assert response.total_users == 5
+    assert response.total_products == 10
+    assert response.total_revenue >= 0
+    assert isinstance(response.orders_by_status, dict)
+
+
+def test_get_dashboard_stats_excludes_canceled_revenue(
+        order_usecase,
+        fake_order_repository_mock
+    ):
+    canceled_order = Order(
+        id=2, user_id=1, address_id=1,
+        total_amount=Decimal("100.00"), delivery_fee=Decimal("5.00"),
+        status=OrderStatus.CANCELED, created_at=datetime.now()
+    )
+    fake_order_repository_mock.get_all_orders.return_value = [canceled_order]
+    response = order_usecase.get_dashboard_stats(total_users=1, total_products=1)
+    assert response.total_revenue == 0.0

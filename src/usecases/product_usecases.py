@@ -133,3 +133,7 @@ class ProductUsecase:
             raise ProductNotFoundException(product_id=product_id)
         logger.info("Product deleted", extra={"product_id": product_id})
         return self.product_repository.delete_product(product_id)
+
+
+    def get_total_products(self) -> int:
+        return len(self.product_repository.get_all_products())
