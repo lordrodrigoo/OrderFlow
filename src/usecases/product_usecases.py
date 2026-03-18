@@ -38,6 +38,7 @@ class ProductUsecase:
             price=product_request.price,
             is_available=product_request.is_available,
             preparation_time=product_request.preparation_time,
+            image_url=str(product_request.image_url) if product_request.image_url else None,
         )
 
         created_product = self.product_repository.create_product(product_entity)
@@ -66,7 +67,8 @@ class ProductUsecase:
             price=product_request.price,
             category_id=product_request.category_id,
             is_available=product_request.is_available,
-            preparation_time=product_request.preparation_time
+            preparation_time=product_request.preparation_time,
+            image_url=str(product_request.image_url) if product_request.image_url else None,
         )
 
         updated_product = self.product_repository.update_product(product_entity)

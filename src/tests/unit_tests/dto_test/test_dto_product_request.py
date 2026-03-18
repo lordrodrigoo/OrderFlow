@@ -14,6 +14,13 @@ def test_valid_product_request(valid_product_data):
     assert product_request.price == Decimal(str(valid_product_data["price"]))
     assert product_request.is_available == valid_product_data["is_available"]
     assert product_request.preparation_time == valid_product_data["preparation_time"]
+    assert str(product_request.image_url) == valid_product_data["image_url"]
+
+
+def test_image_url_is_optional(valid_product_data):
+    data = {**valid_product_data, "image_url": None}
+    product_request = ProductRequest(**data)
+    assert product_request.image_url is None
 
 
 @pytest.mark.parametrize("field,value,expected_msg", [
@@ -38,6 +45,9 @@ def test_valid_product_request(valid_product_data):
     ("preparation_time", None, "Input should be a valid integer"),
     ("preparation_time", 0, "Input should be greater than or equal to 1"),
     ("preparation_time", -5, "Input should be greater than or equal to 1"),
+    ("image_url", "not-a-valid-url", "Input should be a valid URL"),
+    ("image_url", "ftp://example.com/img.png", "URL scheme should be 'http' or 'https'"),
+    ("image_url", "just text", "Input should be a valid URL"),
 ])
 def test_field_validations(valid_product_data, field, value, expected_msg):
     data = valid_product_data.copy()

@@ -36,7 +36,8 @@ def valid_product_data():
         "category_id": 1,
         "price": 29.90,
         "is_available": True,
-        "preparation_time": 20
+        "preparation_time": 20,
+        "image_url": "https://example.com/pizza.png"
     }
 
 

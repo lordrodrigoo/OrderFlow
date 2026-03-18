@@ -4,6 +4,23 @@ def test_create_product(client, fake_category, valid_product_data, admin_auth_to
     response = client.post("/api/v1/products/", json=valid_product_data,
                            headers={"Authorization": f"Bearer {admin_auth_token}"})
     assert response.status_code == 201
+    data = response.json()
+    assert data["image_url"] == valid_product_data["image_url"]
+
+
+def test_create_product_without_image_url(client, fake_category, valid_product_data, admin_auth_token):
+    payload = {**valid_product_data, "name": "No Image Product", "image_url": None}
+    response = client.post("/api/v1/products/", json=payload,
+                           headers={"Authorization": f"Bearer {admin_auth_token}"})
+    assert response.status_code == 201
+    assert response.json()["image_url"] is None
+
+
+def test_create_product_invalid_image_url(client, fake_category, valid_product_data, admin_auth_token):
+    payload = {**valid_product_data, "name": "Bad URL Product", "image_url": "not-a-valid-url"}
+    response = client.post("/api/v1/products/", json=payload,
+                           headers={"Authorization": f"Bearer {admin_auth_token}"})
+    assert response.status_code == 422
 
 
 def test_create_product_forbidden_for_regular_user(client, fake_category, valid_product_data, auth_token):

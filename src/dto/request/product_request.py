@@ -1,6 +1,7 @@
 import re
 from decimal import Decimal
-from pydantic import BaseModel, Field, field_validator
+from typing import Optional
+from pydantic import AnyHttpUrl, BaseModel, Field, field_validator
 
 
 PRODUCT_NAME_PATTERN = re.compile(r'^[A-Za-zÀ-ÿ0-9\s\-]+$')
@@ -40,6 +41,10 @@ class ProductRequest(BaseModel):
         ...,
         ge=1,
         description="preparation time in minutes, ex: 15",
+    )
+    image_url: Optional[AnyHttpUrl] = Field(
+        None,
+        description="URL of the product image, ex: 'https://example.com/image.png'",
     )
 
 
