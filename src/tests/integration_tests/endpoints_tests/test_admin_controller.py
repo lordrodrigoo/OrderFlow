@@ -77,6 +77,27 @@ def test_list_all_orders_filter_by_user(client, fake_order, admin_auth_token):
     assert all(o["user_id"] == fake_order.user_id for o in data)
 
 
+def test_list_all_orders_filter_by_amount(client, fake_order, admin_auth_token):
+    response = client.get(
+        "/api/v1/admin/orders?min_amount=100&max_amount=200",
+        headers={"Authorization": f"Bearer {admin_auth_token}"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert any(o["id"] == fake_order.id for o in data)
+    assert all(100 <= float(o["total_amount"]) <= 200 for o in data)
+
+
+def test_list_all_orders_filter_by_amount_no_match(client, fake_order, admin_auth_token):
+    response = client.get(
+        "/api/v1/admin/orders?min_amount=500&max_amount=1000",
+        headers={"Authorization": f"Bearer {admin_auth_token}"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert not any(o["id"] == fake_order.id for o in data)
+
+
 def test_list_all_orders_forbidden_for_regular_user(client, auth_token):
     response = client.get(
         "/api/v1/admin/orders",

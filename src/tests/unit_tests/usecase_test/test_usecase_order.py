@@ -159,7 +159,7 @@ def test_list_orders_filter_by_amount(
         fake_order_repository_mock,
         valid_order
     ):
-    fake_order_repository_mock.find_orders_by_total_amount.return_value = [valid_order]
+    fake_order_repository_mock.get_all_orders.return_value = [valid_order]
     response = order_usecase.list_orders(
         min_amount=Decimal("50.00"),
         max_amount=Decimal("100.00")
@@ -168,6 +168,19 @@ def test_list_orders_filter_by_amount(
     assert len(response) == 1
     assert isinstance(response[0], OrderResponse)
     assert response[0].id == valid_order.id
+
+
+def test_list_orders_filter_by_amount_no_match(
+        order_usecase,
+        fake_order_repository_mock,
+        valid_order
+    ):
+    fake_order_repository_mock.get_all_orders.return_value = [valid_order]
+    response = order_usecase.list_orders(
+        min_amount=Decimal("500.00"),
+        max_amount=Decimal("1000.00")
+    )
+    assert response == []
 
 
 def test_admin_update_order_status(

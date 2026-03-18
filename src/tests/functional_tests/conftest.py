@@ -1,0 +1,11 @@
+# pylint: disable=unused-import, wildcard-import, unused-wildcard-import
+from src.tests.fixtures.integration_fixtures.integration_fixtures import *
+from src.tests.fixtures.integration_fixtures.user_fixtures import *
+from src.tests.fixtures.integration_fixtures.address_fixtures import *
+from src.tests.fixtures.integration_fixtures.category_fixtures import *
+from src.tests.fixtures.integration_fixtures.product_fixtures import *
+from src.tests.fixtures.integration_fixtures.order_fixtures import *
+from src.tests.fixtures.integration_fixtures.order_item_fixtures import *
+from src.tests.fixtures.integration_fixtures.account_fixtures import *
+from src.tests.fixtures.integration_fixtures.authorization_fixtures import *
+from src.tests.fixtures.integration_fixtures.admin_fixtures import *

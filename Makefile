@@ -31,6 +31,9 @@ test-unit: ## Runs the unit tests
 test-integration: ## Runs the integration tests
 	$(PYTEST) src/tests/integration_tests/ -v --tb=short
 
+test-functional: ## Runs the functional tests
+	$(PYTEST) src/tests/functional_tests/ -v --tb=short
+
 test-all: ## Runs all tests with coverage report
 	$(PYTEST) --tb=short --cov=src --cov-report=term-missing --cov-report=html
 

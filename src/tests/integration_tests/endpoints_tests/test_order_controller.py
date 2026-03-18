@@ -58,7 +58,16 @@ def test_list_orders_filter_by_amount(client, fake_order, auth_token):
                           headers={"Authorization": f"Bearer {auth_token}"})
     assert response.status_code == 200
     data = response.json()
-    assert isinstance(data, list)
+    assert any(o["id"] == fake_order.id for o in data)
+    assert all(100 <= float(o["total_amount"]) <= 200 for o in data)
+
+
+def test_list_orders_filter_by_amount_no_match(client, fake_order, auth_token):
+    response = client.get("/api/v1/orders/?min_amount=500&max_amount=1000",
+                          headers={"Authorization": f"Bearer {auth_token}"})
+    assert response.status_code == 200
+    data = response.json()
+    assert not any(o["id"] == fake_order.id for o in data)
 
 
 def test_update_order(client, fake_order, valid_order_data, auth_token):

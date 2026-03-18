@@ -67,18 +67,18 @@ class OrderUsecase:
             skip: int = 0,
             limit: int = 10
     ) -> list[OrderResponse]:
-        orders = []
-
-        if order_status:
-            orders = self.order_repository.find_orders_by_status(order_status)
-        elif user_id:
+        if user_id:
             orders = self.order_repository.find_orders_by_user(user_id)
-        elif min_amount is not None and max_amount is not None:
-            orders = self.order_repository.find_orders_by_total_amount(min_amount, max_amount)
         else:
             orders = self.order_repository.get_all_orders()
 
-        # Apply pagination
+        if order_status:
+            orders = [o for o in orders if o.status == order_status
+                      or (hasattr(o.status, "value") and o.status.value == order_status)]
+
+        if min_amount is not None and max_amount is not None:
+            orders = [o for o in orders if min_amount <= Decimal(str(o.total_amount)) <= max_amount]
+
         orders = orders[skip:skip + limit]
         return [OrderResponse(**order.__dict__) for order in orders]
 
