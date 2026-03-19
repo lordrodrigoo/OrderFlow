@@ -47,7 +47,7 @@ class UserRepository(UserRepositoryInterface, BaseRepository[UserEntity]):
 
     def is_admin(self, user_id: int) -> bool:
         entity = self.get_by_id(user_id)
-        return entity.role == UserRole.ADMIN.value if entity else False
+        return entity.role in (UserRole.ADMIN.value, UserRole.OWNER.value) if entity else False
 
     def find_all_users(self) -> List[Users]:
         return [Users.from_entity(user) for user in self.get_all()]

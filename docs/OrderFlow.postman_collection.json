@@ -1,12 +1,68 @@
 {
   "info": {
+    "_postman_id": "orderflow-api-collection-v2",
     "name": "OrderFlow API",
+    "description": "Complete collection for the OrderFlow REST API — 58 endpoints organized by resource. Set {{base_url}} to http://localhost:8000 and run Login to auto-populate {{access_token}} and {{refresh_token}}.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
   "variable": [
-    { "key": "base_url", "value": "http://localhost:8000" },
-    { "key": "access_token", "value": "" },
-    { "key": "refresh_token", "value": "" }
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "default"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "secret"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "secret"
+    },
+    {
+      "key": "user_id",
+      "value": "1"
+    },
+    {
+      "key": "account_id",
+      "value": "1"
+    },
+    {
+      "key": "address_id",
+      "value": "1"
+    },
+    {
+      "key": "category_id",
+      "value": "1"
+    },
+    {
+      "key": "product_id",
+      "value": "1"
+    },
+    {
+      "key": "order_id",
+      "value": "1"
+    },
+    {
+      "key": "order_item_id",
+      "value": "1"
+    },
+    {
+      "key": "review_id",
+      "value": "1"
+    }
   ],
   "item": [
     {
@@ -15,8 +71,20 @@
         {
           "name": "Health Check",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
-            "url": "{{base_url}}/health"
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
           }
         }
       ]
@@ -31,20 +99,48 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "var json = pm.response.json();",
-                  "pm.collectionVariables.set('access_token', json.access_token);",
-                  "pm.collectionVariables.set('refresh_token', json.refresh_token);"
-                ]
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', body.access_token);",
+                  "    pm.collectionVariables.set('refresh_token', body.refresh_token);",
+                  "    console.log('Tokens captured successfully');",
+                  "}"
+                ],
+                "type": "text/javascript"
               }
             }
           ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/auth/",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"john_doe\",\n  \"password\": \"P@ssw0rd1\"\n}"
+              "raw": "{\n  \"username\": \"john.doe\",\n  \"password\": \"P@ssw0rd1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                ""
+              ]
             }
           }
         },
@@ -55,19 +151,47 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "var json = pm.response.json();",
-                  "pm.collectionVariables.set('access_token', json.access_token);"
-                ]
+                  "if (pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', body.access_token);",
+                  "    console.log('Access token refreshed');",
+                  "}"
+                ],
+                "type": "text/javascript"
               }
             }
           ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/auth/refresh",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/refresh",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh"
+              ]
             }
           }
         }
@@ -78,71 +202,248 @@
       "item": [
         {
           "name": "Create User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('user_id', body.id);",
+                  "    console.log('user_id captured:', body.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/users/",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"role\": \"customer\"\n}"
+              "raw": "{\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"age\": 30,\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"11999999999\",\n  \"username\": \"john.doe\",\n  \"password\": \"P@ssw0rd1\",\n  \"role\": \"user\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ""
+              ]
             }
           }
         },
         {
           "name": "List Users",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
-            "url": "{{base_url}}/api/v1/users/",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/?skip=0&limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "email",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "active",
+                  "value": "true",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
           }
         },
         {
           "name": "Get Me",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/api/v1/users/me",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "me"
+              ]
+            }
           }
         },
         {
           "name": "Get My Addresses",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/api/v1/users/me/address",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/me/address",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "me",
+                "address"
+              ]
+            }
           }
         },
         {
           "name": "Get User by ID",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
-            "url": "{{base_url}}/api/v1/users/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/:user_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ":user_id"
+              ],
+              "variable": [
+                {
+                  "key": "user_id",
+                  "value": "{{user_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Address (me)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('address_id', body.id);",
+                  "    console.log('address_id captured:', body.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": {{user_id}},\n  \"street\": \"Rua das Flores\",\n  \"number\": \"123\",\n  \"complement\": \"Apto-4B\",\n  \"neighborhood\": \"Jardim Paulista\",\n  \"city\": \"Sao Paulo\",\n  \"state\": \"SP\",\n  \"zip_code\": \"01310-100\",\n  \"is_default\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/me/addresses",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "me",
+                "addresses"
+              ]
+            }
           }
         },
         {
           "name": "Update Me",
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/users/me",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"John Updated\",\n  \"email\": \"john.updated@example.com\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Update User by ID",
-          "request": {
-            "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/users/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"John Updated\",\n  \"email\": \"john.updated@example.com\"\n}"
+              "raw": "{\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"age\": 31,\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"11999999999\",\n  \"username\": \"john.doe\",\n  \"password\": \"P@ssw0rd1\",\n  \"role\": \"user\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "me"
+              ]
             }
           }
         },
@@ -150,47 +451,136 @@
           "name": "Update My Address",
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/users/me/addresses/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"street\": \"Av Paulista\",\n  \"number\": \"1000\",\n  \"complement\": \"Apto 10\",\n  \"neighborhood\": \"Bela Vista\",\n  \"city\": \"Sao Paulo\",\n  \"state\": \"SP\",\n  \"zip_code\": \"01310-100\",\n  \"is_default\": true\n}"
+              "raw": "{\n  \"user_id\": 1,\n  \"street\": \"Avenida Paulista\",\n  \"number\": \"1578\",\n  \"complement\": \"Sala-201\",\n  \"neighborhood\": \"Bela Vista\",\n  \"city\": \"Sao Paulo\",\n  \"state\": \"SP\",\n  \"zip_code\": \"01310-200\",\n  \"is_default\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/me/addresses/:address_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "me",
+                "addresses",
+                ":address_id"
+              ],
+              "variable": [
+                {
+                  "key": "address_id",
+                  "value": "{{address_id}}"
+                }
+              ]
             }
           }
         },
         {
-          "name": "Add My Address",
+          "name": "Update User by ID",
           "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/users/me/addresses",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"street\": \"Av Paulista\",\n  \"number\": \"1000\",\n  \"complement\": \"Apto 10\",\n  \"neighborhood\": \"Bela Vista\",\n  \"city\": \"Sao Paulo\",\n  \"state\": \"SP\",\n  \"zip_code\": \"01310-100\",\n  \"is_default\": true\n}"
+              "raw": "{\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"age\": 31,\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"11999999999\",\n  \"username\": \"john.doe\",\n  \"password\": \"P@ssw0rd1\",\n  \"role\": \"user\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/:user_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ":user_id"
+              ],
+              "variable": [
+                {
+                  "key": "user_id",
+                  "value": "{{user_id}}"
+                }
+              ]
             }
           }
         },
         {
-          "name": "Update Password",
+          "name": "Set Default Address",
           "request": {
             "method": "PATCH",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/users/1/password",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"current_password\": \"P@ssw0rd1\",\n  \"new_password\": \"N3wP@ssword\"\n}"
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/me/addresses/:address_id/default",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "me",
+                "addresses",
+                ":address_id",
+                "default"
+              ],
+              "variable": [
+                {
+                  "key": "address_id",
+                  "value": "{{address_id}}"
+                }
+              ]
             }
           }
         },
         {
           "name": "Delete User",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "DELETE",
-            "url": "{{base_url}}/api/v1/users/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/:user_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ":user_id"
+              ],
+              "variable": [
+                {
+                  "key": "user_id",
+                  "value": "{{user_id}}"
+                }
+              ]
+            }
           }
         }
       ]
@@ -200,13 +590,52 @@
       "item": [
         {
           "name": "Create Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('account_id', body.id);",
+                  "    console.log('account_id captured:', body.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/accounts/",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"user_id\": 1,\n  \"username\": \"john_doe\",\n  \"password\": \"P@ssw0rd1\"\n}"
+              "raw": "{\n  \"user_id\": {{user_id}},\n  \"username\": \"john.doe\",\n  \"password\": \"P@ssw0rd1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/accounts/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "accounts",
+                ""
+              ]
             }
           }
         },
@@ -214,33 +643,155 @@
           "name": "Get Account by ID",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/api/v1/accounts/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
-          }
-        },
-        {
-          "name": "Update Account",
-          "request": {
-            "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/accounts/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"username\": \"john_updated\"\n}"
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/accounts/:account_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "accounts",
+                ":account_id"
+              ],
+              "variable": [
+                {
+                  "key": "account_id",
+                  "value": "{{account_id}}"
+                }
+              ]
             }
           }
         },
         {
-          "name": "Update Password",
+          "name": "Update Account Username",
           "request": {
-            "method": "PATCH",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/accounts/1/password",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"current_password\": \"P@ssw0rd1\",\n  \"new_password\": \"N3wP@ssword\"\n}"
+              "raw": "{\n  \"username\": \"john.doe.updated\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/accounts/:account_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "accounts",
+                ":account_id"
+              ],
+              "variable": [
+                {
+                  "key": "account_id",
+                  "value": "{{account_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current_password\": \"P@ssw0rd1\",\n  \"new_password\": \"N3wP@ssw0rd!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/accounts/:account_id/password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "accounts",
+                ":account_id",
+                "password"
+              ],
+              "variable": [
+                {
+                  "key": "account_id",
+                  "value": "{{account_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Suspend Account",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/accounts/:account_id/suspended",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "accounts",
+                ":account_id",
+                "suspended"
+              ],
+              "variable": [
+                {
+                  "key": "account_id",
+                  "value": "{{account_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Activate Account",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/accounts/:account_id/activate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "accounts",
+                ":account_id",
+                "activate"
+              ],
+              "variable": [
+                {
+                  "key": "account_id",
+                  "value": "{{account_id}}"
+                }
+              ]
             }
           }
         },
@@ -248,40 +799,26 @@
           "name": "Deactivate Account",
           "request": {
             "method": "PATCH",
-            "url": "{{base_url}}/api/v1/accounts/1/deactivate",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
-          }
-        },
-        {
-          "name": "Suspend Account",
-          "request": {
-            "method": "PATCH",
-            "url": "{{base_url}}/api/v1/accounts/1/suspended",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
-          }
-        },
-        {
-          "name": "Activate Account",
-          "request": {
-            "method": "PATCH",
-            "url": "{{base_url}}/api/v1/accounts/1/activate",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
-          }
-        },
-        {
-          "name": "Inactivate Account",
-          "request": {
-            "method": "PATCH",
-            "url": "{{base_url}}/api/v1/accounts/1/inactive",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
-          }
-        },
-        {
-          "name": "Delete Account",
-          "request": {
-            "method": "DELETE",
-            "url": "{{base_url}}/api/v1/accounts/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/accounts/:account_id/inactive",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "accounts",
+                ":account_id",
+                "inactive"
+              ],
+              "variable": [
+                {
+                  "key": "account_id",
+                  "value": "{{account_id}}"
+                }
+              ]
+            }
           }
         }
       ]
@@ -291,51 +828,167 @@
       "item": [
         {
           "name": "Create Address",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('address_id', body.id);",
+                  "    console.log('address_id captured:', body.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/addresses/",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"street\": \"Av Paulista\",\n  \"number\": \"1000\",\n  \"complement\": \"Apto 10\",\n  \"neighborhood\": \"Bela Vista\",\n  \"city\": \"Sao Paulo\",\n  \"state\": \"SP\",\n  \"zip_code\": \"01310-100\",\n  \"is_default\": true\n}"
+              "raw": "{\n  \"user_id\": {{user_id}},\n  \"street\": \"Rua das Flores\",\n  \"number\": \"123\",\n  \"complement\": \"Apto-4B\",\n  \"neighborhood\": \"Jardim Paulista\",\n  \"city\": \"Sao Paulo\",\n  \"state\": \"SP\",\n  \"zip_code\": \"01310-100\",\n  \"is_default\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/addresses/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "addresses",
+                ""
+              ]
             }
           }
         },
         {
           "name": "List Addresses",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
-            "url": "{{base_url}}/api/v1/addresses/",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/addresses/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "addresses",
+                ""
+              ]
+            }
           }
         },
         {
           "name": "Get Address by ID",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
-            "url": "{{base_url}}/api/v1/addresses/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/addresses/:address_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "addresses",
+                ":address_id"
+              ],
+              "variable": [
+                {
+                  "key": "address_id",
+                  "value": "{{address_id}}"
+                }
+              ]
+            }
           }
         },
         {
           "name": "Get Addresses by User ID",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
-            "url": "{{base_url}}/api/v1/addresses/user/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/addresses/user/:user_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "addresses",
+                "user",
+                ":user_id"
+              ],
+              "variable": [
+                {
+                  "key": "user_id",
+                  "value": "{{user_id}}"
+                }
+              ]
+            }
           }
         },
         {
           "name": "Update Address",
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/addresses/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"street\": \"Rua Augusta\",\n  \"number\": \"500\",\n  \"complement\": null,\n  \"neighborhood\": \"Consolacao\",\n  \"city\": \"Sao Paulo\",\n  \"state\": \"SP\",\n  \"zip_code\": \"01305-000\",\n  \"is_default\": false\n}"
+              "raw": "{\n  \"user_id\": 1,\n  \"street\": \"Avenida Paulista\",\n  \"number\": \"1578\",\n  \"complement\": \"Sala-201\",\n  \"neighborhood\": \"Bela Vista\",\n  \"city\": \"Sao Paulo\",\n  \"state\": \"SP\",\n  \"zip_code\": \"01310-200\",\n  \"is_default\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/addresses/:address_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "addresses",
+                ":address_id"
+              ],
+              "variable": [
+                {
+                  "key": "address_id",
+                  "value": "{{address_id}}"
+                }
+              ]
             }
           }
         },
@@ -343,8 +996,25 @@
           "name": "Delete Address",
           "request": {
             "method": "DELETE",
-            "url": "{{base_url}}/api/v1/addresses/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/addresses/:address_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "addresses",
+                ":address_id"
+              ],
+              "variable": [
+                {
+                  "key": "address_id",
+                  "value": "{{address_id}}"
+                }
+              ]
+            }
           }
         }
       ]
@@ -354,41 +1024,138 @@
       "item": [
         {
           "name": "Create Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('category_id', body.id);",
+                  "    console.log('category_id captured:', body.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/categories/",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Cakes\",\n  \"description\": \"Delicious cakes for every occasion\"\n}"
+              "raw": "{\n  \"name\": \"Pizzas\",\n  \"description\": \"Delicious hand-crafted pizzas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/categories/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "categories",
+                ""
+              ]
             }
           }
         },
         {
           "name": "List Categories",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
-            "url": "{{base_url}}/api/v1/categories/"
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/categories/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "categories",
+                ""
+              ]
+            }
           }
         },
         {
           "name": "Get Category by ID",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
-            "url": "{{base_url}}/api/v1/categories/1"
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/categories/:category_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "categories",
+                ":category_id"
+              ],
+              "variable": [
+                {
+                  "key": "category_id",
+                  "value": "{{category_id}}"
+                }
+              ]
+            }
           }
         },
         {
           "name": "Update Category",
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/categories/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Cakes Updated\",\n  \"description\": \"Best cakes in town\"\n}"
+              "raw": "{\n  \"name\": \"Pizzas Artesanais\",\n  \"description\": \"Hand-crafted artisan pizzas made fresh daily\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/categories/:category_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "categories",
+                ":category_id"
+              ],
+              "variable": [
+                {
+                  "key": "category_id",
+                  "value": "{{category_id}}"
+                }
+              ]
             }
           }
         },
@@ -396,8 +1163,25 @@
           "name": "Delete Category",
           "request": {
             "method": "DELETE",
-            "url": "{{base_url}}/api/v1/categories/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/categories/:category_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "categories",
+                ":category_id"
+              ],
+              "variable": [
+                {
+                  "key": "category_id",
+                  "value": "{{category_id}}"
+                }
+              ]
+            }
           }
         }
       ]
@@ -407,30 +1191,105 @@
       "item": [
         {
           "name": "Create Product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('product_id', body.id);",
+                  "    console.log('product_id captured:', body.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/products/",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Chocolate Cake\",\n  \"description\": \"Rich chocolate cake with ganache\",\n  \"price\": 49.90,\n  \"stock\": 10,\n  \"category_id\": 1\n}"
+              "raw": "{\n  \"category_id\": {{category_id}},\n  \"name\": \"Chocolate Cake\",\n  \"description\": \"Rich chocolate cake with ganache topping and crunchy almonds\",\n  \"price\": 49.90,\n  \"is_available\": true,\n  \"preparation_time\": 30,\n  \"image_url\": \"https://example.com/chocolate-cake.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products",
+                ""
+              ]
             }
           }
         },
         {
           "name": "List Products",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{base_url}}/api/v1/products/?skip=0&limit=10",
-              "host": ["{{base_url}}"],
-              "path": ["api", "v1", "products", ""],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products",
+                ""
+              ],
               "query": [
-                { "key": "skip", "value": "0" },
-                { "key": "limit", "value": "10" },
-                { "key": "name", "value": "", "disabled": true },
-                { "key": "category_id", "value": "", "disabled": true }
+                {
+                  "key": "name",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "category_id",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "available",
+                  "value": "true",
+                  "disabled": true
+                },
+                {
+                  "key": "min_price",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "max_price",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
               ]
             }
           }
@@ -438,34 +1297,126 @@
         {
           "name": "Get Product by ID",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
-            "url": "{{base_url}}/api/v1/products/1"
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/:product_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products",
+                ":product_id"
+              ],
+              "variable": [
+                {
+                  "key": "product_id",
+                  "value": "{{product_id}}"
+                }
+              ]
+            }
           }
         },
         {
           "name": "Get Products by Category",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
-            "url": "{{base_url}}/api/v1/products/category/1"
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/category/:category_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products",
+                "category",
+                ":category_id"
+              ],
+              "variable": [
+                {
+                  "key": "category_id",
+                  "value": "{{category_id}}"
+                }
+              ]
+            }
           }
         },
         {
           "name": "Count Products by Category",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
-            "url": "{{base_url}}/api/v1/products/count/category/1"
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/count/category/:category_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products",
+                "count",
+                "category",
+                ":category_id"
+              ],
+              "variable": [
+                {
+                  "key": "category_id",
+                  "value": "{{category_id}}"
+                }
+              ]
+            }
           }
         },
         {
           "name": "Update Product",
           "request": {
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/products/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Chocolate Cake Updated\",\n  \"description\": \"Even richer now\",\n  \"price\": 59.90,\n  \"stock\": 15,\n  \"category_id\": 1\n}"
+              "raw": "{\n  \"category_id\": 1,\n  \"name\": \"Chocolate Cake Deluxe\",\n  \"description\": \"Rich chocolate cake with ganache topping, crunchy almonds and strawberry\",\n  \"price\": 59.90,\n  \"is_available\": true,\n  \"preparation_time\": 35,\n  \"image_url\": \"https://example.com/chocolate-cake-deluxe.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/:product_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products",
+                ":product_id"
+              ],
+              "variable": [
+                {
+                  "key": "product_id",
+                  "value": "{{product_id}}"
+                }
+              ]
             }
           }
         },
@@ -473,8 +1424,25 @@
           "name": "Delete Product",
           "request": {
             "method": "DELETE",
-            "url": "{{base_url}}/api/v1/products/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/:product_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "products",
+                ":product_id"
+              ],
+              "variable": [
+                {
+                  "key": "product_id",
+                  "value": "{{product_id}}"
+                }
+              ]
+            }
           }
         }
       ]
@@ -484,52 +1452,118 @@
       "item": [
         {
           "name": "Create Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('order_id', body.id);",
+                  "    console.log('order_id captured:', body.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/orders/",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"address_id\": 1\n}"
+              "raw": "{\n  \"address_id\": {{address_id}},\n  \"total_amount\": 99.90,\n  \"delivery_fee\": 5.00,\n  \"notes\": \"No onions please\",\n  \"scheduled_date\": \"2026-03-25T18:00:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders",
+                ""
+              ]
             }
           }
         },
         {
-          "name": "List Orders",
+          "name": "List My Orders",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{base_url}}/api/v1/orders/?skip=0&limit=10",
-              "host": ["{{base_url}}"],
-              "path": ["api", "v1", "orders", ""],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders",
+                ""
+              ],
               "query": [
-                { "key": "skip", "value": "0" },
-                { "key": "limit", "value": "10" },
-                { "key": "status", "value": "", "disabled": true }
+                {
+                  "key": "order_status",
+                  "value": "pending",
+                  "disabled": true
+                },
+                {
+                  "key": "min_amount",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "max_amount",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
               ]
-            },
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            }
           }
         },
         {
           "name": "Get Order by ID",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/api/v1/orders/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
-          }
-        },
-        {
-          "name": "Update Order",
-          "request": {
-            "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/orders/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"address_id\": 2\n}"
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/:order_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders",
+                ":order_id"
+              ],
+              "variable": [
+                {
+                  "key": "order_id",
+                  "value": "{{order_id}}"
+                }
+              ]
             }
           }
         },
@@ -537,16 +1571,90 @@
           "name": "Cancel Order",
           "request": {
             "method": "POST",
-            "url": "{{base_url}}/api/v1/orders/1/cancel",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/:order_id/cancel",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders",
+                ":order_id",
+                "cancel"
+              ],
+              "variable": [
+                {
+                  "key": "order_id",
+                  "value": "{{order_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Order",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address_id\": 1,\n  \"total_amount\": 129.90,\n  \"delivery_fee\": 5.00,\n  \"notes\": \"Extra sauce on the side\",\n  \"scheduled_date\": \"2026-03-25T19:00:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/:order_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders",
+                ":order_id"
+              ],
+              "variable": [
+                {
+                  "key": "order_id",
+                  "value": "{{order_id}}"
+                }
+              ]
+            }
           }
         },
         {
           "name": "Delete Order",
           "request": {
             "method": "DELETE",
-            "url": "{{base_url}}/api/v1/orders/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/:order_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "orders",
+                ":order_id"
+              ],
+              "variable": [
+                {
+                  "key": "order_id",
+                  "value": "{{order_id}}"
+                }
+              ]
+            }
           }
         }
       ]
@@ -556,61 +1664,188 @@
       "item": [
         {
           "name": "Create Order Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('order_item_id', body.id);",
+                  "    console.log('order_item_id captured:', body.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/order-items/",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"order_id\": 1,\n  \"product_id\": 1,\n  \"quantity\": 2\n}"
+              "raw": "{\n  \"order_id\": {{order_id}},\n  \"product_id\": {{product_id}},\n  \"quantity\": 2,\n  \"unit_price\": 49.90,\n  \"notes\": \"Well done\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/order-items/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "order-items",
+                ""
+              ]
             }
           }
         },
         {
           "name": "List Order Items",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{base_url}}/api/v1/order-items/?skip=0&limit=10",
-              "host": ["{{base_url}}"],
-              "path": ["api", "v1", "order-items", ""],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "order-items",
+                ""
+              ],
               "query": [
-                { "key": "order_id", "value": "1" },
-                { "key": "skip", "value": "0" },
-                { "key": "limit", "value": "10" }
+                {
+                  "key": "order_id",
+                  "value": "{{order_id}}",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
               ]
-            },
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            }
           }
         },
         {
           "name": "Get Order Item by ID",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
-            "url": "{{base_url}}/api/v1/order-items/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/order-items/:order_item_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "order-items",
+                ":order_item_id"
+              ],
+              "variable": [
+                {
+                  "key": "order_item_id",
+                  "value": "{{order_item_id}}"
+                }
+              ]
+            }
           }
         },
         {
           "name": "Update Order Item",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/order-items/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"order_id\": 1,\n  \"product_id\": 1,\n  \"quantity\": 5\n}"
+              "raw": "{\n  \"order_id\": 1,\n  \"product_id\": 1,\n  \"quantity\": 3,\n  \"unit_price\": 49.90,\n  \"notes\": \"Medium rare\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/order-items/:order_item_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "order-items",
+                ":order_item_id"
+              ],
+              "variable": [
+                {
+                  "key": "order_item_id",
+                  "value": "{{order_item_id}}"
+                }
+              ]
             }
           }
         },
         {
           "name": "Delete Order Item",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "DELETE",
-            "url": "{{base_url}}/api/v1/order-items/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/order-items/:order_item_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "order-items",
+                ":order_item_id"
+              ],
+              "variable": [
+                {
+                  "key": "order_item_id",
+                  "value": "{{order_item_id}}"
+                }
+              ]
+            }
           }
         }
       ]
@@ -620,32 +1855,103 @@
       "item": [
         {
           "name": "Create Review",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('review_id', body.id);",
+                  "    console.log('review_id captured:', body.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": "{{base_url}}/api/v1/reviews/",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"product_id\": 1,\n  \"user_id\": 1,\n  \"rating\": 5,\n  \"comment\": \"Excellent product!\"\n}"
+              "raw": "{\n  \"user_id\": {{user_id}},\n  \"product_id\": {{product_id}},\n  \"rating\": 5,\n  \"comment\": \"Absolutely delicious! Best cake I've ever had.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/reviews/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reviews",
+                ""
+              ]
             }
           }
         },
         {
           "name": "List Reviews",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
+            "header": [],
             "url": {
               "raw": "{{base_url}}/api/v1/reviews/?skip=0&limit=10",
-              "host": ["{{base_url}}"],
-              "path": ["api", "v1", "reviews", ""],
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reviews",
+                ""
+              ],
               "query": [
-                { "key": "product_id", "value": "", "disabled": true },
-                { "key": "user_id", "value": "", "disabled": true },
-                { "key": "min_rating", "value": "", "disabled": true },
-                { "key": "max_rating", "value": "", "disabled": true },
-                { "key": "skip", "value": "0" },
-                { "key": "limit", "value": "10" }
+                {
+                  "key": "product_id",
+                  "value": "{{product_id}}",
+                  "disabled": true
+                },
+                {
+                  "key": "user_id",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "min_rating",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "max_rating",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
               ]
             }
           }
@@ -653,16 +1959,259 @@
         {
           "name": "Get Review by ID",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
-            "url": "{{base_url}}/api/v1/reviews/1"
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/reviews/:review_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reviews",
+                ":review_id"
+              ],
+              "variable": [
+                {
+                  "key": "review_id",
+                  "value": "{{review_id}}"
+                }
+              ]
+            }
           }
         },
         {
           "name": "Delete Review",
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "DELETE",
-            "url": "{{base_url}}/api/v1/reviews/1",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{access_token}}" }] }
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/reviews/:review_id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "reviews",
+                ":review_id"
+              ],
+              "variable": [
+                {
+                  "key": "review_id",
+                  "value": "{{review_id}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Update Order Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"paid\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/orders/:order_id/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders",
+                ":order_id",
+                "status"
+              ],
+              "variable": [
+                {
+                  "key": "order_id",
+                  "value": "{{order_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List All Orders (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/orders?skip=0&limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "order_status",
+                  "value": "pending",
+                  "disabled": true
+                },
+                {
+                  "key": "min_amount",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "max_amount",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/admin/dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "dashboard"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Owner",
+      "description": "Operações exclusivas do owner do sistema. Apenas usuários com role=owner podem executar estes endpoints.",
+      "item": [
+        {
+          "name": "Promote to Admin",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/:user_id/role",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ":user_id",
+                "role"
+              ],
+              "variable": [
+                {
+                  "key": "user_id",
+                  "value": "{{user_id}}"
+                }
+              ]
+            },
+            "description": "Promove um usuário para admin. Apenas o owner pode executar."
+          }
+        },
+        {
+          "name": "Remove Admin Role",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"user\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/:user_id/role",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ":user_id",
+                "role"
+              ],
+              "variable": [
+                {
+                  "key": "user_id",
+                  "value": "{{user_id}}"
+                }
+              ]
+            },
+            "description": "Remove a role de admin, voltando o usuário para user. Apenas o owner pode executar."
           }
         }
       ]

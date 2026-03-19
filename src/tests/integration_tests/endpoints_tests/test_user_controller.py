@@ -171,3 +171,69 @@ def test_delete_user(client, valid_user_data):
 
     get_response = client.get(f"/api/v1/users/{user_id}")
     assert get_response.status_code == 404
+
+
+# --- PATCH /{user_id}/role ---
+
+def test_owner_promotes_user_to_admin(client, owner_auth_token, fake_user, fake_account):
+    response = client.patch(
+        f"/api/v1/users/{fake_user.id}/role",
+        json={"role": "admin"},
+        headers={"Authorization": f"Bearer {owner_auth_token}"}
+    )
+    assert response.status_code == 200
+    assert response.json()["role"] == "admin"
+
+
+def test_owner_demotes_admin_to_user(client, owner_auth_token, fake_admin_user, fake_admin_account):
+    response = client.patch(
+        f"/api/v1/users/{fake_admin_user.id}/role",
+        json={"role": "user"},
+        headers={"Authorization": f"Bearer {owner_auth_token}"}
+    )
+    assert response.status_code == 200
+    assert response.json()["role"] == "user"
+
+
+def test_owner_cannot_assign_owner_role(client, owner_auth_token, fake_user, fake_account):
+    response = client.patch(
+        f"/api/v1/users/{fake_user.id}/role",
+        json={"role": "owner"},
+        headers={"Authorization": f"Bearer {owner_auth_token}"}
+    )
+    assert response.status_code == 403
+
+
+def test_admin_cannot_change_roles(client, admin_auth_token, fake_user, fake_account):
+    response = client.patch(
+        f"/api/v1/users/{fake_user.id}/role",
+        json={"role": "admin"},
+        headers={"Authorization": f"Bearer {admin_auth_token}"}
+    )
+    assert response.status_code == 403
+
+
+def test_user_cannot_change_roles(client, auth_token, fake_user, fake_account):
+    response = client.patch(
+        f"/api/v1/users/{fake_user.id}/role",
+        json={"role": "admin"},
+        headers={"Authorization": f"Bearer {auth_token}"}
+    )
+    assert response.status_code == 403
+
+
+def test_unauthenticated_cannot_change_roles(client, fake_user):
+    response = client.patch(
+        f"/api/v1/users/{fake_user.id}/role",
+        json={"role": "admin"}
+    )
+    assert response.status_code == 401
+
+
+def test_owner_change_role_user_not_found(client, owner_auth_token):
+    response = client.patch(
+        "/api/v1/users/99999/role",
+        json={"role": "admin"},
+        headers={"Authorization": f"Bearer {owner_auth_token}"}
+    )
+    assert response.status_code == 404

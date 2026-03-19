@@ -21,7 +21,7 @@ setup: ## Creates virtualenv and installs dependencies
 # ── Dev ───────────────────────────────────────────────────────────────────────
 
 run: ## Starts the server in development mode (reload)
-	$(UVICORN) src.main:app --host 0.0.0.0 --port 8000 --reload
+	ENV=development $(UVICORN) src.main:app --host 0.0.0.0 --port 8000 --reload
 
 # ── Tests ──────────────────────────────────────────────────────────────────────
 

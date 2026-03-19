@@ -9,7 +9,8 @@ from src.dto.response.address_response import AddressResponse
 from src.api.dependencies import get_address_usecase
 from src.dto.request.user_request import UserRequest
 from src.dto.response.user_response import UserResponse
-from src.api.dependencies import get_user_usecase, get_current_user
+from src.api.dependencies import get_user_usecase, get_current_user, get_current_owner
+from src.dto.request.role_request import RoleUpdateRequest
 
 
 
@@ -140,3 +141,14 @@ def delete_user(user_id: int, user_usecase: UserUsecase = Depends(get_user_useca
     logger.info("Deleting user", extra={"user_id": user_id})
     user_usecase.delete_user(user_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.patch("/{user_id}/role", response_model=UserResponse, status_code=status.HTTP_200_OK)
+def update_user_role(
+    user_id: int,
+    body: RoleUpdateRequest,
+    current_owner: UserResponse = Depends(get_current_owner),
+    user_usecase: UserUsecase = Depends(get_user_usecase)
+):
+    """Endpoint exclusive for OWNER: promotes or demotes a user to admin or user role."""
+    return user_usecase.update_user_role(user_id, body.role, current_owner)

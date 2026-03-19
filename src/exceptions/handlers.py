@@ -41,6 +41,7 @@ from src.exceptions.exception_handlers_auth import (
     InvalidCredentialsException as AuthInvalidCredentialsException,
     invalid_credentials_exception_handler as auth_invalid_credentials_exception_handler,
     AdminForbiddenException, admin_forbidden_exception_handler,
+    OwnerForbiddenException, owner_forbidden_exception_handler,
 )
 from src.exceptions.exception_handlers_account import (
     InvalidCredentialsException, invalid_credentials_exception_handler,
@@ -81,3 +82,4 @@ def register_exception_handlers(app: FastAPI):
     app.add_exception_handler(AccountPermissionDeniedException, account_permission_denied_exception_handler)
     app.add_exception_handler(UsernameAlreadyExistsException, username_exception_handler)
     app.add_exception_handler(AdminForbiddenException, admin_forbidden_exception_handler)
+    app.add_exception_handler(OwnerForbiddenException, owner_forbidden_exception_handler)

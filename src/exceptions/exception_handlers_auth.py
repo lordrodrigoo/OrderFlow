@@ -53,3 +53,16 @@ async def admin_forbidden_exception_handler(request: Request, exc: AdminForbidde
         status_code=status.HTTP_403_FORBIDDEN,
         content={"message": exc.message}
     )
+
+
+class OwnerForbiddenException(Exception):
+    def __init__(self, message: str = "Owner access required"):
+        self.message = message
+        super().__init__(message)
+
+
+async def owner_forbidden_exception_handler(request: Request, exc: OwnerForbiddenException):
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN,
+        content={"message": exc.message}
+    )

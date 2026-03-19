@@ -15,7 +15,7 @@ from src.exceptions.exception_handlers_user import (
 from src.exceptions.exception_handlers_account import (
     UsernameAlreadyExistsException,
 )
-from src.exceptions.exception_handlers_auth import AdminForbiddenException
+from src.exceptions.exception_handlers_auth import AdminForbiddenException, OwnerForbiddenException
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ class UserUsecase:
             phone=user_request.phone,
             email=user_request.email,
             is_active=True,
-            role=user_request.role
+            role=UserRole.USER
         )
         created_user = self.user_repository.create_user(user_entity)
 
@@ -113,7 +113,7 @@ class UserUsecase:
             current_user: UserResponse
     ) -> UserResponse:
 
-        if current_user.id != user_id and current_user.role != UserRole.ADMIN:
+        if current_user.id != user_id and current_user.role not in (UserRole.ADMIN, UserRole.OWNER):
             logger.warning("Permission denied to update user", extra={"user_id": user_id, "requester_id": current_user.id})
             raise UserPermissionDeniedException(user_id=user_id)
 
@@ -160,9 +160,29 @@ class UserUsecase:
 
 
     def verify_admin(self, user: UserResponse) -> UserResponse:
-        if user.role != UserRole.ADMIN:
+        if user.role not in (UserRole.ADMIN, UserRole.OWNER):
             raise AdminForbiddenException()
         return user
+
+
+    def verify_owner(self, user: UserResponse) -> UserResponse:
+        if user.role != UserRole.OWNER:
+            raise OwnerForbiddenException()
+        return user
+
+
+    def update_user_role(self, user_id: int, new_role: UserRole, current_user: UserResponse) -> UserResponse:
+        if current_user.role != UserRole.OWNER:
+            raise OwnerForbiddenException()
+        if new_role == UserRole.OWNER:
+            raise OwnerForbiddenException(message="Cannot assign owner role")
+        user = self.user_repository.find_user_by_id(user_id)
+        if not user:
+            raise UserNotFoundException(user_id=user_id)
+        user.role = new_role
+        updated_user = self.user_repository.update_user(user)
+        logger.info("User role updated", extra={"user_id": user_id, "new_role": new_role.value})
+        return UserResponse(**updated_user.__dict__)
 
 
     def get_total_users(self) -> int:

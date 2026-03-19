@@ -43,6 +43,45 @@ def test_is_admin(fake_user, db_session):
     assert user_repo.is_admin(fake_user.id) is False
 
 
+def test_is_admin_returns_true_for_admin(fake_user, db_session):
+    fake_user.role = UserRole.ADMIN.value
+    db_session.commit()
+
+    db_handler = FakeDBConnectionHandler(db_session)
+    user_repo = UserRepository(db_handler)
+
+    assert user_repo.is_admin(fake_user.id) is True
+
+
+def test_is_admin_returns_true_for_owner(fake_user, db_session):
+    fake_user.role = UserRole.OWNER.value
+    db_session.commit()
+
+    db_handler = FakeDBConnectionHandler(db_session)
+    user_repo = UserRepository(db_handler)
+
+    assert user_repo.is_admin(fake_user.id) is True
+
+
+def test_is_admin_returns_false_for_nonexistent_user(db_session):
+    db_handler = FakeDBConnectionHandler(db_session)
+    user_repo = UserRepository(db_handler)
+
+    assert user_repo.is_admin(99999) is False
+
+
+def test_get_user_by_role_owner(fake_user, db_session):
+    fake_user.role = UserRole.OWNER.value
+    db_session.commit()
+
+    db_handler = FakeDBConnectionHandler(db_session)
+    user_repo = UserRepository(db_handler)
+
+    owners = user_repo.get_user_by_role(UserRole.OWNER)
+    assert len(owners) == 1
+    assert owners[0].role == UserRole.OWNER
+
+
 def test_find_by_name(fake_user, db_session):
     db_handler = FakeDBConnectionHandler(db_session)
     user_repo = UserRepository(db_handler)
