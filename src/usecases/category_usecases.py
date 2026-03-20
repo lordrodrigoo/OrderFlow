@@ -38,8 +38,8 @@ class CategoryUsecase:
         if not self.category_repository.get_category_by_id(category_id):
             raise CategoryNotFoundException(category_id)
 
-        existing = self.category_repository.get_category_by_id(category_id)
-        if existing and existing.id != category_id and existing.name == category_request.name:
+        existing_by_name = self.category_repository.find_category_by_name(category_request.name)
+        if existing_by_name and existing_by_name.id != category_id:
             raise CategoryAlreadyExistsException(category_name=category_request.name)
 
 

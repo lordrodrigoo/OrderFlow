@@ -3,6 +3,7 @@ from decimal import Decimal
 import pytest
 from pydantic import ValidationError
 from src.domain.models.order import OrderStatus, Order
+from src.domain.models.user import UserRole
 from src.dto.request.order_item_request import OrderItemRequest
 from src.dto.response.order_item_response import OrderItemResponse
 from src.exceptions.exception_handlers_order_item import (
@@ -18,7 +19,7 @@ def test_create_order_item(
         valid_order_item_data
     ):
     request = OrderItemRequest(**valid_order_item_data)
-    response = order_item_usecase.create_order_item(request)
+    response = order_item_usecase.create_order_item(request, current_user_id=1, current_role=UserRole.USER)
 
     assert isinstance(response, OrderItemResponse)
     assert response.order_id == valid_order_item_data["order_id"]
@@ -34,7 +35,7 @@ def test_order_item_not_found(
     ):
     fake_order_item_repository_mock.get_order_item_by_id.return_value = None
     with pytest.raises(OrderItemNotFoundException) as exc_info:
-        order_item_usecase.get_order_item_by_id(999)
+        order_item_usecase.get_order_item_by_id(999, current_user_id=1, current_role=UserRole.USER)
     assert "Order item with ID: '999' not found." in str(exc_info.value)
 
 
@@ -83,7 +84,7 @@ def test_update_order_item(
     updated_data["quantity"] = 3
     updated_data["unit_price"] = Decimal("19.99")
 
-    response = order_item_usecase.update_order_item(1, OrderItemRequest(**updated_data))
+    response = order_item_usecase.update_order_item(1, OrderItemRequest(**updated_data), current_user_id=1, current_role=UserRole.USER)
 
     assert isinstance(response, OrderItemResponse)
     assert response.order_id == updated_data["order_id"]
@@ -102,7 +103,7 @@ def test_duplicate_order_item(
     fake_order_item_repository_mock.get_order_item_by_id.return_value = valid_order_item
     fake_order_item_repository_mock.exists.return_value = True
     with pytest.raises(DuplicateOrderItemException) as exc_info:
-        order_item_usecase.create_order_item(OrderItemRequest(**valid_order_item_data))
+        order_item_usecase.create_order_item(OrderItemRequest(**valid_order_item_data), current_user_id=1, current_role=UserRole.USER)
     assert "Product '1' is already associated with order '1'." in str(exc_info.value)
 
 
@@ -122,7 +123,7 @@ def test_invalid_order_item_status(
         status=OrderStatus.CANCELED
     )
     with pytest.raises(InvalidOrderItemException) as exc_info:
-        order_item_usecase.create_order_item(OrderItemRequest(**valid_order_item_data))
+        order_item_usecase.create_order_item(OrderItemRequest(**valid_order_item_data), current_user_id=1, current_role=UserRole.USER)
     assert "Cannot add items to order ID: '1' with status: 'canceled'." in str(exc_info.value)
 
 
@@ -135,7 +136,7 @@ def test_deleted_order_item(
     ):
     fake_order_item_repository_mock.get_order_item_by_id.return_value = None
     with pytest.raises(OrderItemNotFoundException) as exc_info:
-        order_item_usecase.get_order_item_by_id(1)
+        order_item_usecase.get_order_item_by_id(1, current_user_id=1, current_role=UserRole.USER)
     assert "Order item with ID: '1' not found." in str(exc_info.value)
 
 
@@ -146,9 +147,8 @@ def test_find_all_order_items_by_order_id(
         valid_order_item
     ):
     fake_order_item_repository_mock.get_order_items_by_order_id.return_value = [valid_order_item]
-    order_item_usecase.order_repository.exists.return_value = True
 
-    response = order_item_usecase.list_order_items(order_id=1)
+    response = order_item_usecase.list_order_items(order_id=1, current_user_id=1, current_role=UserRole.USER)
 
     assert isinstance(response, list)
     assert len(response) == 1
@@ -168,7 +168,7 @@ def test_get_order_item_by_id(
     ):
     fake_order_item_repository_mock.get_order_item_by_id.return_value = valid_order_item
 
-    response = order_item_usecase.get_order_item_by_id(1)
+    response = order_item_usecase.get_order_item_by_id(1, current_user_id=1, current_role=UserRole.USER)
 
     assert isinstance(response, OrderItemResponse)
     assert response.order_id == valid_order_item_data["order_id"]
@@ -185,7 +185,7 @@ def test_subtotal_calculation(
     ):
     fake_order_item_repository_mock.get_order_item_by_id.return_value = valid_order_item
 
-    response = order_item_usecase.get_order_item_by_id(1)
+    response = order_item_usecase.get_order_item_by_id(1, current_user_id=1, current_role=UserRole.USER)
 
     expected_subtotal = Decimal(str(valid_order_item_data["quantity"])) * Decimal(str(valid_order_item_data["unit_price"]))
     assert response.subtotal == expected_subtotal
@@ -202,7 +202,7 @@ def test_delete_order_item_not_found(
     ):
     fake_order_item_repository_mock.get_order_item_by_id.return_value = None
     with pytest.raises(OrderItemNotFoundException) as exc_info:
-        order_item_usecase.delete_order_item(999)
+        order_item_usecase.delete_order_item(999, current_user_id=1, current_role=UserRole.USER)
     assert "Order item with ID: '999' not found." in str(exc_info.value)
 
 
@@ -222,7 +222,7 @@ def test_delete_order_item_invalid_status(
         status=OrderStatus.DELIVERED
     )
     with pytest.raises(InvalidOrderItemException):
-        order_item_usecase.delete_order_item(1)
+        order_item_usecase.delete_order_item(1, current_user_id=1, current_role=UserRole.USER)
 
 
 def test_update_order_item_not_found(
@@ -232,7 +232,7 @@ def test_update_order_item_not_found(
     ):
     fake_order_item_repository_mock.get_order_item_by_id.return_value = None
     with pytest.raises(OrderItemNotFoundException) as exc_info:
-        order_item_usecase.update_order_item(999, OrderItemRequest(**valid_order_item_data))
+        order_item_usecase.update_order_item(999, OrderItemRequest(**valid_order_item_data), current_user_id=1, current_role=UserRole.USER)
     assert "Order item with ID: '999' not found." in str(exc_info.value)
 
 
@@ -253,7 +253,7 @@ def test_update_order_item_invalid_status(
         status=OrderStatus.CANCELED
     )
     with pytest.raises(InvalidOrderItemException):
-        order_item_usecase.update_order_item(1, OrderItemRequest(**valid_order_item_data))
+        order_item_usecase.update_order_item(1, OrderItemRequest(**valid_order_item_data), current_user_id=1, current_role=UserRole.USER)
 
 
 def test_list_order_items_all(
@@ -262,7 +262,7 @@ def test_list_order_items_all(
         valid_order_item
     ):
     fake_order_item_repository_mock.get_all_order_items.return_value = [valid_order_item]
-    response = order_item_usecase.list_order_items()
+    response = order_item_usecase.list_order_items(current_user_id=1, current_role=UserRole.USER)
     assert isinstance(response, list)
     assert len(response) == 1
 
@@ -271,6 +271,6 @@ def test_list_order_items_order_not_found(
         order_item_usecase,
         fake_order_repository_mock
     ):
-    fake_order_repository_mock.exists.return_value = False
+    fake_order_repository_mock.get_order_by_id.return_value = None
     with pytest.raises(OrderNotFoundException):
-        order_item_usecase.list_order_items(order_id=999)
+        order_item_usecase.list_order_items(order_id=999, current_user_id=1, current_role=UserRole.USER)

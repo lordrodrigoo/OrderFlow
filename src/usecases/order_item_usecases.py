@@ -1,5 +1,6 @@
 import logging
 from src.domain.models.order_item import OrderItem
+from src.domain.models.user import UserRole
 from src.dto.request.order_item_request import OrderItemRequest
 from src.dto.response.order_item_response import OrderItemResponse
 from src.domain.repositories.order_item_repository import OrderItemRepositoryInterface
@@ -9,7 +10,8 @@ from src.domain.models.order import OrderStatus
 from src.exceptions.exception_handlers_order_item import (
     OrderItemNotFoundException,
     InvalidOrderItemException,
-    DuplicateOrderItemException
+    DuplicateOrderItemException,
+    OrderItemPermissionDeniedException,
 )
 from src.exceptions.exception_handlers_order import OrderNotFoundException
 from src.exceptions.exception_handlers_product import ProductNotFoundException
@@ -29,7 +31,7 @@ class OrderItemUsecase:
         self.order_repository = order_repository
 
 
-    def create_order_item(self, order_item_request: OrderItemRequest) -> OrderItemResponse:
+    def create_order_item(self, order_item_request: OrderItemRequest, current_user_id: int, current_role: UserRole) -> OrderItemResponse:
         order_id = order_item_request.order_id
         product_id = order_item_request.product_id
 
@@ -37,6 +39,10 @@ class OrderItemUsecase:
         if not order:
             logger.warning("Order not found", extra={"order_id": order_id})
             raise OrderNotFoundException(order_id=order_id)
+
+        if order.user_id != current_user_id and current_role not in (UserRole.ADMIN, UserRole.OWNER):
+            logger.warning("Permission denied for order item", extra={"order_id": order_id, "user_id": current_user_id})
+            raise OrderItemPermissionDeniedException()
 
         product = self.product_repository.find_product_by_id(product_id)
         if not product:
@@ -63,12 +69,16 @@ class OrderItemUsecase:
         return OrderItemResponse(**created_order_item.__dict__)
 
 
-    def update_order_item(self, order_item_id: int, order_item_request: OrderItemRequest) -> OrderItemResponse:
+    def update_order_item(self, order_item_id: int, order_item_request: OrderItemRequest, current_user_id: int, current_role: UserRole) -> OrderItemResponse:
         order_item_entity = self.order_item_repository.get_order_item_by_id(order_item_id)
         if not order_item_entity:
             raise OrderItemNotFoundException(order_item_id=order_item_id)
 
         order = self.order_repository.get_order_by_id(order_item_entity.order_id)
+        if order.user_id != current_user_id and current_role not in (UserRole.ADMIN, UserRole.OWNER):
+            logger.warning("Permission denied for order item update", extra={"order_item_id": order_item_id, "user_id": current_user_id})
+            raise OrderItemPermissionDeniedException()
+
         if order.status in (OrderStatus.DELIVERED, OrderStatus.CANCELED):
             raise InvalidOrderItemException(order_id=order.id, status=order.status.value)
 
@@ -82,24 +92,32 @@ class OrderItemUsecase:
         return OrderItemResponse(**updated_order_item.__dict__)
 
 
-    def get_order_item_by_id(self, order_item_id: int) -> OrderItemResponse:
+    def get_order_item_by_id(self, order_item_id: int, current_user_id: int, current_role: UserRole) -> OrderItemResponse:
         order_item_entity = self.order_item_repository.get_order_item_by_id(order_item_id)
         if not order_item_entity:
             logger.warning("Order item not found", extra={"order_item_id": order_item_id})
             raise OrderItemNotFoundException(order_item_id=order_item_id)
+        order = self.order_repository.get_order_by_id(order_item_entity.order_id)
+        if order and order.user_id != current_user_id and current_role not in (UserRole.ADMIN, UserRole.OWNER):
+            raise OrderItemPermissionDeniedException()
         return OrderItemResponse(**order_item_entity.__dict__)
 
 
     def list_order_items(
         self,
         order_id: int = None,
+        current_user_id: int = None,
+        current_role: UserRole = None,
         skip: int = 0,
         limit: int = 10
     ) -> list[OrderItemResponse]:
         items = []
         if order_id is not None:
-            if not self.order_repository.exists(order_id):
+            order = self.order_repository.get_order_by_id(order_id)
+            if not order:
                 raise OrderNotFoundException(order_id=order_id)
+            if order.user_id != current_user_id and current_role not in (UserRole.ADMIN, UserRole.OWNER):
+                raise OrderItemPermissionDeniedException()
             items = self.order_item_repository.get_order_items_by_order_id(order_id)
         else:
             items = self.order_item_repository.get_all_order_items()
@@ -107,12 +125,16 @@ class OrderItemUsecase:
         return [OrderItemResponse(**item.__dict__) for item in items]
 
 
-    def delete_order_item(self, order_item_id: int) -> bool:
+    def delete_order_item(self, order_item_id: int, current_user_id: int, current_role: UserRole) -> bool:
         order_item_entity = self.order_item_repository.get_order_item_by_id(order_item_id)
         if not order_item_entity:
             raise OrderItemNotFoundException(order_item_id=order_item_id)
 
         order = self.order_repository.get_order_by_id(order_item_entity.order_id)
+        if order.user_id != current_user_id and current_role not in (UserRole.ADMIN, UserRole.OWNER):
+            logger.warning("Permission denied for order item deletion", extra={"order_item_id": order_item_id, "user_id": current_user_id})
+            raise OrderItemPermissionDeniedException()
+
         if order.status in (OrderStatus.DELIVERED, OrderStatus.CANCELED):
             raise InvalidOrderItemException(order_id=order.id, status=order.status.value)
 

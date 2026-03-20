@@ -1,14 +1,15 @@
 import logging
-from typing import Optional
 from src.domain.models.review import Review
-from src.dto.request.review_request import ReviewRequest
+from src.domain.models.user import UserRole
+from src.dto.request.review_request import ReviewRequest, ReviewFilters
 from src.dto.response.review_response import ReviewResponse
 from src.domain.repositories.review_repository import ReviewRepositoryInterface
 from src.domain.repositories.user_repository import UserRepositoryInterface
 from src.domain.repositories.product_repository import ProductRepositoryInterface
 from src.exceptions.exception_handlers_review import (
     ReviewNotFoundException,
-    InvalidReviewException
+    InvalidReviewException,
+    ReviewPermissionDeniedException,
 )
 from src.exceptions.exception_handlers_user import UserNotFoundException
 from src.exceptions.exception_handlers_product import ProductNotFoundException
@@ -61,43 +62,34 @@ class ReviewUsecase:
         return ReviewResponse(**review.__dict__)
 
 
-    def list_reviews(
-        self,
-        product_id: Optional[int] = None,
-        user_id: Optional[int] = None,
-        min_rating: Optional[int] = None,
-        max_rating: Optional[int] = None,
-        skip: int = 0,
-        limit: int = 10
-) -> list[ReviewResponse]:
-        if user_id:
-            user = self.user_repository.find_user_by_id(user_id)
+    def list_reviews(self, filters: ReviewFilters = None) -> list[ReviewResponse]:
+        if filters is None:
+            filters = ReviewFilters()
+
+        if filters.user_id:
+            user = self.user_repository.find_user_by_id(filters.user_id)
             if not user:
-                raise UserNotFoundException(user_id=user_id)
+                raise UserNotFoundException(user_id=filters.user_id)
 
-        if product_id:
-            product = self.product_repository.find_product_by_id(product_id)
+        if filters.product_id:
+            product = self.product_repository.find_product_by_id(filters.product_id)
             if not product:
-                raise ProductNotFoundException(product_id=product_id)
+                raise ProductNotFoundException(product_id=filters.product_id)
 
-        if min_rating and max_rating and min_rating > max_rating:
+        if filters.min_rating and filters.max_rating and filters.min_rating > filters.max_rating:
             raise InvalidReviewException("min_rating cannot be greater than max_rating")
 
-        reviews = self.review_repository.get_all_reviews(
-            product_id=product_id,
-            user_id=user_id,
-            min_rating=min_rating,
-            max_rating=max_rating,
-            skip=skip,
-            limit=limit
-        )
+        reviews = self.review_repository.get_all_reviews(**filters.model_dump())
         return [ReviewResponse(**review.__dict__) for review in reviews]
 
 
-    def delete_review(self, review_id: int) -> None:
+    def delete_review(self, review_id: int, current_user_id: int, current_role: UserRole) -> None:
         review = self.review_repository.get_review_by_id(review_id)
         if not review:
             logger.warning("Review not found for deletion", extra={"review_id": review_id})
             raise ReviewNotFoundException(review_id=review_id)
+        if review.user_id != current_user_id and current_role not in (UserRole.ADMIN, UserRole.OWNER):
+            logger.warning("Permission denied for review deletion", extra={"review_id": review_id, "user_id": current_user_id})
+            raise ReviewPermissionDeniedException()
         self.review_repository.delete_review(review_id)
         logger.info("Review deleted", extra={"review_id": review_id})

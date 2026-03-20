@@ -149,7 +149,10 @@ class UserUsecase:
         return UserResponse(**updated_user.__dict__)
 
 
-    def delete_user(self, user_id: int) -> bool:
+    def delete_user(self, user_id: int, current_user: UserResponse) -> bool:
+        if current_user.id != user_id and current_user.role not in (UserRole.ADMIN, UserRole.OWNER):
+            logger.warning("Permission denied to delete user", extra={"user_id": user_id, "requester_id": current_user.id})
+            raise UserPermissionDeniedException(user_id=user_id)
         user = self.user_repository.find_user_by_id(user_id)
         if not user:
             logger.warning("User not found for deletion", extra={"user_id": user_id})

@@ -3,9 +3,10 @@ import logging
 from typing import List, Optional
 from fastapi import APIRouter, Response, Query, status, Depends
 from src.usecases.review_usecases import ReviewUsecase
-from src.dto.request.review_request import ReviewRequest
+from src.dto.request.review_request import ReviewRequest, ReviewFilters
 from src.dto.response.review_response import ReviewResponse
-from src.api.dependencies import get_review_usecase
+from src.dto.response.user_response import UserResponse
+from src.api.dependencies import get_review_usecase, get_current_user
 
 
 
@@ -20,9 +21,11 @@ logger = logging.getLogger(__name__)
 def create_review(
     review_request: ReviewRequest,
     response: Response,
+    current_user: UserResponse = Depends(get_current_user),
     review_usecase: ReviewUsecase = Depends(get_review_usecase)
 ):
     """Endpoint to create a new review."""
+    review_request.user_id = current_user.id
     logger.info("Creating review", extra={"product_id": review_request.product_id})
     review = review_usecase.create_review(review_request)
     response.headers['Location'] = f"{API_PREFIX}/{review.id}"
@@ -52,7 +55,7 @@ def list_reviews(
     review_usecase: ReviewUsecase = Depends(get_review_usecase)
 ):
     """Endpoint to list reviews with optional filters."""
-    return review_usecase.list_reviews(
+    filters = ReviewFilters(
         product_id=product_id,
         user_id=user_id,
         min_rating=min_rating,
@@ -60,13 +63,15 @@ def list_reviews(
         skip=skip,
         limit=limit
     )
+    return review_usecase.list_reviews(filters)
 
 
 @router.delete("/{review_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_review(
     review_id: int,
+    current_user: UserResponse = Depends(get_current_user),
     review_usecase: ReviewUsecase = Depends(get_review_usecase)
 ):
     """Endpoint to delete a review by review_id."""
-    review_usecase.delete_review(review_id)
+    review_usecase.delete_review(review_id, current_user.id, current_user.role)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -220,10 +220,9 @@ def test_admin_get_all_orders_filter_by_status(
         fake_order_repository_mock,
         valid_order
     ):
-    fake_order_repository_mock.find_orders_by_status.return_value = [valid_order]
+    fake_order_repository_mock.get_all_orders.return_value = [valid_order]
     response = order_usecase.admin_get_all_orders(order_status="pending")
     assert len(response) == 1
-    fake_order_repository_mock.find_orders_by_status.assert_called_once_with("pending")
 
 
 def test_admin_get_all_orders_filter_by_user(
@@ -231,10 +230,9 @@ def test_admin_get_all_orders_filter_by_user(
         fake_order_repository_mock,
         valid_order
     ):
-    fake_order_repository_mock.find_orders_by_user.return_value = [valid_order]
+    fake_order_repository_mock.get_all_orders.return_value = [valid_order]
     response = order_usecase.admin_get_all_orders(user_id=1)
     assert len(response) == 1
-    fake_order_repository_mock.find_orders_by_user.assert_called_once_with(1)
 
 
 def test_get_dashboard_stats(

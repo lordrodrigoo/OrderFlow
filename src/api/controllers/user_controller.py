@@ -9,7 +9,7 @@ from src.dto.response.address_response import AddressResponse
 from src.api.dependencies import get_address_usecase
 from src.dto.request.user_request import UserRequest
 from src.dto.response.user_response import UserResponse
-from src.api.dependencies import get_user_usecase, get_current_user, get_current_owner
+from src.api.dependencies import get_user_usecase, get_current_user, get_current_owner, get_current_admin
 from src.dto.request.role_request import RoleUpdateRequest
 
 
@@ -52,6 +52,7 @@ def list_users(
     active: Optional[bool] = Query(None, description="Filter users by active status"),
     skip: int = 0,
     limit: int = 10,
+    _: UserResponse = Depends(get_current_admin),
     user_usecase: UserUsecase = Depends(get_user_usecase)
 ) -> List[UserResponse]:
     """Endpoint to list users with optional filters."""
@@ -78,6 +79,7 @@ def list_my_addresses(
 def get_user_by_id(
     user_id: int,
     response: Response,
+    _: UserResponse = Depends(get_current_user),
     user_usecase: UserUsecase = Depends(get_user_usecase)
 ):
     """Endpoint to get a user by user_id."""
@@ -136,10 +138,14 @@ def set_default_address(
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(user_id: int, user_usecase: UserUsecase = Depends(get_user_usecase)):
+def delete_user(
+    user_id: int,
+    current_user: UserResponse = Depends(get_current_user),
+    user_usecase: UserUsecase = Depends(get_user_usecase)
+):
     """Endpoint to delete a user."""
     logger.info("Deleting user", extra={"user_id": user_id})
-    user_usecase.delete_user(user_id)
+    user_usecase.delete_user(user_id, current_user)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 

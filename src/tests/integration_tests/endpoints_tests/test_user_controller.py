@@ -6,53 +6,62 @@ def test_create_user(client, valid_user_data):
     assert data["email"] == valid_user_data["email"]
 
 
-def test_list_users_with_filters(client, valid_user_data):
+def test_list_users_with_filters(client, admin_auth_token, valid_user_data):
     client.post("/api/v1/users/", json=valid_user_data)
 
     response = client.get(
         "/api/v1/users/",
-        params={
-            "email": valid_user_data["email"]})
+        params={"email": valid_user_data["email"]},
+        headers={"Authorization": f"Bearer {admin_auth_token}"}
+    )
     assert response.status_code == 200
     data = response.json()
     assert len(data) == 1
     assert data[0]["email"] == valid_user_data["email"]
 
 
-def test_list_users_with_name_filter(client, fake_user, fake_account):
-    response = client.get("/api/v1/users/", params={"name": fake_user.first_name})
+def test_list_users_with_name_filter(client, admin_auth_token, fake_user, fake_account):
+    response = client.get(
+        "/api/v1/users/",
+        params={"name": fake_user.first_name},
+        headers={"Authorization": f"Bearer {admin_auth_token}"}
+    )
     assert response.status_code == 200
     data = response.json()
     assert any(u["email"] == fake_user.email for u in data)
 
 
-def test_list_users_with_active_filter(client, fake_user, fake_account):
-    response = client.get("/api/v1/users/", params={"active": True})
+def test_list_users_with_active_filter(client, admin_auth_token, fake_user, fake_account):
+    response = client.get(
+        "/api/v1/users/",
+        params={"active": True},
+        headers={"Authorization": f"Bearer {admin_auth_token}"}
+    )
     assert response.status_code == 200
     data = response.json()
     assert all(u["is_active"] is True for u in data)
 
 
-def test_list_users_without_filters(client, valid_user_data):
+def test_list_users_without_filters(client, admin_auth_token, valid_user_data):
     client.post("/api/v1/users/", json=valid_user_data)
 
-    response = client.get("/api/v1/users/")
+    response = client.get("/api/v1/users/", headers={"Authorization": f"Bearer {admin_auth_token}"})
     assert response.status_code == 200
     data = response.json()
     assert len(data) >= 1
 
 
-def test_get_user_by_id(client, valid_user_data):
-    create_response = client.post("/api/v1/users/", json = valid_user_data)
+def test_get_user_by_id(client, auth_token, valid_user_data):
+    create_response = client.post("/api/v1/users/", json=valid_user_data)
     user_id = create_response.json()["id"]
-    response = client.get(f"/api/v1/users/{user_id}")
+    response = client.get(f"/api/v1/users/{user_id}", headers={"Authorization": f"Bearer {auth_token}"})
     assert response.status_code == 200
     data = response.json()
     assert data["id"] == user_id
 
 
-def test_get_inexistent_user_by_id(client):
-    response = client.get("/api/v1/users/9999")
+def test_get_inexistent_user_by_id(client, auth_token):
+    response = client.get("/api/v1/users/9999", headers={"Authorization": f"Bearer {auth_token}"})
     assert response.status_code == 404
 
 
@@ -163,13 +172,19 @@ def test_set_default_address(client, auth_token, fake_address):
     assert response.status_code == 200
 
 
-def test_delete_user(client, valid_user_data):
+def test_delete_user(client, admin_auth_token, valid_user_data):
     create_response = client.post("/api/v1/users/", json=valid_user_data)
     user_id = create_response.json()["id"]
-    delete_response = client.delete(f"/api/v1/users/{user_id}")
+    delete_response = client.delete(
+        f"/api/v1/users/{user_id}",
+        headers={"Authorization": f"Bearer {admin_auth_token}"}
+    )
     assert delete_response.status_code == 204
 
-    get_response = client.get(f"/api/v1/users/{user_id}")
+    get_response = client.get(
+        f"/api/v1/users/{user_id}",
+        headers={"Authorization": f"Bearer {admin_auth_token}"}
+    )
     assert get_response.status_code == 404
 
 

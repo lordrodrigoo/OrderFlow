@@ -135,14 +135,13 @@ class OrderUsecase:
             skip: int = 0,
             limit: int = 10
     ) -> list[OrderResponse]:
+        orders = self.order_repository.get_all_orders()
         if order_status:
-            orders = self.order_repository.find_orders_by_status(order_status)
-        elif user_id:
-            orders = self.order_repository.find_orders_by_user(user_id)
-        elif min_amount is not None and max_amount is not None:
-            orders = self.order_repository.find_orders_by_total_amount(min_amount, max_amount)
-        else:
-            orders = self.order_repository.get_all_orders()
+            orders = [o for o in orders if (o.status.value if hasattr(o.status, "value") else o.status) == order_status]
+        if user_id:
+            orders = [o for o in orders if o.user_id == user_id]
+        if min_amount is not None and max_amount is not None:
+            orders = [o for o in orders if min_amount <= float(o.total_amount) <= max_amount]
         orders = orders[skip:skip + limit]
         return [OrderResponse(**order.__dict__) for order in orders]
 

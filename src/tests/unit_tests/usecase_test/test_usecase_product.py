@@ -5,6 +5,7 @@ import pytest
 from pydantic import ValidationError
 from src.dto.request.product_request import ProductRequest
 from src.dto.response.product_response import ProductResponse
+from src.domain.models.product import Product
 from src.exceptions.exception_handlers_product import (
     ProductNotFoundException,
     ProductAlreadyExistsException,
@@ -259,8 +260,18 @@ def test_update_product_already_exists(
         valid_product_data,
         fake_product_response_mock
     ):
-
-    duplicate = ProductResponse(
+    # Existing product has a different name; new name is taken by another product
+    existing = ProductResponse(
+        id=1,
+        name="Old Name",
+        description=valid_product_data["description"],
+        category_id=valid_product_data["category_id"],
+        price=valid_product_data["price"],
+        is_available=valid_product_data["is_available"],
+        preparation_time=valid_product_data["preparation_time"],
+        created_at=datetime.now(),
+    )
+    duplicate = Product(
         id=99,
         name=valid_product_data["name"],
         description=valid_product_data["description"],
@@ -270,10 +281,8 @@ def test_update_product_already_exists(
         preparation_time=valid_product_data["preparation_time"],
         created_at=datetime.now(),
     )
-    fake_product_repository_mock.find_product_by_id.side_effect = [
-        fake_product_response_mock,
-        duplicate
-    ]
+    fake_product_repository_mock.find_product_by_id.return_value = existing
+    fake_product_repository_mock.find_products_by_name.return_value = [duplicate]
     with pytest.raises(ProductAlreadyExistsException) as exc_info:
         product_usecase.update_product(1, ProductRequest(**valid_product_data))
     assert valid_product_data["name"] in exc_info.value.message

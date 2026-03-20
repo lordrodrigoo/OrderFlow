@@ -33,3 +33,16 @@ async def invalid_review_exception_handler(request: Request, exc: InvalidReviewE
         status_code=status.HTTP_400_BAD_REQUEST,
         content={"message": exc.message}
     )
+
+
+class ReviewPermissionDeniedException(Exception):
+    def __init__(self):
+        self.message = "You do not have permission to access this review."
+        super().__init__(self.message)
+
+
+async def review_permission_denied_exception_handler(request: Request, exc: ReviewPermissionDeniedException):
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN,
+        content={"message": exc.message}
+    )

@@ -43,7 +43,6 @@ def get_order_by_id(
 
 @router.get("/", response_model=List[OrderResponse], status_code=status.HTTP_200_OK)
 def list_orders(
-    user_id: Optional[int] = Query(None, description="Filter orders by user ID"),
     order_status: Optional[str] = Query(None, description="Filter orders by status"),
     min_amount: Optional[float] = Query(None, description="Minimum total amount"),
     max_amount: Optional[float] = Query(None, description="Maximum total amount"),
@@ -55,7 +54,7 @@ def list_orders(
 ):
     """Endpoint to list orders with optional filters and pagination."""
     orders = order_usecase.list_orders(
-        user_id=user_id if user_id is not None else current_user.id,
+        user_id=current_user.id,
         order_status=order_status,
         min_amount=min_amount,
         max_amount=max_amount,

@@ -46,3 +46,16 @@ async def duplicate_order_item_exception_handler(request: Request, exc: Duplicat
         status_code=status.HTTP_400_BAD_REQUEST,
         content={"message": exc.message}
     )
+
+
+class OrderItemPermissionDeniedException(Exception):
+    def __init__(self):
+        self.message = "You do not have permission to access this order item."
+        super().__init__(self.message)
+
+
+async def order_item_permission_denied_exception_handler(request: Request, exc: OrderItemPermissionDeniedException):
+    return JSONResponse(
+        status_code=status.HTTP_403_FORBIDDEN,
+        content={"message": exc.message}
+    )

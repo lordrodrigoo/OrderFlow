@@ -51,14 +51,16 @@ class ProductUsecase:
             product_request: ProductRequest
         ) -> ProductResponse:
 
-        if not self.product_repository.find_product_by_id(product_id):
+        existing = self.product_repository.find_product_by_id(product_id)
+        if not existing:
             logger.warning("Product not found", extra={"product_id": product_id})
             raise ProductNotFoundException(product_id=product_id)
 
-        existing = self.product_repository.find_product_by_id(product_id)
-        if existing and existing.id != product_id and existing.name == product_request.name:
-            logger.warning("Product already exists", extra={"product_name": product_request.name})
-            raise ProductAlreadyExistsException(product_name=product_request.name)
+        if existing.name != product_request.name:
+            dup = self.product_repository.find_products_by_name(product_request.name)
+            if any(p.id != product_id for p in (dup or [])):
+                logger.warning("Product already exists", extra={"product_name": product_request.name})
+                raise ProductAlreadyExistsException(product_name=product_request.name)
 
         product_entity = Product (
             id=product_id,

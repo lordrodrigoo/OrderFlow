@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -23,3 +24,12 @@ class ReviewRequest(BaseModel):
         if value and value.strip() == "":
             raise ValueError("Comment cannot be empty string")
         return value.strip() if value else value
+
+
+class ReviewFilters(BaseModel):
+    product_id: Optional[int] = None
+    user_id: Optional[int] = None
+    min_rating: Optional[int] = None
+    max_rating: Optional[int] = None
+    skip: int = 0
+    limit: int = 10

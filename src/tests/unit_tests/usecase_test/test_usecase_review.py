@@ -1,7 +1,8 @@
 #pylint: disable=unused-argument
 import pytest
 from pydantic import ValidationError
-from src.dto.request.review_request import ReviewRequest
+from src.domain.models.user import UserRole
+from src.dto.request.review_request import ReviewRequest, ReviewFilters
 from src.dto.response.review_response import ReviewResponse
 from src.exceptions.exception_handlers_review import (
     ReviewNotFoundException,
@@ -74,7 +75,7 @@ def test_list_reviews_invalid_rating_range(
         review_usecase,
     ):
     with pytest.raises(InvalidReviewException):
-        review_usecase.list_reviews(min_rating=5, max_rating=1)
+        review_usecase.list_reviews(ReviewFilters(min_rating=5, max_rating=1))
 
 
 def test_list_reviews_user_not_found(
@@ -83,7 +84,7 @@ def test_list_reviews_user_not_found(
     ):
     fake_user_repository_mock.find_user_by_id.return_value = None
     with pytest.raises(UserNotFoundException):
-        review_usecase.list_reviews(user_id=999)
+        review_usecase.list_reviews(ReviewFilters(user_id=999))
 
 
 def test_list_reviews_product_not_found(
@@ -92,7 +93,7 @@ def test_list_reviews_product_not_found(
     ):
     fake_product_repository_mock_review.find_product_by_id.return_value = None
     with pytest.raises(ProductNotFoundException):
-        review_usecase.list_reviews(product_id=999)
+        review_usecase.list_reviews(ReviewFilters(product_id=999))
 
 
 def test_list_reviews_success(
@@ -101,7 +102,7 @@ def test_list_reviews_success(
         valid_review
     ):
     fake_review_repository_mock.get_all_reviews.return_value = [valid_review]
-    response = review_usecase.list_reviews()
+    response = review_usecase.list_reviews(ReviewFilters())
     assert isinstance(response, list)
     assert len(response) == 1
     assert isinstance(response[0], ReviewResponse)
@@ -127,7 +128,7 @@ def test_delete_review_success(
         valid_review
     ):
     fake_review_repository_mock.get_review_by_id.return_value = valid_review
-    review_usecase.delete_review(1)
+    review_usecase.delete_review(1, current_user_id=1, current_role=UserRole.USER)
     fake_review_repository_mock.delete_review.assert_called_once_with(1)
 
 
@@ -137,4 +138,4 @@ def test_delete_review_not_found(
     ):
     fake_review_repository_mock.get_review_by_id.return_value = None
     with pytest.raises(ReviewNotFoundException):
-        review_usecase.delete_review(999)
+        review_usecase.delete_review(999, current_user_id=1, current_role=UserRole.USER)

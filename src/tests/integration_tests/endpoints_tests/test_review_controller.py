@@ -1,11 +1,11 @@
 #pylint: disable=unused-argument
-def test_create_review(client, fake_user, fake_product, fake_category):
+def test_create_review(client, auth_token, fake_user, fake_product, fake_category):
     response = client.post("/api/v1/reviews/", json={
         "user_id": fake_user.id,
         "product_id": fake_product.id,
         "rating": 5,
         "comment": "Excellent!"
-    })
+    }, headers={"Authorization": f"Bearer {auth_token}"})
     assert response.status_code == 201
     data = response.json()
     assert data["user_id"] == fake_user.id
@@ -13,23 +13,13 @@ def test_create_review(client, fake_user, fake_product, fake_category):
     assert data["rating"] == 5
 
 
-def test_create_review_user_not_found(client, fake_product, fake_category):
-    response = client.post("/api/v1/reviews/", json={
-        "user_id": 9999,
-        "product_id": fake_product.id,
-        "rating": 4,
-        "comment": "Good"
-    })
-    assert response.status_code == 404
-
-
-def test_create_review_product_not_found(client, fake_user):
+def test_create_review_product_not_found(client, auth_token, fake_user):
     response = client.post("/api/v1/reviews/", json={
         "user_id": fake_user.id,
         "product_id": 9999,
         "rating": 3,
         "comment": "Average"
-    })
+    }, headers={"Authorization": f"Bearer {auth_token}"})
     assert response.status_code == 404
 
 
@@ -72,8 +62,11 @@ def test_list_reviews_filter_by_rating(client, fake_review):
     assert isinstance(response.json(), list)
 
 
-def test_delete_review(client, fake_review):
-    delete_response = client.delete(f"/api/v1/reviews/{fake_review.id}")
+def test_delete_review(client, auth_token, fake_review):
+    delete_response = client.delete(
+        f"/api/v1/reviews/{fake_review.id}",
+        headers={"Authorization": f"Bearer {auth_token}"}
+    )
     assert delete_response.status_code == 204
 
     get_response = client.get(f"/api/v1/reviews/{fake_review.id}")

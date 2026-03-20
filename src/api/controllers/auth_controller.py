@@ -31,7 +31,9 @@ def login(
 
 
 @router.post("/refresh", response_model=TokenResponse, status_code=status.HTTP_200_OK)
+@limiter.limit("10/minute")
 def refresh_token(
+    request: Request,
     refresh_request: RefreshTokenRequest,
     auth_usecase: AuthUseCases = Depends(get_auth_usecase)
 ):
