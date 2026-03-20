@@ -64,7 +64,8 @@ def get_category_usecase(db=Depends(get_db)):
 
 def get_order_usecase(db=Depends(get_db)):
     order_repository = OrderRepository(db)
-    return OrderUsecase(order_repository)
+    address_repository = AddressRepository(db)
+    return OrderUsecase(order_repository, address_repository)
 
 
 def get_order_item_usecase(db=Depends(get_db)):

@@ -5,20 +5,26 @@ from src.dto.request.order_request import OrderRequest
 from src.dto.response.order_response import OrderResponse
 from src.dto.response.dashboard_response import DashboardResponse
 from src.domain.repositories.order_repository import OrderRepositoryInterface
+from src.domain.repositories.address_repository import AddressRepositoryInterface
 from src.exceptions.exception_handlers_order import (
     OrderNotFoundException,
-    OrderAlreadyCanceledException
+    OrderAlreadyCanceledException,
+    OrderAddressNotFoundException
 )
 
 logger = logging.getLogger(__name__)
 
 
 class OrderUsecase:
-    def __init__(self, order_repository: OrderRepositoryInterface):
+    def __init__(self, order_repository: OrderRepositoryInterface, address_repository: AddressRepositoryInterface):
         self.order_repository = order_repository
+        self.address_repository = address_repository
 
 
     def create_order(self, order_request: OrderRequest, user_id: int) -> OrderResponse:
+        if not self.address_repository.find_address_by_id(order_request.address_id):
+            logger.warning("Address not found for order", extra={"address_id": order_request.address_id})
+            raise OrderAddressNotFoundException(address_id=order_request.address_id)
         order_entity = Order(
             user_id=user_id,
             address_id=order_request.address_id,

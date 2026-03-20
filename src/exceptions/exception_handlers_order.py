@@ -27,3 +27,16 @@ async def order_already_canceled_exception_handler(request: Request, exc: OrderA
         status_code=status.HTTP_409_CONFLICT,
         content={"message": exc.message}
     )
+
+
+class OrderAddressNotFoundException(Exception):
+    def __init__(self, address_id: int):
+        self.address_id = address_id
+        self.message = f"Address with ID: '{address_id}' not found."
+        super().__init__(self.message)
+
+async def order_address_not_found_exception_handler(request: Request, exc: OrderAddressNotFoundException):
+    return JSONResponse(
+        status_code=status.HTTP_404_NOT_FOUND,
+        content={"message": exc.message}
+    )

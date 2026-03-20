@@ -3,7 +3,7 @@ from src.dto.request.address_request import AddressRequest
 from src.dto.response.address_response import AddressResponse
 from src.domain.models.address import Address
 from src.domain.repositories.address_repository import AddressRepositoryInterface
-from src.domain.models.user import Users
+from src.domain.models.user import Users, UserRole
 from src.exceptions.exception_handlers_address import (
     AddressNotFoundException,
     AddressAlreadyExistsException,
@@ -55,13 +55,13 @@ class AddressUsecase:
             logger.warning("Address not found", extra={"address_id": address_id})
             raise AddressNotFoundException(address_id=address_id)
 
-        if address.user_id != current_user.id:
+        if address.user_id != current_user.id and current_user.role not in (UserRole.ADMIN, UserRole.OWNER):
             logger.warning("Permission denied to update address", extra={"address_id": address_id})
             raise AddressPermissionDeniedException(address_id=address_id)
 
         address_entity = Address(
             id=address_id,
-            user_id=address_request.user_id,
+            user_id=address.user_id,
             street=address_request.street,
             number=address_request.number,
             neighborhood=address_request.neighborhood,
@@ -103,7 +103,7 @@ class AddressUsecase:
             logger.warning("Address not found for deletion", extra={"address_id": address_id})
             raise AddressNotFoundException(address_id=address_id)
 
-        if address.user_id != current_user.id:
+        if address.user_id != current_user.id and current_user.role not in (UserRole.ADMIN, UserRole.OWNER):
             logger.warning("Permission denied to delete address", extra={"address_id": address_id})
             raise AddressPermissionDeniedException(address_id=address_id)
         logger.info("Address deleted", extra={"address_id": address_id})

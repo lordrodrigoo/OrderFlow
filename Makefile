@@ -1,4 +1,4 @@
-.PHONY: help setup run test test-integration test-all lint up down down-v logs shell
+.PHONY: help setup run test test-integration test-all lint up down down-v logs shell db-reset
 
 VENV := venv
 PYTHON := $(VENV)/bin/python
@@ -58,3 +58,11 @@ logs: ## Shows the logs of the app container
 
 shell: ## Opens a shell in the app container
 	docker compose exec app sh
+
+# ── Database ─────────────────────────────────────────────────────────────────
+
+db-reset: ## Truncates all tables and resets ID sequences (local dev only)
+	PGPASSWORD=$(shell grep DB_PASSWORD .env | cut -d= -f2 | tr -d "'") \
+	psql -h localhost -U $(shell grep DB_USERNAME .env | cut -d= -f2 | tr -d "'") -d delivery_db -c \
+	"TRUNCATE TABLE reviews, order_items, orders, addresses, products, categories, accounts, users RESTART IDENTITY CASCADE;"
+	@echo "Database reset — all tables truncated and sequences restarted."

@@ -16,12 +16,6 @@
 ---
 
 ### 1. Import the collection
-
-1. Open Postman.
-2. Click **Import** (top-left).
-3. Select the file `docs/OrderFlow.postman_collection.json`.
-4. The collection **OrderFlow API** will appear in your sidebar.
-
 ---
 
 ### 2. Set the base URL
@@ -74,7 +68,7 @@ Use **Auth → Refresh Token** when the access token expires. The new token is s
 │   └─ Delete User                     DELETE /api/v1/users/:user_id
 
 📁 Accounts
-│   ├─ Create Account                  POST   /api/v1/accounts/
+│   ├─ Create Account                  POST   /api/v1/accounts/        🔒 admin/owner only
 │   ├─ Get My Account                  GET    /api/v1/accounts/me
 │   ├─ Get Account by ID               GET    /api/v1/accounts/:account_id
 │   ├─ Update Account                  PUT    /api/v1/accounts/:account_id
@@ -84,58 +78,6 @@ Use **Auth → Refresh Token** when the access token expires. The new token is s
 │   ├─ Create Address                  POST   /api/v1/addresses/
 │   ├─ List Addresses                  GET    /api/v1/addresses/
 │   ├─ Get Address by ID               GET    /api/v1/addresses/:address_id
-│   ├─ Update Address                  PUT    /api/v1/addresses/:address_id
-│   ├─ Set Default Address             PATCH  /api/v1/addresses/:address_id/default
-│   └─ Delete Address                  DELETE /api/v1/addresses/:address_id
-
-📁 Categories
-│   ├─ Create Category                 POST   /api/v1/categories/
-│   ├─ List Categories                 GET    /api/v1/categories/
-│   ├─ Get Category by ID              GET    /api/v1/categories/:category_id
-│   ├─ Update Category                 PUT    /api/v1/categories/:category_id
-│   └─ Delete Category                 DELETE /api/v1/categories/:category_id
-
-📁 Products
-│   ├─ Create Product                  POST   /api/v1/products/
-│   ├─ List Products                   GET    /api/v1/products/
-│   ├─ Get Product by ID               GET    /api/v1/products/:product_id
-│   ├─ Update Product                  PUT    /api/v1/products/:product_id
-│   └─ Delete Product                  DELETE /api/v1/products/:product_id
-
-📁 Orders
-│   ├─ Create Order                    POST   /api/v1/orders/
-│   ├─ List My Orders                  GET    /api/v1/orders/
-│   ├─ Get Order by ID                 GET    /api/v1/orders/:order_id
-│   ├─ Cancel Order                    POST   /api/v1/orders/:order_id/cancel
-│   └─ Delete Order                    DELETE /api/v1/orders/:order_id
-
-📁 Order Items
-│   ├─ Create Order Item               POST   /api/v1/order-items/
-│   ├─ List Order Items                GET    /api/v1/order-items/
-│   ├─ Get Order Item by ID            GET    /api/v1/order-items/:order_item_id
-│   ├─ Update Order Item               PUT    /api/v1/order-items/:order_item_id
-│   └─ Delete Order Item               DELETE /api/v1/order-items/:order_item_id
-
-📁 Reviews
-│   ├─ Create Review                   POST   /api/v1/reviews/
-│   ├─ List Reviews                    GET    /api/v1/reviews/
-│   ├─ Get Review by ID                GET    /api/v1/reviews/:review_id
-│   ├─ Update Review                   PUT    /api/v1/reviews/:review_id
-│   └─ Delete Review                   DELETE /api/v1/reviews/:review_id
-
-📁 Admin                               🔒 Requires role: admin or owner
-│   ├─ Update Order Status             PATCH /api/v1/admin/orders/:order_id/status
-│   ├─ List All Orders (Admin)         GET   /api/v1/admin/orders
-│   └─ Dashboard                       GET   /api/v1/admin/dashboard
-
-📁 Owner                               🔒 Requires role: owner
-│   ├─ Promote to Admin                PATCH /api/v1/users/:user_id/role  {"role": "admin"}
-│   └─ Remove Admin Role               PATCH /api/v1/users/:user_id/role  {"role": "user"}
-```
-
----
-
-### 5. Role hierarchy
 
 ```
 OWNER  ──▶  can do everything + manage roles
@@ -168,13 +110,14 @@ Assigning the `owner` role through the API is intentionally blocked — it retur
 
 ### 7. Quick start flow
 
+> **Note:** `POST /users/` automatically creates the linked account in the same operation — you do **not** need to call `POST /accounts/` separately.
+
 ```
-1. POST /api/v1/users/           → create an account
-2. POST /api/v1/auth/            → login (token saved automatically)
-3. POST /api/v1/accounts/        → create account profile
-4. POST /api/v1/users/me/addresses → add a delivery address
-5. POST /api/v1/orders/          → place an order
-6. POST /api/v1/order-items/     → add items to the order
+1. POST /api/v1/users/              → create user (account is created automatically)
+2. POST /api/v1/auth/               → login (token saved automatically)
+3. POST /api/v1/users/me/addresses  → add a delivery address
+4. POST /api/v1/orders/             → place an order
+5. POST /api/v1/order-items/        → add items to the order
 ```
 
 ---
@@ -193,12 +136,6 @@ Assigning the `owner` role through the API is intentionally blocked — it retur
 ---
 
 ### 1. Importar a collection
-
-1. Abra o Postman.
-2. Clique em **Import** (canto superior esquerdo).
-3. Selecione o arquivo `docs/OrderFlow.postman_collection.json`.
-4. A collection **OrderFlow API** vai aparecer na barra lateral.
-
 ---
 
 ### 2. Configurar a URL base
@@ -251,7 +188,7 @@ Use **Auth → Refresh Token** quando o access token expirar. O novo token é sa
 │   └─ Delete User                     DELETE /api/v1/users/:user_id
 
 📁 Accounts
-│   ├─ Create Account                  POST   /api/v1/accounts/
+│   ├─ Create Account                  POST   /api/v1/accounts/        🔒 somente admin/owner
 │   ├─ Get My Account                  GET    /api/v1/accounts/me
 │   ├─ Get Account by ID               GET    /api/v1/accounts/:account_id
 │   ├─ Update Account                  PUT    /api/v1/accounts/:account_id
@@ -261,58 +198,6 @@ Use **Auth → Refresh Token** quando o access token expirar. O novo token é sa
 │   ├─ Create Address                  POST   /api/v1/addresses/
 │   ├─ List Addresses                  GET    /api/v1/addresses/
 │   ├─ Get Address by ID               GET    /api/v1/addresses/:address_id
-│   ├─ Update Address                  PUT    /api/v1/addresses/:address_id
-│   ├─ Set Default Address             PATCH  /api/v1/addresses/:address_id/default
-│   └─ Delete Address                  DELETE /api/v1/addresses/:address_id
-
-📁 Categories
-│   ├─ Create Category                 POST   /api/v1/categories/
-│   ├─ List Categories                 GET    /api/v1/categories/
-│   ├─ Get Category by ID              GET    /api/v1/categories/:category_id
-│   ├─ Update Category                 PUT    /api/v1/categories/:category_id
-│   └─ Delete Category                 DELETE /api/v1/categories/:category_id
-
-📁 Products
-│   ├─ Create Product                  POST   /api/v1/products/
-│   ├─ List Products                   GET    /api/v1/products/
-│   ├─ Get Product by ID               GET    /api/v1/products/:product_id
-│   ├─ Update Product                  PUT    /api/v1/products/:product_id
-│   └─ Delete Product                  DELETE /api/v1/products/:product_id
-
-📁 Orders
-│   ├─ Create Order                    POST   /api/v1/orders/
-│   ├─ List My Orders                  GET    /api/v1/orders/
-│   ├─ Get Order by ID                 GET    /api/v1/orders/:order_id
-│   ├─ Cancel Order                    POST   /api/v1/orders/:order_id/cancel
-│   └─ Delete Order                    DELETE /api/v1/orders/:order_id
-
-📁 Order Items
-│   ├─ Create Order Item               POST   /api/v1/order-items/
-│   ├─ List Order Items                GET    /api/v1/order-items/
-│   ├─ Get Order Item by ID            GET    /api/v1/order-items/:order_item_id
-│   ├─ Update Order Item               PUT    /api/v1/order-items/:order_item_id
-│   └─ Delete Order Item               DELETE /api/v1/order-items/:order_item_id
-
-📁 Reviews
-│   ├─ Create Review                   POST   /api/v1/reviews/
-│   ├─ List Reviews                    GET    /api/v1/reviews/
-│   ├─ Get Review by ID                GET    /api/v1/reviews/:review_id
-│   ├─ Update Review                   PUT    /api/v1/reviews/:review_id
-│   └─ Delete Review                   DELETE /api/v1/reviews/:review_id
-
-📁 Admin                               🔒 Requer role: admin ou owner
-│   ├─ Update Order Status             PATCH /api/v1/admin/orders/:order_id/status
-│   ├─ List All Orders (Admin)         GET   /api/v1/admin/orders
-│   └─ Dashboard                       GET   /api/v1/admin/dashboard
-
-📁 Owner                               🔒 Requer role: owner
-│   ├─ Promote to Admin                PATCH /api/v1/users/:user_id/role  {"role": "admin"}
-│   └─ Remove Admin Role               PATCH /api/v1/users/:user_id/role  {"role": "user"}
-```
-
----
-
-### 5. Hierarquia de roles
 
 ```
 OWNER  ──▶  acesso total + gerenciar roles de outros usuários
@@ -345,11 +230,12 @@ Atribuir a role `owner` via API é bloqueado intencionalmente — retorna **403*
 
 ### 7. Fluxo rápido de uso
 
+> **Atenção:** `POST /users/` já cria automaticamente a conta vinculada na mesma operação — **não é necessário** chamar `POST /accounts/` separadamente.
+
 ```
-1. POST /api/v1/users/              → criar um usuário
+1. POST /api/v1/users/              → criar usuário (conta criada automaticamente)
 2. POST /api/v1/auth/               → fazer login (token salvo automaticamente)
-3. POST /api/v1/accounts/           → criar perfil de conta
-4. POST /api/v1/users/me/addresses  → adicionar endereço de entrega
-5. POST /api/v1/orders/             → criar um pedido
-6. POST /api/v1/order-items/        → adicionar itens ao pedido
+3. POST /api/v1/users/me/addresses  → adicionar endereço de entrega
+4. POST /api/v1/orders/             → criar um pedido
+5. POST /api/v1/order-items/        → adicionar itens ao pedido
 ```

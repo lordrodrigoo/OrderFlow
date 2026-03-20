@@ -1,7 +1,7 @@
 import os
 import logging
 from fastapi import APIRouter, Response, status, Depends
-from src.api.dependencies import get_account_usecase, get_current_user
+from src.api.dependencies import get_account_usecase, get_current_user, get_current_admin
 from src.dto.response.account_response import AccountResponse
 from src.dto.response.user_response import UserResponse
 from src.usecases.account_usecases import AccountUsecase
@@ -24,9 +24,10 @@ logger = logging.getLogger(__name__)
 def create_account(
     account_request: AccountRequest,
     response: Response,
-    account_usecase: AccountUsecase = Depends(get_account_usecase)
+    account_usecase: AccountUsecase = Depends(get_account_usecase),
+    _: UserResponse = Depends(get_current_admin),
 ):
-    """Endpoint to create a new user account."""
+    """Endpoint to create a new user account (admin/owner only)."""
     logger.info("Creating account", extra={"username": account_request.username})
     account = account_usecase.create_account(account_request)
     response.headers['Location'] = f"{API_PREFIX}/{account.id}"

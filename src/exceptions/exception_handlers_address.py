@@ -36,7 +36,7 @@ async def address_already_exists_exception_handler(request: Request, exc: Addres
 class AddressPermissionDeniedException(Exception):
     def __init__(self, address_id: int):
         self.address_id = address_id
-        self.message = f"You do not have permission to update address with ID: '{address_id}'."
+        self.message = f"You do not have permission to access address with ID: '{address_id}'."
         super().__init__(self.message)
 
 

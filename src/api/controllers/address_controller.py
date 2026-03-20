@@ -64,6 +64,7 @@ def update_address(
     current_user: UserResponse = Depends(get_current_user)
 ):
     """Endpoint to update an existing address."""
+    address_request.user_id = current_user.id
     updated_address = address_usecase.update_address(
         address_id,
         address_request,

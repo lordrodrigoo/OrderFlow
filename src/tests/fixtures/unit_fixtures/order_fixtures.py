@@ -12,7 +12,9 @@ from src.domain.models.order import Order, OrderStatus
 def order_usecase(
     fake_order_repository_mock
 ):
-    return OrderUsecase(fake_order_repository_mock)
+    fake_address_repository_mock = MagicMock()
+    fake_address_repository_mock.find_address_by_id.return_value = MagicMock(id=1)
+    return OrderUsecase(fake_order_repository_mock, fake_address_repository_mock)
 
 
 

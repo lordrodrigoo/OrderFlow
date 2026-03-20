@@ -1,14 +1,22 @@
-def test_create_account(client, valid_account_data):
-    response = client.post("/api/v1/accounts/", json=valid_account_data)
+def test_create_account(client, valid_account_data, admin_auth_token):
+    response = client.post(
+        "/api/v1/accounts/",
+        json=valid_account_data,
+        headers={"Authorization": f"Bearer {admin_auth_token}"}
+    )
     assert response.status_code == 201
     data = response.json()
     assert data["username"] == valid_account_data["username"]
     assert data["status"] == "active"
 
 
-def test_create_account_duplicate_username(client, fake_account, valid_account_data):
+def test_create_account_duplicate_username(client, fake_account, valid_account_data, admin_auth_token):
     valid_account_data["username"] = fake_account.username
-    response = client.post("/api/v1/accounts/", json=valid_account_data)
+    response = client.post(
+        "/api/v1/accounts/",
+        json=valid_account_data,
+        headers={"Authorization": f"Bearer {admin_auth_token}"}
+    )
     assert response.status_code == 409
 
 
