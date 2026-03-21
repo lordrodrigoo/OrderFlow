@@ -9,7 +9,8 @@ from src.dto.response.order_item_response import OrderItemResponse
 from src.exceptions.exception_handlers_order_item import (
     OrderItemNotFoundException,
     InvalidOrderItemException,
-    DuplicateOrderItemException
+    DuplicateOrderItemException,
+    OrderItemPermissionDeniedException,
 )
 from src.exceptions.exception_handlers_order import OrderNotFoundException
 
@@ -274,3 +275,65 @@ def test_list_order_items_order_not_found(
     fake_order_repository_mock.get_order_by_id.return_value = None
     with pytest.raises(OrderNotFoundException):
         order_item_usecase.list_order_items(order_id=999, current_user_id=1, current_role=UserRole.USER)
+
+
+def test_list_order_items_permission_denied(
+        order_item_usecase,
+        fake_order_repository_mock
+    ):
+    """Order belongs to user_id=1, requester is user_id=99 with USER role."""
+    with pytest.raises(OrderItemPermissionDeniedException):
+        order_item_usecase.list_order_items(order_id=1, current_user_id=99, current_role=UserRole.USER)
+
+
+def test_create_order_item_permission_denied(
+        order_item_usecase,
+        fake_order_repository_mock,
+        valid_order_item_data
+    ):
+    """Order belongs to user_id=1, requester is user_id=99 with USER role."""
+    with pytest.raises(OrderItemPermissionDeniedException):
+        order_item_usecase.create_order_item(
+            OrderItemRequest(**valid_order_item_data),
+            current_user_id=99,
+            current_role=UserRole.USER
+        )
+
+
+def test_update_order_item_permission_denied(
+        order_item_usecase,
+        fake_order_item_repository_mock,
+        fake_order_repository_mock,
+        valid_order_item_data,
+        valid_order_item
+    ):
+    fake_order_item_repository_mock.get_order_item_by_id.return_value = valid_order_item
+    with pytest.raises(OrderItemPermissionDeniedException):
+        order_item_usecase.update_order_item(
+            1,
+            OrderItemRequest(**valid_order_item_data),
+            current_user_id=99,
+            current_role=UserRole.USER
+        )
+
+
+def test_delete_order_item_permission_denied(
+        order_item_usecase,
+        fake_order_item_repository_mock,
+        fake_order_repository_mock,
+        valid_order_item
+    ):
+    fake_order_item_repository_mock.get_order_item_by_id.return_value = valid_order_item
+    with pytest.raises(OrderItemPermissionDeniedException):
+        order_item_usecase.delete_order_item(1, current_user_id=99, current_role=UserRole.USER)
+
+
+def test_get_order_item_permission_denied(
+        order_item_usecase,
+        fake_order_item_repository_mock,
+        fake_order_repository_mock,
+        valid_order_item
+    ):
+    fake_order_item_repository_mock.get_order_item_by_id.return_value = valid_order_item
+    with pytest.raises(OrderItemPermissionDeniedException):
+        order_item_usecase.get_order_item_by_id(1, current_user_id=99, current_role=UserRole.USER)

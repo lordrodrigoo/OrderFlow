@@ -6,7 +6,8 @@ from src.dto.request.review_request import ReviewRequest, ReviewFilters
 from src.dto.response.review_response import ReviewResponse
 from src.exceptions.exception_handlers_review import (
     ReviewNotFoundException,
-    InvalidReviewException
+    InvalidReviewException,
+    ReviewPermissionDeniedException
 )
 from src.exceptions.exception_handlers_user import UserNotFoundException
 from src.exceptions.exception_handlers_product import ProductNotFoundException
@@ -106,6 +107,28 @@ def test_list_reviews_success(
     assert isinstance(response, list)
     assert len(response) == 1
     assert isinstance(response[0], ReviewResponse)
+
+
+def test_list_reviews_no_filters_arg(
+        review_usecase,
+        fake_review_repository_mock,
+        valid_review
+    ):
+    """Covers the `if filters is None: filters = ReviewFilters()` branch."""
+    fake_review_repository_mock.get_all_reviews.return_value = [valid_review]
+    response = review_usecase.list_reviews()
+    assert isinstance(response, list)
+    assert len(response) == 1
+
+
+def test_delete_review_permission_denied(
+        review_usecase,
+        fake_review_repository_mock,
+        valid_review
+    ):
+    fake_review_repository_mock.get_review_by_id.return_value = valid_review
+    with pytest.raises(ReviewPermissionDeniedException):
+        review_usecase.delete_review(valid_review.id, current_user_id=999, current_role=UserRole.USER)
 
 
 def test_get_review_by_id_success(

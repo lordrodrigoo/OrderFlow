@@ -4,8 +4,10 @@ from src.tests.helpers import _call_handler
 from src.exceptions.exception_handlers_review import (
     ReviewNotFoundException,
     InvalidReviewException,
+    ReviewPermissionDeniedException,
     review_not_found_exception_handler,
     invalid_review_exception_handler,
+    review_permission_denied_exception_handler,
 )
 
 
@@ -27,7 +29,15 @@ def test_exception_attributes(exception, expected_value):
 
     (InvalidReviewException("Rating must be between 1 and 5."),
      invalid_review_exception_handler, status.HTTP_400_BAD_REQUEST),
+
+    (ReviewPermissionDeniedException(),
+     review_permission_denied_exception_handler, status.HTTP_403_FORBIDDEN),
 ])
 async def test_exception_handlers(exc, handler, expected_status):
     response = await _call_handler(handler, exc)
     assert response.status_code == expected_status
+
+
+def test_review_permission_denied_message():
+    exc = ReviewPermissionDeniedException()
+    assert "permission" in exc.message.lower()

@@ -1,6 +1,7 @@
 #pylint: disable=unused-argument
 from datetime import datetime, timedelta
 from decimal import Decimal
+from unittest.mock import patch
 import pytest
 from pydantic import ValidationError
 from src.domain.models.order import OrderStatus, Order
@@ -9,7 +10,8 @@ from src.dto.response.order_response import OrderResponse
 from src.dto.response.dashboard_response import DashboardResponse
 from src.exceptions.exception_handlers_order import (
     OrderNotFoundException,
-    OrderAlreadyCanceledException
+    OrderAlreadyCanceledException,
+    OrderAddressNotFoundException
 )
 
 
@@ -28,6 +30,25 @@ def test_create_order(
     assert response.delivery_fee == Decimal(str(valid_order_data["delivery_fee"]))
     assert response.notes == valid_order_data["notes"]
     assert response.status.value == "pending"
+
+
+def test_create_order_address_not_found(
+        order_usecase,
+        fake_order_repository_mock
+    ):
+    with patch.object(order_usecase, 'address_repository') as mock_addr:
+        mock_addr.find_address_by_id.return_value = None
+        request = OrderRequest(
+            user_id=1,
+            address_id=999,
+            total_amount=Decimal("10.00"),
+            delivery_fee=Decimal("2.00"),
+            notes="test",
+            scheduled_date=datetime.now() + timedelta(days=1)
+        )
+        with pytest.raises(OrderAddressNotFoundException) as exc_info:
+            order_usecase.create_order(request, 1)
+        assert "999" in exc_info.value.message
 
 
 def test_order_not_found(

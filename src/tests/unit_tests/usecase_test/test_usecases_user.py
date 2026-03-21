@@ -29,6 +29,14 @@ def test_delete_user_raises_404_when_not_found(usecase, user_repository_mock):
         usecase.delete_user(999, current_user)
 
 
+def test_delete_user_permission_denied(usecase, user_repository_mock):
+    current_user = MagicMock()
+    current_user.id = 2
+    current_user.role = UserRole.USER
+    with pytest.raises(UserPermissionDeniedException):
+        usecase.delete_user(999, current_user)
+
+
 def test_update_user_permission_denied(usecase, user_repository_mock, valid_user_data, fake_admin_user):
     fake_admin_user.role = UserRole.USER
     fake_admin_user.id = 1

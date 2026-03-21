@@ -48,11 +48,12 @@ Use **Auth → Refresh Token** when the access token expires. The new token is s
 
 ```
 📁 Health
-│   └─ Health Check                    GET  /health
+│   └─ Health Check                    GET    /health
 
 📁 Auth
-│   ├─ Login                           POST /api/v1/auth/
-│   └─ Refresh Token                   POST /api/v1/auth/refresh
+│   ├─ Login                           POST   /api/v1/auth/
+│   ├─ Refresh Token                   POST   /api/v1/auth/refresh
+│   └─ Login Owner                     POST   /api/v1/auth/
 
 📁 Users
 │   ├─ Create User                     POST   /api/v1/users/
@@ -65,19 +66,76 @@ Use **Auth → Refresh Token** when the access token expires. The new token is s
 │   ├─ Update My Address               PUT    /api/v1/users/me/addresses/:address_id
 │   ├─ Update User by ID               PUT    /api/v1/users/:user_id
 │   ├─ Set Default Address             PATCH  /api/v1/users/me/addresses/:address_id/default
+│   ├─ Update User Role                PATCH  /api/v1/users/:user_id/role
 │   └─ Delete User                     DELETE /api/v1/users/:user_id
 
-📁 Accounts
-│   ├─ Create Account                  POST   /api/v1/accounts/        🔒 admin/owner only
-│   ├─ Get My Account                  GET    /api/v1/accounts/me
+📁 Accounts                            (created automatically with POST /users/)
+│   ├─ Create Account                  POST   /api/v1/accounts/              🔒 admin/owner only
 │   ├─ Get Account by ID               GET    /api/v1/accounts/:account_id
-│   ├─ Update Account                  PUT    /api/v1/accounts/:account_id
-│   └─ Delete Account                  DELETE /api/v1/accounts/:account_id
+│   ├─ Update Account Username         PUT    /api/v1/accounts/:account_id
+│   ├─ Change Password                 PATCH  /api/v1/accounts/:account_id/password
+│   ├─ Suspend Account                 PATCH  /api/v1/accounts/:account_id/suspended
+│   ├─ Activate Account                PATCH  /api/v1/accounts/:account_id/activate
+│   └─ Deactivate Account              PATCH  /api/v1/accounts/:account_id/inactive
 
 📁 Addresses
 │   ├─ Create Address                  POST   /api/v1/addresses/
 │   ├─ List Addresses                  GET    /api/v1/addresses/
 │   ├─ Get Address by ID               GET    /api/v1/addresses/:address_id
+│   ├─ Get Addresses by User ID        GET    /api/v1/addresses/user/:user_id
+│   ├─ Update Address                  PUT    /api/v1/addresses/:address_id
+│   └─ Delete Address                  DELETE /api/v1/addresses/:address_id
+
+📁 Categories
+│   ├─ Create Category                 POST   /api/v1/categories/
+│   ├─ List Categories                 GET    /api/v1/categories/
+│   ├─ Get Category by ID              GET    /api/v1/categories/:category_id
+│   ├─ Update Category                 PUT    /api/v1/categories/:category_id
+│   └─ Delete Category                 DELETE /api/v1/categories/:category_id
+
+📁 Products
+│   ├─ Create Product                  POST   /api/v1/products/
+│   ├─ List Products                   GET    /api/v1/products/
+│   ├─ Get Product by ID               GET    /api/v1/products/:product_id
+│   ├─ Get Products by Category        GET    /api/v1/products/category/:category_id
+│   ├─ Count Products by Category      GET    /api/v1/products/count/category/:category_id
+│   ├─ Update Product                  PUT    /api/v1/products/:product_id
+│   └─ Delete Product                  DELETE /api/v1/products/:product_id
+
+📁 Orders
+│   ├─ Create Order                    POST   /api/v1/orders/
+│   ├─ List My Orders                  GET    /api/v1/orders/
+│   ├─ Get Order by ID                 GET    /api/v1/orders/:order_id
+│   ├─ Cancel Order                    POST   /api/v1/orders/:order_id/cancel
+│   ├─ Update Order                    PUT    /api/v1/orders/:order_id
+│   └─ Delete Order                    DELETE /api/v1/orders/:order_id
+
+📁 Order Items
+│   ├─ Create Order Item               POST   /api/v1/order-items/
+│   ├─ List Order Items                GET    /api/v1/order-items/
+│   ├─ Get Order Item by ID            GET    /api/v1/order-items/:order_item_id
+│   ├─ Update Order Item               PUT    /api/v1/order-items/:order_item_id
+│   └─ Delete Order Item               DELETE /api/v1/order-items/:order_item_id
+
+📁 Reviews
+│   ├─ Create Review                   POST   /api/v1/reviews/
+│   ├─ List Reviews                    GET    /api/v1/reviews/
+│   ├─ Get Review by ID                GET    /api/v1/reviews/:review_id
+│   └─ Delete Review                   DELETE /api/v1/reviews/:review_id
+
+📁 Admin                               🔒 admin/owner only
+│   ├─ Update Order Status             PATCH  /api/v1/admin/orders/:order_id/status
+│   ├─ List All Orders                 GET    /api/v1/admin/orders
+│   └─ Dashboard                       GET    /api/v1/admin/dashboard
+
+📁 Owner                               🔒 owner only
+│   ├─ Promote to Admin                PATCH  /api/v1/users/:user_id/role
+│   └─ Remove Admin Role               PATCH  /api/v1/users/:user_id/role
+```
+
+---
+
+### 5. Roles and permissions
 
 ```
 OWNER  ──▶  can do everything + manage roles
@@ -168,11 +226,12 @@ Use **Auth → Refresh Token** quando o access token expirar. O novo token é sa
 
 ```
 📁 Health
-│   └─ Health Check                    GET  /health
+│   └─ Health Check                    GET    /health
 
 📁 Auth
-│   ├─ Login                           POST /api/v1/auth/
-│   └─ Refresh Token                   POST /api/v1/auth/refresh
+│   ├─ Login                           POST   /api/v1/auth/
+│   ├─ Refresh Token                   POST   /api/v1/auth/refresh
+│   └─ Login Owner                     POST   /api/v1/auth/
 
 📁 Users
 │   ├─ Create User                     POST   /api/v1/users/
@@ -185,19 +244,76 @@ Use **Auth → Refresh Token** quando o access token expirar. O novo token é sa
 │   ├─ Update My Address               PUT    /api/v1/users/me/addresses/:address_id
 │   ├─ Update User by ID               PUT    /api/v1/users/:user_id
 │   ├─ Set Default Address             PATCH  /api/v1/users/me/addresses/:address_id/default
+│   ├─ Update User Role                PATCH  /api/v1/users/:user_id/role
 │   └─ Delete User                     DELETE /api/v1/users/:user_id
 
-📁 Accounts
-│   ├─ Create Account                  POST   /api/v1/accounts/        🔒 somente admin/owner
-│   ├─ Get My Account                  GET    /api/v1/accounts/me
+📁 Accounts                            (criada automaticamente ao criar um usuário)
+│   ├─ Create Account                  POST   /api/v1/accounts/              🔒 somente admin/owner
 │   ├─ Get Account by ID               GET    /api/v1/accounts/:account_id
-│   ├─ Update Account                  PUT    /api/v1/accounts/:account_id
-│   └─ Delete Account                  DELETE /api/v1/accounts/:account_id
+│   ├─ Update Account Username         PUT    /api/v1/accounts/:account_id
+│   ├─ Change Password                 PATCH  /api/v1/accounts/:account_id/password
+│   ├─ Suspend Account                 PATCH  /api/v1/accounts/:account_id/suspended
+│   ├─ Activate Account                PATCH  /api/v1/accounts/:account_id/activate
+│   └─ Deactivate Account              PATCH  /api/v1/accounts/:account_id/inactive
 
 📁 Addresses
 │   ├─ Create Address                  POST   /api/v1/addresses/
 │   ├─ List Addresses                  GET    /api/v1/addresses/
 │   ├─ Get Address by ID               GET    /api/v1/addresses/:address_id
+│   ├─ Get Addresses by User ID        GET    /api/v1/addresses/user/:user_id
+│   ├─ Update Address                  PUT    /api/v1/addresses/:address_id
+│   └─ Delete Address                  DELETE /api/v1/addresses/:address_id
+
+📁 Categories
+│   ├─ Create Category                 POST   /api/v1/categories/
+│   ├─ List Categories                 GET    /api/v1/categories/
+│   ├─ Get Category by ID              GET    /api/v1/categories/:category_id
+│   ├─ Update Category                 PUT    /api/v1/categories/:category_id
+│   └─ Delete Category                 DELETE /api/v1/categories/:category_id
+
+📁 Products
+│   ├─ Create Product                  POST   /api/v1/products/
+│   ├─ List Products                   GET    /api/v1/products/
+│   ├─ Get Product by ID               GET    /api/v1/products/:product_id
+│   ├─ Get Products by Category        GET    /api/v1/products/category/:category_id
+│   ├─ Count Products by Category      GET    /api/v1/products/count/category/:category_id
+│   ├─ Update Product                  PUT    /api/v1/products/:product_id
+│   └─ Delete Product                  DELETE /api/v1/products/:product_id
+
+📁 Orders
+│   ├─ Create Order                    POST   /api/v1/orders/
+│   ├─ List My Orders                  GET    /api/v1/orders/
+│   ├─ Get Order by ID                 GET    /api/v1/orders/:order_id
+│   ├─ Cancel Order                    POST   /api/v1/orders/:order_id/cancel
+│   ├─ Update Order                    PUT    /api/v1/orders/:order_id
+│   └─ Delete Order                    DELETE /api/v1/orders/:order_id
+
+📁 Order Items
+│   ├─ Create Order Item               POST   /api/v1/order-items/
+│   ├─ List Order Items                GET    /api/v1/order-items/
+│   ├─ Get Order Item by ID            GET    /api/v1/order-items/:order_item_id
+│   ├─ Update Order Item               PUT    /api/v1/order-items/:order_item_id
+│   └─ Delete Order Item               DELETE /api/v1/order-items/:order_item_id
+
+📁 Reviews
+│   ├─ Create Review                   POST   /api/v1/reviews/
+│   ├─ List Reviews                    GET    /api/v1/reviews/
+│   ├─ Get Review by ID                GET    /api/v1/reviews/:review_id
+│   └─ Delete Review                   DELETE /api/v1/reviews/:review_id
+
+📁 Admin                               🔒 somente admin/owner
+│   ├─ Update Order Status             PATCH  /api/v1/admin/orders/:order_id/status
+│   ├─ List All Orders                 GET    /api/v1/admin/orders
+│   └─ Dashboard                       GET    /api/v1/admin/dashboard
+
+📁 Owner                               🔒 somente owner
+│   ├─ Promote to Admin                PATCH  /api/v1/users/:user_id/role
+│   └─ Remove Admin Role               PATCH  /api/v1/users/:user_id/role
+```
+
+---
+
+### 5. Roles e permissões
 
 ```
 OWNER  ──▶  acesso total + gerenciar roles de outros usuários

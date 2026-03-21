@@ -71,4 +71,4 @@ def seed_owner() -> None:
         )
         account_repo.create_account(account)
 
-        logger.info("System owner created successfully (user_id=%s)", created_user.id)
+        logger.info("System owner created successfully")
