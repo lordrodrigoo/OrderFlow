@@ -1,0 +1,378 @@
+# ==============================================================================
+# DEPLOY PIPELINE — OrderFlow
+# ==============================================================================
+#
+# PIPELINE STAGES:
+#
+#   SOURCE  →  BUILD  →  DEPLOY
+#
+#   [lint]            Static code analysis
+#   [test-*]          Parallel test suites: unit, integration, functional
+#   [build-image]     Validates the Docker image builds correctly (no push)
+#   [publish-image]   Publishes the image to GHCR tagged with the commit SHA
+#   [deploy-vps]      Deploys to VPS via SSH with health check and rollback
+#
+# ------------------------------------------------------------------------------
+# FUTURE AWS MIGRATION NOTES:
+#   - publish-image  →  push to Amazon ECR (swap GHCR_PAT for IAM Role)
+#   - deploy-vps     →  aws ecs update-service (ECS handles rolling update,
+#                        health check and rollback automatically)
+#   - GitHub Secrets →  AWS Secrets Manager / Parameter Store
+#   - The rest (lint, tests, build) stays identical
+# ==============================================================================
+ 
+name: Deploy Pipeline
+ 
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+ 
+permissions:
+  contents: read
+  packages: write
+ 
+# Cancels previous runs on the same branch to prevent overlapping deploys.
+# On AWS: controlled natively by CodePipeline's execution queue.
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+ 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/orderflow
+  PYTHON_VERSION: "3.12"
+ 
+# ==============================================================================
+# STAGE: SOURCE
+# Runs all quality checks in parallel to reduce total pipeline time.
+# On AWS: equivalent to the validation phase in CodeBuild before image build.
+# ==============================================================================
+ 
+jobs:
+ 
+  # ----------------------------------------------------------------------------
+  # Lint
+  # ----------------------------------------------------------------------------
+  lint:
+    name: Source — Lint
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+ 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+ 
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+ 
+      - name: Run pylint
+        run: pylint src/
+ 
+  # ----------------------------------------------------------------------------
+  # Unit tests
+  # ----------------------------------------------------------------------------
+  test-unit:
+    name: Source — Unit Tests
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+ 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+ 
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+ 
+      - name: Run unit tests
+        run: pytest src/tests/unit_tests/ -q --tb=short
+ 
+  # ----------------------------------------------------------------------------
+  # Integration tests
+  # ----------------------------------------------------------------------------
+  test-integration:
+    name: Source — Integration Tests
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+ 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+ 
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+ 
+      - name: Run integration tests
+        run: pytest src/tests/integration_tests/ -q --tb=short
+ 
+  # ----------------------------------------------------------------------------
+  # Functional tests
+  # ----------------------------------------------------------------------------
+  test-functional:
+    name: Source — Functional Tests
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+ 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+ 
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+ 
+      - name: Run functional tests
+        run: pytest src/tests/functional_tests/ -q --tb=short
+ 
+# ==============================================================================
+# STAGE: BUILD
+# On AWS: CodeBuild builds and publishes the image to ECR.
+#
+# Two separate jobs:
+#   build-image    → only validates the image compiles (runs on PRs too)
+#   publish-image  → publishes to the registry (main branch only)
+# ==============================================================================
+ 
+  # ----------------------------------------------------------------------------
+  # Build image (validation only, no push)
+  # Runs on every PR so broken Dockerfiles are caught before merge.
+  # ----------------------------------------------------------------------------
+  build-image:
+    name: Build — Validate Image
+    runs-on: ubuntu-latest
+    needs: [lint, test-unit, test-integration, test-functional]
+ 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+ 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+ 
+      - name: Build image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: local/orderflow:ci-check
+          # Layer cache avoids rebuilding unchanged layers on every run.
+          # On AWS: use ECR cache or S3 cache in buildspec.yml.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+ 
+  # ----------------------------------------------------------------------------
+  # Publish image to GHCR
+  # Runs only on push to main (after PR merge).
+  # On AWS: this job pushes to ECR using an IAM Role instead of GHCR_PAT.
+  # ----------------------------------------------------------------------------
+  publish-image:
+    name: Build — Publish Image
+    runs-on: ubuntu-latest
+    needs: build-image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+ 
+    outputs:
+      image_tag: ${{ steps.vars.outputs.image_tag }}
+ 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+ 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+ 
+      # Immutable tag with the commit SHA ensures full traceability.
+      # You always know exactly which commit is running in production.
+      # On AWS: this tag is used in the ECS task definition.
+      - name: Define image tag
+        id: vars
+        run: echo "image_tag=sha-${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+ 
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+ 
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+ 
+# ==============================================================================
+# STAGE: DEPLOY
+# On AWS: CodeDeploy → ECS (rolling update or Blue/Green).
+#
+# OPERATION ORDER:
+#   1. Pull new image          (no downtime yet)
+#   2. Save current image      (for rollback reference)
+#   3. Start new container     (replaces the previous one)
+#   4. Run migrations          (AFTER startup — must be backward-compatible
+#                               with the previous version for rollback to work)
+#   5. Health check            (validates the app is responding)
+#   6. Auto rollback           (triggered if steps 3–5 fail)
+#   7. Cleanup                 (remove unused images to free disk space)
+#
+# NOTE ON MIGRATIONS AND ROLLBACK:
+#   Migrations are not automatically reversible. For safe rollbacks, use the
+#   Expand/Contract pattern:
+#     Expand:   add new column (compatible with old version)
+#     Contract: drop old column (in a future separate deploy)
+#   This ensures the previous image still works if a rollback is needed.
+#
+# FUTURE AWS MIGRATION:
+#   Replace this entire job with:
+#     aws ecs update-service \
+#       --cluster orderflow \
+#       --service orderflow-app \
+#       --force-new-deployment
+#   ECS handles rolling update, health check and rollback automatically.
+#   Migrations on AWS: run as a separate ECS Task before update-service,
+#   or as an init container in the task definition.
+# ==============================================================================
+ 
+  deploy-vps:
+    name: Deploy — VPS
+    runs-on: ubuntu-latest
+    needs: publish-image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+ 
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        # Variables passed via "envs" to avoid inline interpolation in the
+        # script body, which can leak values into Actions debug logs.
+        env:
+          APP_IMAGE: "ghcr.io/${{ github.repository_owner }}/orderflow:${{ needs.publish-image.outputs.image_tag }}"
+          GHCR_PAT: ${{ secrets.GHCR_PAT }}
+          GHCR_USER: ${{ secrets.GHCR_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: 22
+          envs: APP_IMAGE,GHCR_PAT,GHCR_USER,DEPLOY_PATH
+          script: |
+            set -Eeuo pipefail
+            cd "$DEPLOY_PATH"
+ 
+            # ------------------------------------------------------------------
+            # 1. Authenticate and pull the new image before touching anything.
+            #    A failure here has zero impact on the running production container.
+            # ------------------------------------------------------------------
+            echo "$GHCR_PAT" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            docker compose pull app
+ 
+            # ------------------------------------------------------------------
+            # 2. Save current state for rollback.
+            #    Captures the image running RIGHT NOW, before any changes.
+            #    If the container does not exist (first deploy), PREV_IMAGE
+            #    stays empty and rollback is skipped gracefully.
+            # ------------------------------------------------------------------
+            PREV_IMAGE=$(docker inspect --format='{{.Config.Image}}' orderflow_app 2>/dev/null || true)
+ 
+            rollback() {
+              echo "⚠️  Deploy failed. Starting rollback..."
+              if [ -n "$PREV_IMAGE" ]; then
+                export APP_IMAGE="$PREV_IMAGE"
+                docker compose up -d app
+                echo "✅ Rollback completed: $PREV_IMAGE"
+              else
+                echo "ℹ️  No previous image found — skipping rollback (first deploy)."
+              fi
+            }
+            trap rollback ERR
+ 
+            # ------------------------------------------------------------------
+            # 3. Start the new container.
+            #    --remove-orphans removes containers from services that were
+            #    deleted from docker-compose.yml.
+            # ------------------------------------------------------------------
+            export APP_IMAGE="$APP_IMAGE"
+            docker compose up -d --remove-orphans
+ 
+            # ------------------------------------------------------------------
+            # 4. Run migrations AFTER the container is up.
+            #    Migrations must be backward-compatible (Expand/Contract pattern)
+            #    so the previous image still works if a rollback is triggered.
+            #    On AWS (ECS): run as a separate ECS Task before update-service.
+            # ------------------------------------------------------------------
+            docker compose exec -T app alembic upgrade head
+ 
+            # ------------------------------------------------------------------
+            # 5. Health check — validates the app is responding.
+            #    Retries up to 5 times with 5s delay to allow for container
+            #    startup time before declaring the deploy a failure.
+            #    On AWS: the ALB and ECS handle this automatically.
+            # ------------------------------------------------------------------
+            echo "Waiting for application to be ready..."
+            for i in $(seq 1 5); do
+              if curl -fsS http://localhost:8000/health >/dev/null; then
+                echo "✅ Health check passed"
+                break
+              fi
+              if [ "$i" -eq 5 ]; then
+                echo "❌ Health check failed after 5 attempts"
+                exit 1
+              fi
+              echo "Attempt $i/5 failed — retrying in 5s..."
+              sleep 5
+            done
+ 
+            # ------------------------------------------------------------------
+            # 6. Cleanup unused images to free disk space.
+            # ------------------------------------------------------------------
+            docker image prune -f
+ 
+            echo "🚀 Deploy complete: $APP_IMAGE"
+ 
+      # ------------------------------------------------------------------------
+      # Failure notification — fires immediately if any step above fails.
+      # Swap DISCORD_WEBHOOK for SLACK_WEBHOOK if you prefer Slack.
+      # On AWS: use SNS + Lambda or a CloudWatch Alarm for notifications.
+      # ------------------------------------------------------------------------
+      - name: Notify failure
+        if: failure()
+        run: |
+          curl -s -X POST "${{ secrets.DISCORD_WEBHOOK }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "content": "❌ **Deploy failed!**\nCommit: `${{ github.sha }}`\nAuthor: `${{ github.actor }}`\nLogs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }'
