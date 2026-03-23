@@ -12,6 +12,7 @@
             R0917,  # too-many-positional-arguments
             R0913,  # too-many-arguments
             W0404,  # reimported
+            R0801,  # duplicate-code
 
 
 # Analyse import fallback blocks. This can be used to support both Python 2 and
@@ -459,7 +460,8 @@ disable=raw-checker-failed,
         deprecated-pragma,
         use-symbolic-message-instead,
         use-implicit-booleaness-not-comparison-to-string,
-        use-implicit-booleaness-not-comparison-to-zero
+        use-implicit-booleaness-not-comparison-to-zero,
+        
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
