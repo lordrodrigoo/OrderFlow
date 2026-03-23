@@ -21,291 +21,291 @@
 #   - The rest (lint, tests, build) stays identical
 # ==============================================================================
  
-name: Deploy Pipeline
+# name: Deploy Pipeline
  
-on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
-  workflow_dispatch:
+# on:
+#   pull_request:
+#     branches: [main]
+#   push:
+#     branches: [main]
+#   workflow_dispatch:
  
-permissions:
-  contents: read
-  packages: write
+# permissions:
+#   contents: read
+#   packages: write
  
-# Cancels previous runs on the same branch to prevent overlapping deploys.
-# On AWS: controlled natively by CodePipeline's execution queue.
-concurrency:
-  group: deploy-${{ github.ref }}
-  cancel-in-progress: true
+# # Cancels previous runs on the same branch to prevent overlapping deploys.
+# # On AWS: controlled natively by CodePipeline's execution queue.
+# concurrency:
+#   group: deploy-${{ github.ref }}
+#   cancel-in-progress: true
  
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/orderflow
-  PYTHON_VERSION: "3.12"
+# env:
+#   REGISTRY: ghcr.io
+#   IMAGE_NAME: ${{ github.repository_owner }}/orderflow
+#   PYTHON_VERSION: "3.12"
  
-# ==============================================================================
-# STAGE: SOURCE
-# Runs all quality checks in parallel to reduce total pipeline time.
-# On AWS: equivalent to the validation phase in CodeBuild before image build.
-# ==============================================================================
+# # ==============================================================================
+# # STAGE: SOURCE
+# # Runs all quality checks in parallel to reduce total pipeline time.
+# # On AWS: equivalent to the validation phase in CodeBuild before image build.
+# # ==============================================================================
  
-jobs:
+# jobs:
  
-  # ----------------------------------------------------------------------------
-  # Lint
-  # ----------------------------------------------------------------------------
-  lint:
-    name: Source — Lint
-    runs-on: ubuntu-latest
+#   # ----------------------------------------------------------------------------
+#   # Lint
+#   # ----------------------------------------------------------------------------
+#   lint:
+#     name: Source — Lint
+#     runs-on: ubuntu-latest
  
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
  
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: pip
+#       - name: Setup Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: ${{ env.PYTHON_VERSION }}
+#           cache: pip
  
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+#       - name: Install dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install -r requirements.txt
  
-      - name: Run pylint
-        run: pylint src/
+#       - name: Run pylint
+#         run: pylint src/
  
-  # ----------------------------------------------------------------------------
-  # Unit tests
-  # ----------------------------------------------------------------------------
-  test-unit:
-    name: Source — Unit Tests
-    runs-on: ubuntu-latest
+#   # ----------------------------------------------------------------------------
+#   # Unit tests
+#   # ----------------------------------------------------------------------------
+#   test-unit:
+#     name: Source — Unit Tests
+#     runs-on: ubuntu-latest
  
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
  
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: pip
+#       - name: Setup Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: ${{ env.PYTHON_VERSION }}
+#           cache: pip
  
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+#       - name: Install dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install -r requirements.txt
  
-      - name: Run unit tests
-        run: pytest src/tests/unit_tests/ -q --tb=short
+#       - name: Run unit tests
+#         run: pytest src/tests/unit_tests/ -q --tb=short
  
-  # ----------------------------------------------------------------------------
-  # Integration tests
-  # ----------------------------------------------------------------------------
-  test-integration:
-    name: Source — Integration Tests
-    runs-on: ubuntu-latest
+#   # ----------------------------------------------------------------------------
+#   # Integration tests
+#   # ----------------------------------------------------------------------------
+#   test-integration:
+#     name: Source — Integration Tests
+#     runs-on: ubuntu-latest
  
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
  
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: pip
+#       - name: Setup Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: ${{ env.PYTHON_VERSION }}
+#           cache: pip
  
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+#       - name: Install dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install -r requirements.txt
  
-      - name: Run integration tests
-        run: pytest src/tests/integration_tests/ -q --tb=short
+#       - name: Run integration tests
+#         run: pytest src/tests/integration_tests/ -q --tb=short
  
-  # ----------------------------------------------------------------------------
-  # Functional tests
-  # ----------------------------------------------------------------------------
-  test-functional:
-    name: Source — Functional Tests
-    runs-on: ubuntu-latest
+#   # ----------------------------------------------------------------------------
+#   # Functional tests
+#   # ----------------------------------------------------------------------------
+#   test-functional:
+#     name: Source — Functional Tests
+#     runs-on: ubuntu-latest
  
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
  
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          cache: pip
+#       - name: Setup Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: ${{ env.PYTHON_VERSION }}
+#           cache: pip
  
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+#       - name: Install dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install -r requirements.txt
  
-      - name: Run functional tests
-        run: pytest src/tests/functional_tests/ -q --tb=short
+#       - name: Run functional tests
+#         run: pytest src/tests/functional_tests/ -q --tb=short
  
-# ==============================================================================
-# STAGE: BUILD
-# On AWS: CodeBuild builds and publishes the image to ECR.
-#
-# Two separate jobs:
-#   build-image    → only validates the image compiles (runs on PRs too)
-#   publish-image  → publishes to the registry (main branch only)
-# ==============================================================================
+# # ==============================================================================
+# # STAGE: BUILD
+# # On AWS: CodeBuild builds and publishes the image to ECR.
+# #
+# # Two separate jobs:
+# #   build-image    → only validates the image compiles (runs on PRs too)
+# #   publish-image  → publishes to the registry (main branch only)
+# # ==============================================================================
  
-  # ----------------------------------------------------------------------------
-  # Build image (validation only, no push)
-  # Runs on every PR so broken Dockerfiles are caught before merge.
-  # ----------------------------------------------------------------------------
-  build-image:
-    name: Build — Validate Image
-    runs-on: ubuntu-latest
-    needs: [lint, test-unit, test-integration, test-functional]
+#   # ----------------------------------------------------------------------------
+#   # Build image (validation only, no push)
+#   # Runs on every PR so broken Dockerfiles are caught before merge.
+#   # ----------------------------------------------------------------------------
+#   build-image:
+#     name: Build — Validate Image
+#     runs-on: ubuntu-latest
+#     needs: [lint, test-unit, test-integration, test-functional]
  
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
  
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+#       - name: Set up Docker Buildx
+#         uses: docker/setup-buildx-action@v3
  
-      - name: Build image (no push)
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: false
-          tags: local/orderflow:ci-check
-          # Layer cache avoids rebuilding unchanged layers on every run.
-          # On AWS: use ECR cache or S3 cache in buildspec.yml.
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+#       - name: Build image (no push)
+#         uses: docker/build-push-action@v6
+#         with:
+#           context: .
+#           push: false
+#           tags: local/orderflow:ci-check
+#           # Layer cache avoids rebuilding unchanged layers on every run.
+#           # On AWS: use ECR cache or S3 cache in buildspec.yml.
+#           cache-from: type=gha
+#           cache-to: type=gha,mode=max
  
-  # ----------------------------------------------------------------------------
-  # Publish image to GHCR
-  # Runs only on push to main (after PR merge).
-  # On AWS: this job pushes to ECR using an IAM Role instead of GHCR_PAT.
-  # ----------------------------------------------------------------------------
-  publish-image:
-    name: Build — Publish Image
-    runs-on: ubuntu-latest
-    needs: build-image
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+#   # ----------------------------------------------------------------------------
+#   # Publish image to GHCR
+#   # Runs only on push to main (after PR merge).
+#   # On AWS: this job pushes to ECR using an IAM Role instead of GHCR_PAT.
+#   # ----------------------------------------------------------------------------
+#   publish-image:
+#     name: Build — Publish Image
+#     runs-on: ubuntu-latest
+#     needs: build-image
+#     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
  
-    outputs:
-      image_tag: ${{ steps.vars.outputs.image_tag }}
+#     outputs:
+#       image_tag: ${{ steps.vars.outputs.image_tag }}
  
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
  
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+#       - name: Set up Docker Buildx
+#         uses: docker/setup-buildx-action@v3
  
-      # Immutable tag with the commit SHA ensures full traceability.
-      # You always know exactly which commit is running in production.
-      # On AWS: this tag is used in the ECS task definition.
-      - name: Define image tag
-        id: vars
-        run: echo "image_tag=sha-${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+#       # Immutable tag with the commit SHA ensures full traceability.
+#       # You always know exactly which commit is running in production.
+#       # On AWS: this tag is used in the ECS task definition.
+#       - name: Define image tag
+#         id: vars
+#         run: echo "image_tag=sha-${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
  
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+#       - name: Login to GHCR
+#         uses: docker/login-action@v3
+#         with:
+#           registry: ${{ env.REGISTRY }}
+#           username: ${{ github.actor }}
+#           password: ${{ secrets.GITHUB_TOKEN }}
  
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+#       - name: Build and push
+#         uses: docker/build-push-action@v6
+#         with:
+#           context: .
+#           push: true
+#           tags: |
+#             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }}
+#             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+#           cache-from: type=gha
+#           cache-to: type=gha,mode=max
  
-# ==============================================================================
-# STAGE: DEPLOY
-  deploy-vps:
-    name: Deploy — VPS
-    runs-on: ubuntu-latest
-    needs: publish-image
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+# # ==============================================================================
+# # STAGE: DEPLOY
+#   deploy-vps:
+#     name: Deploy — VPS
+#     runs-on: ubuntu-latest
+#     needs: publish-image
+#     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
  
-    steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.2.0
-        env:
-          APP_IMAGE: "ghcr.io/${{ github.repository_owner }}/orderflow:${{ needs.publish-image.outputs.image_tag }}"
-          GHCR_PAT: ${{ secrets.CONTAINER_REGISTRY_TOKEN }}
-          GHCR_USER: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
-          DEPLOY_PATH: ${{ secrets.VPS_DEPLOY_PATH }}
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: 22
-          envs: APP_IMAGE,GHCR_PAT,GHCR_USER,DEPLOY_PATH
-          script: |
-            set -Eeuo pipefail
-            cd "$DEPLOY_PATH"
-            echo "$GHCR_PAT" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
-            docker compose pull app
-            PREV_IMAGE=$(docker inspect --format='{{.Config.Image}}' orderflow_app 2>/dev/null || true)
-            rollback() {
-              echo "⚠️  Deploy failed. Starting rollback..."
-              if [ -n "$PREV_IMAGE" ]; then
-                export APP_IMAGE="$PREV_IMAGE"
-                docker compose up -d app
-                echo "✅ Rollback completed: $PREV_IMAGE"
-              else
-                echo "ℹ️  No previous image found — skipping rollback (first deploy)."
-              fi
-            }
-            trap rollback ERR
-            export APP_IMAGE="$APP_IMAGE"
-            docker compose up -d --remove-orphans
-            docker compose exec -T app alembic upgrade head
-            echo "Waiting for application to be ready..."
-            for i in $(seq 1 5); do
-              if curl -fsS http://localhost:8000/health >/dev/null; then
-                echo "✅ Health check passed"
-                break
-              fi
-              if [ "$i" -eq 5 ]; then
-                echo "❌ Health check failed after 5 attempts"
-                exit 1
-              fi
-              echo "Attempt $i/5 failed — retrying in 5s..."
-              sleep 5
-            done
-            docker image prune -f
-            echo "🚀 Deploy complete: $APP_IMAGE"
+#     steps:
+#       - name: Deploy via SSH
+#         uses: appleboy/ssh-action@v1.2.0
+#         env:
+#           APP_IMAGE: "ghcr.io/${{ github.repository_owner }}/orderflow:${{ needs.publish-image.outputs.image_tag }}"
+#           GHCR_PAT: ${{ secrets.CONTAINER_REGISTRY_TOKEN }}
+#           GHCR_USER: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
+#           DEPLOY_PATH: ${{ secrets.VPS_DEPLOY_PATH }}
+#         with:
+#           host: ${{ secrets.VPS_HOST }}
+#           username: ${{ secrets.VPS_USER }}
+#           key: ${{ secrets.VPS_SSH_KEY }}
+#           port: 22
+#           envs: APP_IMAGE,GHCR_PAT,GHCR_USER,DEPLOY_PATH
+#           script: |
+#             set -Eeuo pipefail
+#             cd "$DEPLOY_PATH"
+#             echo "$GHCR_PAT" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+#             docker compose pull app
+#             PREV_IMAGE=$(docker inspect --format='{{.Config.Image}}' orderflow_app 2>/dev/null || true)
+#             rollback() {
+#               echo "⚠️  Deploy failed. Starting rollback..."
+#               if [ -n "$PREV_IMAGE" ]; then
+#                 export APP_IMAGE="$PREV_IMAGE"
+#                 docker compose up -d app
+#                 echo "✅ Rollback completed: $PREV_IMAGE"
+#               else
+#                 echo "ℹ️  No previous image found — skipping rollback (first deploy)."
+#               fi
+#             }
+#             trap rollback ERR
+#             export APP_IMAGE="$APP_IMAGE"
+#             docker compose up -d --remove-orphans
+#             docker compose exec -T app alembic upgrade head
+#             echo "Waiting for application to be ready..."
+#             for i in $(seq 1 5); do
+#               if curl -fsS http://localhost:8000/health >/dev/null; then
+#                 echo "✅ Health check passed"
+#                 break
+#               fi
+#               if [ "$i" -eq 5 ]; then
+#                 echo "❌ Health check failed after 5 attempts"
+#                 exit 1
+#               fi
+#               echo "Attempt $i/5 failed — retrying in 5s..."
+#               sleep 5
+#             done
+#             docker image prune -f
+#             echo "🚀 Deploy complete: $APP_IMAGE"
 
-      - name: Notify failure by email
-        if: failure()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          subject: "[OrderFlow] Deploy failed!"
-          to: destinatario@email.com
-          from: "OrderFlow Deploy <no-reply@email.com>"
-          body: |
-            ❌ Deploy failed!
-            Commit: ${{ github.sha }}
-            Author: ${{ github.actor }}
-            Logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+#       - name: Notify failure by email
+#         if: failure()
+#         uses: dawidd6/action-send-mail@v3
+#         with:
+#           server_address: smtp.gmail.com
+#           server_port: 465
+#           username: ${{ secrets.SMTP_USERNAME }}
+#           password: ${{ secrets.SMTP_PASSWORD }}
+#           subject: "[OrderFlow] Deploy failed!"
+#           to: destinatario@email.com
+#           from: "OrderFlow Deploy <no-reply@email.com>"
+#           body: |
+#             ❌ Deploy failed!
+#             Commit: ${{ github.sha }}
+#             Author: ${{ github.actor }}
+#             Logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
