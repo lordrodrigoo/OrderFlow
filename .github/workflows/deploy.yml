@@ -94,6 +94,8 @@ jobs:
       API_V1_ORDER_ITEM: "/api/v1/order-items"
       API_V1_REVIEW: "/api/v1/reviews"
       API_V1_ADMIN: "/api/v1/admin"
+      SECRET_KEY: testsecret
+      ALGORITHM: HS256
     name: Source — Unit Tests
     runs-on: ubuntu-latest
  
@@ -131,6 +133,8 @@ jobs:
       API_V1_ORDER_ITEM: "/api/v1/order-items"
       API_V1_REVIEW: "/api/v1/reviews"
       API_V1_ADMIN: "/api/v1/admin"
+      SECRET_KEY: testsecret
+      ALGORITHM: HS256
     name: Source — Integration Tests
     runs-on: ubuntu-latest
  
@@ -168,6 +172,8 @@ jobs:
       API_V1_ORDER_ITEM: "/api/v1/order-items"
       API_V1_REVIEW: "/api/v1/reviews"
       API_V1_ADMIN: "/api/v1/admin"
+      SECRET_KEY: testsecret
+      ALGORITHM: HS256
     name: Source — Functional Tests
     runs-on: ubuntu-latest
  
