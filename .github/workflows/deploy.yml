@@ -82,6 +82,8 @@ jobs:
   # Unit tests
   # ----------------------------------------------------------------------------
   test-unit:
+    env:
+      DB_URL: "sqlite:///:memory:"
     name: Source — Unit Tests
     runs-on: ubuntu-latest
  
@@ -107,6 +109,8 @@ jobs:
   # Integration tests
   # ----------------------------------------------------------------------------
   test-integration:
+    env:
+      DB_URL: "sqlite:///:memory:"
     name: Source — Integration Tests
     runs-on: ubuntu-latest
  
@@ -132,6 +136,8 @@ jobs:
   # Functional tests
   # ----------------------------------------------------------------------------
   test-functional:
+    env:
+      DB_URL: "sqlite:///:memory:"
     name: Source — Functional Tests
     runs-on: ubuntu-latest
  
