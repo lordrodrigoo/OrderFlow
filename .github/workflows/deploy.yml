@@ -85,6 +85,15 @@ jobs:
     env:
       DB_URL: "sqlite:///:memory:"
       API_V1_AUTH: "/api/v1/auth"
+      API_V1_USER: "/api/v1/users"
+      API_V1_ACCOUNT: "/api/v1/accounts"
+      API_V1_ADDRESS: "/api/v1/addresses"
+      API_V1_PRODUCT: "/api/v1/products"
+      API_V1_CATEGORY: "/api/v1/categories"
+      API_V1_ORDER: "/api/v1/orders"
+      API_V1_ORDER_ITEM: "/api/v1/order-items"
+      API_V1_REVIEW: "/api/v1/reviews"
+      API_V1_ADMIN: "/api/v1/admin"
     name: Source — Unit Tests
     runs-on: ubuntu-latest
  
@@ -113,6 +122,15 @@ jobs:
     env:
       DB_URL: "sqlite:///:memory:"
       API_V1_AUTH: "/api/v1/auth"
+      API_V1_USER: "/api/v1/users"
+      API_V1_ACCOUNT: "/api/v1/accounts"
+      API_V1_ADDRESS: "/api/v1/addresses"
+      API_V1_PRODUCT: "/api/v1/products"
+      API_V1_CATEGORY: "/api/v1/categories"
+      API_V1_ORDER: "/api/v1/orders"
+      API_V1_ORDER_ITEM: "/api/v1/order-items"
+      API_V1_REVIEW: "/api/v1/reviews"
+      API_V1_ADMIN: "/api/v1/admin"
     name: Source — Integration Tests
     runs-on: ubuntu-latest
  
@@ -141,6 +159,15 @@ jobs:
     env:
       DB_URL: "sqlite:///:memory:"
       API_V1_AUTH: "/api/v1/auth"
+      API_V1_USER: "/api/v1/users"
+      API_V1_ACCOUNT: "/api/v1/accounts"
+      API_V1_ADDRESS: "/api/v1/addresses"
+      API_V1_PRODUCT: "/api/v1/products"
+      API_V1_CATEGORY: "/api/v1/categories"
+      API_V1_ORDER: "/api/v1/orders"
+      API_V1_ORDER_ITEM: "/api/v1/order-items"
+      API_V1_REVIEW: "/api/v1/reviews"
+      API_V1_ADMIN: "/api/v1/admin"
     name: Source — Functional Tests
     runs-on: ubuntu-latest
  
