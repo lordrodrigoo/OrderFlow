@@ -126,7 +126,7 @@ Or access `/docs` with the application running for the interactive FastAPI docum
 
 ### 📄 License
 
-MIT
+[MIT](LICENSE)
 
 ### Contact
 rodrigog3wconcept@gmail.com
@@ -245,7 +245,7 @@ Ou acesse `/docs` com a aplicação rodando para a documentação interativa do 
 
 ### 📄 Licença
 
-MIT
+[MIT](LICENSE)
 
 ### Contato
 rodrigog3wconcept@gmail.com
