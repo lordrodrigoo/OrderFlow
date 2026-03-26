@@ -9,6 +9,16 @@ def test_create_database_engine():
 
 
 @pytest.mark.unit
+def test_create_database_engine_sqlite(monkeypatch):
+    sqlite_url = "sqlite:///test.db"
+    monkeypatch.setenv("DB_URL", sqlite_url)
+    handler = DBConnectionHandler()
+    engine = handler.get_engine()
+    assert engine is not None
+    assert str(engine.url).startswith("sqlite")
+
+
+@pytest.mark.unit
 def test_get_session():
     db = DBConnectionHandler()
     session = db.get_session()
