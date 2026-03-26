@@ -53,7 +53,7 @@ Use **Auth → Refresh Token** when the access token expires. The new token is s
 📁 Auth
 │   ├─ Login                           POST   /api/v1/auth/
 │   ├─ Refresh Token                   POST   /api/v1/auth/refresh
-│   └─ Login Owner                     POST   /api/v1/auth/
+│   └─ Login Owner                     POST   /api/v1/auth/  (same endpoint — OWNER credentials from .env)
 
 📁 Users
 │   ├─ Create User                     POST   /api/v1/users/
@@ -231,7 +231,7 @@ Use **Auth → Refresh Token** quando o access token expirar. O novo token é sa
 📁 Auth
 │   ├─ Login                           POST   /api/v1/auth/
 │   ├─ Refresh Token                   POST   /api/v1/auth/refresh
-│   └─ Login Owner                     POST   /api/v1/auth/
+│   └─ Login Owner                     POST   /api/v1/auth/  (mesmo endpoint — credenciais do OWNER via .env)
 
 📁 Users
 │   ├─ Create User                     POST   /api/v1/users/
