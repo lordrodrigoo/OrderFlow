@@ -10,10 +10,10 @@ from src.api.dependencies import get_review_usecase, get_current_user
 
 
 
-API_PREFIX = os.getenv("API_V1_REVIEW")
-TAG = os.getenv("TAG_REVIEW")
+API_V1_PREFIX = os.getenv("API_V1_PREFIX", "/api/v1")
+REVIEW_PREFIX = f"{API_V1_PREFIX}/reviews"
 
-router = APIRouter(prefix=API_PREFIX, tags=[TAG])
+router = APIRouter(prefix=REVIEW_PREFIX, tags=["reviews"])
 logger = logging.getLogger(__name__)
 
 
@@ -28,7 +28,7 @@ def create_review(
     review_request.user_id = current_user.id
     logger.info("Creating review", extra={"product_id": review_request.product_id})
     review = review_usecase.create_review(review_request)
-    response.headers['Location'] = f"{API_PREFIX}/{review.id}"
+    response.headers['Location'] = f"{REVIEW_PREFIX}/{review.id}"
     return review
 
 
@@ -40,7 +40,7 @@ def get_review_by_id(
 ):
     """Endpoint to get a review by review_id."""
     review = review_usecase.get_review_by_id(review_id)
-    response.headers['Location'] = f"{API_PREFIX}/{review.id}"
+    response.headers['Location'] = f"{REVIEW_PREFIX}/{review.id}"
     return review
 
 

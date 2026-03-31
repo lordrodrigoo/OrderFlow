@@ -10,11 +10,11 @@ from src.usecases.address_usecase import AddressUsecase
 
 
 
-API_PREFIX = os.getenv("API_V1_ADDRESS")
-TAG = os.getenv("TAG_ADDRESS")
-router = APIRouter(prefix=API_PREFIX, tags=[TAG])
-logger = logging.getLogger(__name__)
+API_V1_PREFIX = os.getenv("API_V1_PREFIX", "/api/v1")
+ADDRESS_PREFIX = f"{API_V1_PREFIX}/addresses"
 
+router = APIRouter(prefix=ADDRESS_PREFIX, tags=["addresses"])
+logger = logging.getLogger(__name__)
 
 
 
@@ -28,7 +28,7 @@ def create_address(
     """Endpoint to create a new address (apenas para o usuário autenticado)."""
     address_request.user_id = current_user.id
     address = address_usecase.create_address(address_request)
-    response.headers['Location'] = f"{API_PREFIX}/{address.id}"
+    response.headers['Location'] = f"{ADDRESS_PREFIX}/{address.id}"
     return address
 
 
@@ -40,7 +40,7 @@ def find_address_by_id(
 ):
     """Endpoint to get an address by address_id."""
     address = address_usecase.find_address_by_id(address_id)
-    response.headers['Location'] = f"{API_PREFIX}/{address.id}"
+    response.headers['Location'] = f"{ADDRESS_PREFIX}/{address.id}"
     return address
 
 

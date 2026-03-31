@@ -11,10 +11,10 @@ from src.api.dependencies import get_auth_usecase
 
 
 
-API_PREFIX = os.getenv("API_V1_AUTH")
-TAG = os.getenv("TAG_AUTH")
+API_V1_PREFIX = os.getenv("API_V1_PREFIX", "/api/v1")
+AUTH_PREFIX = f"{API_V1_PREFIX}/auth"
 
-router = APIRouter(prefix=API_PREFIX, tags=[TAG])
+router = APIRouter(prefix=AUTH_PREFIX, tags=["auth"])
 logger = logging.getLogger(__name__)
 
 

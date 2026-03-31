@@ -9,10 +9,10 @@ from src.api.dependencies import get_category_usecase, get_current_admin
 
 
 
-API_PREFIX = os.getenv("API_V1_CATEGORY")
-TAG = os.getenv("TAG_CATEGORY")
+API_V1_PREFIX = os.getenv("API_V1_PREFIX", "/api/v1")
+CATEGORIES_PREFIX = f"{API_V1_PREFIX}/categories"
 
-router = APIRouter(prefix=API_PREFIX, tags=[TAG])
+router = APIRouter(prefix=CATEGORIES_PREFIX, tags=["categories"])
 logger = logging.getLogger(__name__)
 
 @router.post("/", response_model=CategoryResponse, status_code=status.HTTP_201_CREATED)
@@ -25,7 +25,7 @@ def create_category(
     """Endpoint to create a new category."""
     logger.info("Creating category", extra={"category_name": category_request.name})
     category = category_usecase.create_category(category_request)
-    response.headers['Location'] = f"{API_PREFIX}/{category.id}"
+    response.headers['Location'] = f"{CATEGORIES_PREFIX}/{category.id}"
     return category
 
 
@@ -37,7 +37,7 @@ def get_category_by_id(
 ):
     """Endpoint to get a category by category_id."""
     category = category_usecase.get_category_by_id(category_id)
-    response.headers['Location'] = f"{API_PREFIX}/{category.id}"
+    response.headers['Location'] = f"{CATEGORIES_PREFIX}/{category.id}"
     return category
 
 
@@ -48,7 +48,7 @@ def list_categories(
 ):
     """Endpoint to list all categories."""
     categories = category_usecase.list_categories()
-    response.headers['Location'] = f"{API_PREFIX}/"
+    response.headers['Location'] = f"{CATEGORIES_PREFIX}/"
     return categories
 
 
@@ -62,7 +62,7 @@ def update_category(
 ):
     """Endpoint to update a category by category_id."""
     category = category_usecase.update_category(category_id, category_request)
-    response.headers['Location'] = f"{API_PREFIX}/{category.id}"
+    response.headers['Location'] = f"{CATEGORIES_PREFIX}/{category.id}"
     return category
 
 

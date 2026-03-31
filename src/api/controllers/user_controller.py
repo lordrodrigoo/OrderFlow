@@ -14,10 +14,10 @@ from src.dto.request.role_request import RoleUpdateRequest
 
 
 
-API_PREFIX = os.getenv("API_V1_USER")
-TAG = os.getenv("TAG_USER")
+API_V1_PREFIX = os.getenv("API_V1_PREFIX", "/api/v1")
+USER_PREFIX = f"{API_V1_PREFIX}/users"
 
-router = APIRouter(prefix=API_PREFIX, tags=[TAG])
+router = APIRouter(prefix=USER_PREFIX, tags=["users"])
 logger = logging.getLogger(__name__)
 
 
@@ -30,7 +30,7 @@ def create_user(
     """Endpoint to create a new user."""
     logger.info("Creating user", extra={"email": user_request.email})
     user = user_usecase.create_user(user_request)
-    response.headers['Location'] = f"{API_PREFIX}/{user.id}"
+    response.headers['Location'] = f"{USER_PREFIX}/{user.id}"
     return user
 
 
@@ -84,7 +84,7 @@ def get_user_by_id(
 ):
     """Endpoint to get a user by user_id."""
     user = user_usecase.get_user_by_id(user_id)
-    response.headers['Location'] = f"{API_PREFIX}/{user.id}"
+    response.headers['Location'] = f"{USER_PREFIX}/{user.id}"
     return user
 
 

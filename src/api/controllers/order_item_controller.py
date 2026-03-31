@@ -10,10 +10,10 @@ from src.api.dependencies import get_order_item_usecase, get_current_user
 
 
 
-API_PREFIX = os.getenv("API_V1_ORDER_ITEM")
-TAG = os.getenv("TAG_ORDER_ITEM")
+API_V1_PREFIX = os.getenv("API_V1_ORDER_ITEM", "/api/v1/order-items")
+ORDER_ITEMS_PREFIX = f"{API_V1_PREFIX}/order-items"
 
-router = APIRouter(prefix=API_PREFIX, tags=[TAG])
+router = APIRouter(prefix=ORDER_ITEMS_PREFIX, tags=["order-items"])
 logger = logging.getLogger(__name__)
 
 
@@ -27,7 +27,7 @@ def create_order_item(
     """Endpoint to create a new order item."""
     logger.info("Creating order item", extra={"order_id": order_item_request.order_id})
     order_item = order_item_usecase.create_order_item(order_item_request, current_user.id, current_user.role)
-    response.headers['Location'] = f"{API_PREFIX}/{order_item.id}"
+    response.headers['Location'] = f"{ORDER_ITEMS_PREFIX}/{order_item.id}"
     return order_item
 
 
@@ -41,7 +41,7 @@ def update_order_item(
 ):
     """Endpoint to update an existing order item."""
     updated_order_item = order_item_usecase.update_order_item(order_item_id, order_item_request, current_user.id, current_user.role)
-    response.headers['Location'] = f"{API_PREFIX}/{updated_order_item.id}"
+    response.headers['Location'] = f"{ORDER_ITEMS_PREFIX}/{updated_order_item.id}"
     return updated_order_item
 
 
@@ -65,7 +65,7 @@ def get_order_item_by_id(
 ):
     """Endpoint to get an order item by order_item_id."""
     order_item = order_item_usecase.get_order_item_by_id(order_item_id, current_user.id, current_user.role)
-    response.headers['Location'] = f"{API_PREFIX}/{order_item.id}"
+    response.headers['Location'] = f"{ORDER_ITEMS_PREFIX}/{order_item.id}"
     return order_item
 
 
@@ -87,5 +87,5 @@ def list_order_items(
         limit=limit
     )
     if response is not None:
-        response.headers['Location'] = f"{API_PREFIX}/"
+        response.headers['Location'] = f"{ORDER_ITEMS_PREFIX}/"
     return order_items

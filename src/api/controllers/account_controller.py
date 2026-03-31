@@ -13,10 +13,10 @@ from src.dto.request.account_request import (
 
 
 
-API_PREFIX = os.getenv("API_V1_ACCOUNT")
-TAG = os.getenv("TAG_ACCOUNT")
+API_V1_PREFIX = os.getenv("API_V1_PREFIX", "/api/v1")
+ACCOUNT_PREFIX = f"{API_V1_PREFIX}/accounts"
 
-router = APIRouter(prefix=API_PREFIX, tags=[TAG])
+router = APIRouter(prefix=ACCOUNT_PREFIX, tags=["accounts"])
 logger = logging.getLogger(__name__)
 
 
@@ -30,7 +30,7 @@ def create_account(
     """Endpoint to create a new user account (admin/owner only)."""
     logger.info("Creating account", extra={"username": account_request.username})
     account = account_usecase.create_account(account_request)
-    response.headers['Location'] = f"{API_PREFIX}/{account.id}"
+    response.headers['Location'] = f"{ACCOUNT_PREFIX}/{account.id}"
     return account
 
 

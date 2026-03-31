@@ -1,3 +1,4 @@
+import os
 import logging
 from typing import List, Optional
 from fastapi import APIRouter, Response, Query, status, Depends
@@ -10,10 +11,11 @@ from src.dto.response.dashboard_response import DashboardResponse
 from src.dto.response.user_response import UserResponse
 from src.api.dependencies import get_order_usecase, get_user_usecase, get_product_usecase, get_current_admin
 
-API_PREFIX = "/api/v1/admin"
-TAG = "Admin"
+API_V1_PREFIX = os.getenv("API_V1_PREFIX", "/api/v1")
+ADMIN_PREFIX = f"{API_V1_PREFIX}/admin"
 
-router = APIRouter(prefix=API_PREFIX, tags=[TAG])
+
+router = APIRouter(prefix=ADMIN_PREFIX, tags=["admin"])
 logger = logging.getLogger(__name__)
 
 
@@ -28,7 +30,7 @@ def update_order_status(
     """Admin endpoint to update the status of any order."""
     logger.info("Admin updating order status", extra={"order_id": order_id, "admin_id": current_admin.id})
     updated_order = order_usecase.admin_update_order_status(order_id, status_request.status)
-    response.headers["Location"] = f"{API_PREFIX}/orders/{updated_order.id}"
+    response.headers["Location"] = f"{ADMIN_PREFIX}/orders/{updated_order.id}"
     return updated_order
 
 

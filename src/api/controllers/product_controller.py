@@ -8,10 +8,10 @@ from src.dto.response.product_response import ProductResponse
 from src.api.dependencies import get_product_usecase, get_current_admin
 
 
-API_PREFIX = os.getenv("API_V1_PRODUCT")
-TAG = os.getenv("TAG_PRODUCT")
+API_V1_PREFIX = os.getenv("API_V1_PREFIX", "/api/v1")
+PRODUCT_PREFIX = f"{API_V1_PREFIX}/products"
 
-router = APIRouter(prefix=API_PREFIX, tags=[TAG])
+router = APIRouter(prefix=PRODUCT_PREFIX, tags=["products"])
 logger = logging.getLogger(__name__)
 
 @router.post("/", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
@@ -24,7 +24,7 @@ def create_product(
     """Endpoint to create a new product."""
     logger.info("Creating product", extra={"product_name": product_request.name})
     product = product_usecase.create_product(product_request)
-    response.headers['Location'] = f"{API_PREFIX}/{product.id}"
+    response.headers['Location'] = f"{PRODUCT_PREFIX}/{product.id}"
     return product
 
 
@@ -36,7 +36,7 @@ def get_product_by_id(
 ):
     """Endpoint to get a product by product_id."""
     product = product_usecase.get_product_by_id(product_id)
-    response.headers['Location'] = f"{API_PREFIX}/{product.id}"
+    response.headers['Location'] = f"{PRODUCT_PREFIX}/{product.id}"
     return product
 
 
@@ -48,7 +48,7 @@ def find_products_by_category(
 ):
     """Endpoint to find products by category_id."""
     products = product_usecase.find_products_by_category(category_id)
-    response.headers['Location'] = f"{API_PREFIX}/category/{category_id}"
+    response.headers['Location'] = f"{PRODUCT_PREFIX}/category/{category_id}"
     return products
 
 
@@ -99,7 +99,7 @@ def update_product(
 ):
     """Endpoint to update a product by product_id."""
     updated_product = product_usecase.update_product(product_id, product_request)
-    response.headers['Location'] = f"{API_PREFIX}/{updated_product.id}"
+    response.headers['Location'] = f"{PRODUCT_PREFIX}/{updated_product.id}"
     return updated_product
 
 
