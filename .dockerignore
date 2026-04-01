@@ -7,6 +7,7 @@ __pycache__/
 .eggs/
 dist/
 build/
+*.so
 
 # Virtual environment
 venv/
@@ -16,20 +17,39 @@ env/
 # Tests & coverage
 htmlcov/
 .coverage
+.coverage.*
 .pytest_cache/
 pytest.ini
+src/tests/
 
 # Docs
 docs/
+*.md
+README*
 
 # Dev & editor
 .env
 .env.*
 .git/
 .gitignore
+.github/
 .vscode/
 .idea/
 
 # Docker
 Dockerfile
+Dockerfile.*
 .dockerignore
+docker-compose.yml
+docker-compose*.yml
+
+# Makefile
+Makefile
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db

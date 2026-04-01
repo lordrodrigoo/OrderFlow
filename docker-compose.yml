@@ -1,19 +1,23 @@
 services:
 
-  db:
+  database:
     image: postgres:16-alpine
-    container_name: orderflow_db
+    container_name: orderflow_database
     environment:
-      POSTGRES_USER: rodrigo
-      POSTGRES_PASSWORD: rodrigo2944508
-      POSTGRES_DB: delivery_db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U rodrigo -d delivery_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    networks:
+      - orderflow-network
+    restart: unless-stopped
 
   app:
     image: ${APP_IMAGE:-orderflow:local}
@@ -21,16 +25,23 @@ services:
     container_name: orderflow_app
     env_file: .env
     environment:
-      # Override DB_HOST to point to the db service instead of localhost
-      DB_HOST: db
-      DB_URL: postgresql+psycopg2://rodrigo:rodrigo2944508@db:5432/delivery_db
+      DB_HOST: database
+      DB_URL: postgresql+psycopg2://${DB_USER}:${DB_PASSWORD}@database:${DB_PORT}/${DB_NAME}
       LOG_FORMAT: json
     ports:
       - "8000:8000"
     depends_on:
-      db:
+      database:
         condition: service_healthy
+    networks:
+      - orderflow-network
+    restart: unless-stopped
     command: uvicorn src.main:app --host 0.0.0.0 --port 8000
 
 volumes:
   postgres_data:
+    driver: local
+
+networks:
+  orderflow-network:
+    driver: bridge
