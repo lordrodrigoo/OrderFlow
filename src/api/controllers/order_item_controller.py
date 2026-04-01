@@ -10,7 +10,7 @@ from src.api.dependencies import get_order_item_usecase, get_current_user
 
 
 
-API_V1_PREFIX = os.getenv("API_V1_ORDER_ITEM", "/api/v1/order-items")
+API_V1_PREFIX = os.getenv("API_V1_PREFIX", "/api/v1")
 ORDER_ITEMS_PREFIX = f"{API_V1_PREFIX}/order-items"
 
 router = APIRouter(prefix=ORDER_ITEMS_PREFIX, tags=["order-items"])

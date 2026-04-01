@@ -1,5 +1,6 @@
 #pylint: disable=unused-argument
 from unittest.mock import MagicMock, patch, patch
+from fastapi.security import HTTPAuthorizationCredentials
 from src.api.dependencies import (
     get_db,
     get_user_usecase,
@@ -95,11 +96,13 @@ def test_get_current_user_returns_user_response():
     fake_user_usecase = MagicMock()
     fake_user_usecase.get_user_by_email.return_value = fake_user
 
+    fake_credentials = HTTPAuthorizationCredentials(scheme="Bearer", credentials="faketoken")
+
     original_verify = deps.verify_token
     deps.verify_token = lambda token: fake_token_payload
 
     try:
-        result = get_current_user(token="faketoken", user_usecase=fake_user_usecase)
+        result = get_current_user(token=fake_credentials, user_usecase=fake_user_usecase)
         assert result == fake_user
         fake_user_usecase.get_user_by_email.assert_called_once_with("user@example.com")
     finally:

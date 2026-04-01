@@ -1,4 +1,5 @@
 from fastapi import Depends
+from fastapi.security import HTTPAuthorizationCredentials
 
 from src.infra.db.settings.connection import DBConnectionHandler
 from src.usecases.auth_usecases import AuthUseCases
@@ -83,10 +84,10 @@ def get_review_usecase(db=Depends(get_db)):
 
 
 def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    token: HTTPAuthorizationCredentials = Depends(oauth2_scheme),
     user_usecase: UserUsecase = Depends(get_user_usecase)
 ) -> UserResponse:
-    token_data: TokenPayload = verify_token(token)
+    token_data: TokenPayload = verify_token(token.credentials)
     return user_usecase.get_user_by_email(token_data.sub)
 
 

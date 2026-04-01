@@ -1,16 +1,15 @@
 import os
 import logging
-from typing import List, Optional
-from fastapi import APIRouter, Response, Query, status, Depends
+from typing import List
+from fastapi import APIRouter, Response, status, Depends
 from src.usecases.address_usecase import AddressUsecase
 from src.usecases.user_usecases import UserUsecase
 from src.dto.request.address_request import AddressRequest
 from src.dto.response.address_response import AddressResponse
-from src.api.dependencies import get_address_usecase
 from src.dto.request.user_request import UserRequest
 from src.dto.response.user_response import UserResponse
-from src.api.dependencies import get_user_usecase, get_current_user, get_current_owner, get_current_admin
-from src.dto.request.role_request import RoleUpdateRequest
+from src.api.dependencies import get_user_usecase, get_current_user, get_address_usecase
+
 
 
 
@@ -44,20 +43,6 @@ def add_address(
     address_request.user_id = current_user.id
     return address_usecase.create_address(address_request)
 
-
-@router.get("/", response_model=List[UserResponse], status_code=status.HTTP_200_OK)
-def list_users(
-    name: Optional[str] = Query(None, description="Filter users by name"),
-    email: Optional[str] = Query(None, description="Filter users by email"),
-    active: Optional[bool] = Query(None, description="Filter users by active status"),
-    skip: int = 0,
-    limit: int = 10,
-    _: UserResponse = Depends(get_current_admin),
-    user_usecase: UserUsecase = Depends(get_user_usecase)
-) -> List[UserResponse]:
-    """Endpoint to list users with optional filters."""
-    users = user_usecase.list_users(name, email, active, skip, limit)
-    return users
 
 
 @router.get("/me", response_model=UserResponse)
@@ -147,14 +132,3 @@ def delete_user(
     logger.info("Deleting user", extra={"user_id": user_id})
     user_usecase.delete_user(user_id, current_user)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-@router.patch("/{user_id}/role", response_model=UserResponse, status_code=status.HTTP_200_OK)
-def update_user_role(
-    user_id: int,
-    body: RoleUpdateRequest,
-    current_owner: UserResponse = Depends(get_current_owner),
-    user_usecase: UserUsecase = Depends(get_user_usecase)
-):
-    """Endpoint exclusive for OWNER: promotes or demotes a user to admin or user role."""
-    return user_usecase.update_user_role(user_id, body.role, current_owner)
