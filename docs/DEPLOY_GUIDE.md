@@ -1,6 +1,6 @@
-#  🚀 Deploy Guide — OrderFlow
+# 🚀 Deploy Guide — OrderFlow
 
-🇧🇷 Versão em Português logo abaixo · 🇺🇸 English version first
+🇺🇸 English version first · 🇧🇷 Versão em Português logo abaixo
 
 ---
 
@@ -32,26 +32,28 @@ cd orderflow
 cp .env.example .env
 ```
 
-Edit `.env` with your values:
+Edit `.env` with your values. The defaults below work out of the box for local development:
 
 #### Database
 ```dotenv
-DB_URL='postgresql+psycopg2://USER:PASSWORD@HOST:PORT/DATABASE'
-DB_USER='your_user'
-DB_PASSWORD='your_password'
-DB_HOST='your_host'
-DB_PORT='5432'
-DB_NAME='your_database'
+DB_URL=postgresql+psycopg2://postgres:postgres@localhost:5432/orderflow_db
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=orderflow_db
 
-ALEMBIC_DATABASE_URL=postgresql+psycopg2://USER:PASSWORD@HOST:PORT/DATABASE
+ALEMBIC_DB_URL=postgresql+psycopg2://postgres:postgres@localhost:5432/orderflow_db
 ```
+
+> ⚠️ For production, replace `postgres/postgres` with strong credentials and point the host to your database server.
 
 #### System Owner
 Created automatically on first startup — no manual step needed.
 ```dotenv
-OWNER_EMAIL=owner@orderflow.com
 OWNER_USERNAME=owner
 OWNER_PASSWORD=ChangeMe@2026
+OWNER_EMAIL=owner@orderflow.com
 OWNER_FIRST_NAME=System
 OWNER_LAST_NAME=Owner
 ```
@@ -59,21 +61,38 @@ OWNER_LAST_NAME=Owner
 
 #### JWT
 ```dotenv
-SECRET_KEY='your_secret_key'          # Use a strong random value in production
-ALGORITHM='HS256'
+SECRET_KEY=your_secret_key    # Generate with: openssl rand -hex 64
+ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 REFRESH_TOKEN_EXPIRE_DAYS=7
 ```
 
+> ⚠️ Never use a weak or default `SECRET_KEY` in production.
+
+#### Environment & Trusted Hosts
+```dotenv
+ENV=development               # development | production
+ALLOWED_HOSTS=localhost,127.0.0.1
+```
+
+#### API
+```dotenv
+API_TITLE=OrderFlow API
+API_VERSION=1.0.0
+API_V1_PREFIX=/api/v1
+```
+
 #### Logging
 ```dotenv
-LOG_LEVEL=INFO       # DEBUG | INFO | WARNING | ERROR | CRITICAL
-LOG_FORMAT=json      # Use 'json' in production for structured log parsing
+LOG_LEVEL=DEBUG        # DEBUG | INFO | WARNING | ERROR | CRITICAL
+LOG_FORMAT=text        # text (development) | json (production)
 ```
 
 ---
 
 ### 3. Run locally (without Docker)
+
+> For a full walkthrough of local setup options (Makefile vs manual), see the [README](../README.md).
 
 ```bash
 # Create and activate virtual environment
@@ -97,7 +116,7 @@ Access: http://localhost:8000/docs
 ### 4. Run with Docker
 
 ```bash
-docker-compose up --build -d
+docker compose up --build -d
 ```
 
 The container will:
@@ -112,25 +131,16 @@ Access: http://localhost:8000/docs
 
 ### 5. Run the test suite
 
-```bash
-make test        # runs all tests (unit, integration, functional)
-make coverage    # generates coverage report
-```
-
-Or individually:
+> For the full list of test commands, see the [README](../README.md).
 
 ```bash
-pytest src/tests/unit_tests/        -q --tb=short
-pytest src/tests/integration_tests/ -q --tb=short
-pytest src/tests/functional_tests/  -q --tb=short
-```
+# Run all tests with coverage report
+make test-all
 
-Or with makefile:
-```
+# Or run each suite individually
 make test-unit
 make test-integration
 make test-functional
-make test-all
 ```
 
 ---
@@ -142,13 +152,13 @@ The pipeline runs automatically on every push or pull request to `main`.
 #### Pipeline stages
 
 ```
-SOURCE                          BUILD                  DEPLOY
-──────────────────────────      ───────────────────    ──────────────────────
-[lint]          ─┐
-[test-unit]      ├─→  [build-image]  →  [publish-image]  →  [deploy-vps]
-[test-integration] ┤        │                  │                   │
-[test-functional] ─┘   (PR: validate     (main only:         (main only:
-                         no push)         push to GHCR)       deploy to VPS)
+SOURCE                            BUILD                  DEPLOY
+────────────────────────────      ───────────────────    ──────────────────────
+[lint]            ─┐
+[test-unit]        ├─→  [build-image]  →  [publish-image]  →  [deploy-vps]
+[test-integration] ┤         │                  │                   │
+[test-functional]  ─┘   (PR: validate     (main only:         (main only:
+                           no push)         push to GHCR)       deploy to VPS)
 ```
 
 #### Stage details
@@ -222,32 +232,17 @@ Security highlights:
 
 ---
 
-### 9. Future AWS migration
-
-The pipeline was designed with AWS in mind. Migration path:
-
-| Current | AWS equivalent |
-|---------|---------------|
-| GHCR | Amazon ECR |
-| `deploy-vps` (SSH) | `aws ecs update-service` |
-| GitHub Secrets | AWS Secrets Manager / Parameter Store |
-| GHCR_PAT | IAM Role (no token needed) |
-
-The `lint`, `test-*`, and `build-image` stages remain identical.
-
----
-
 ### Troubleshooting
 
 **Container not starting**
 ```bash
-docker-compose logs app
+docker compose logs app
 ```
 
 **Migration errors**
 ```bash
-docker-compose exec app alembic upgrade head
-docker-compose exec app alembic history
+docker compose exec app alembic upgrade head
+docker compose exec app alembic history
 ```
 
 **Health check failing**
@@ -262,7 +257,6 @@ lsof -i :8000
 ```
 
 ---
-
 ---
 
 ## 🇧🇷 Português
@@ -293,26 +287,28 @@ cd orderflow
 cp .env.example .env
 ```
 
-Edite o `.env` com seus valores:
+Edite o `.env` com seus valores. Os padrões abaixo já funcionam para desenvolvimento local:
 
 #### Banco de dados
 ```dotenv
-DB_URL='postgresql+psycopg2://USER:PASSWORD@HOST:PORT/DATABASE'
-DB_USER='seu_usuario'
-DB_PASSWORD='sua_senha'
-DB_HOST='seu_host'
-DB_PORT='5432'
-DB_NAME='seu_banco'
+DB_URL=postgresql+psycopg2://postgres:postgres@localhost:5432/orderflow_db
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=orderflow_db
 
-ALEMBIC_DATABASE_URL=postgresql+psycopg2://USER:PASSWORD@HOST:PORT/DATABASE
+ALEMBIC_DB_URL=postgresql+psycopg2://postgres:postgres@localhost:5432/orderflow_db
 ```
+
+> ⚠️ Em produção, substitua `postgres/postgres` por credenciais fortes e aponte o host para o seu servidor de banco de dados.
 
 #### Owner do sistema
 Criado automaticamente na primeira inicialização — nenhum passo manual necessário.
 ```dotenv
-OWNER_EMAIL=owner@orderflow.com
 OWNER_USERNAME=owner
 OWNER_PASSWORD=ChangeMe@2026
+OWNER_EMAIL=owner@orderflow.com
 OWNER_FIRST_NAME=System
 OWNER_LAST_NAME=Owner
 ```
@@ -320,21 +316,38 @@ OWNER_LAST_NAME=Owner
 
 #### JWT
 ```dotenv
-SECRET_KEY='sua_chave_secreta'        # Use um valor aleatório forte em produção
-ALGORITHM='HS256'
+SECRET_KEY=sua_chave_secreta    # Gere com: openssl rand -hex 64
+ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 REFRESH_TOKEN_EXPIRE_DAYS=7
 ```
 
+> ⚠️ Nunca use uma `SECRET_KEY` fraca ou padrão em produção.
+
+#### Environment & Trusted Hosts
+```dotenv
+ENV=development               # development | production
+ALLOWED_HOSTS=localhost,127.0.0.1
+```
+
+#### API
+```dotenv
+API_TITLE=OrderFlow API
+API_VERSION=1.0.0
+API_V1_PREFIX=/api/v1
+```
+
 #### Logging
 ```dotenv
-LOG_LEVEL=INFO       # DEBUG | INFO | WARNING | ERROR | CRITICAL
-LOG_FORMAT=json      # Use 'json' em produção para parsing estruturado de logs
+LOG_LEVEL=DEBUG        # DEBUG | INFO | WARNING | ERROR | CRITICAL
+LOG_FORMAT=text        # text (desenvolvimento) | json (produção)
 ```
 
 ---
 
 ### 3. Rodar localmente (sem Docker)
+
+> Para um passo a passo completo das opções de setup local (Makefile vs manual), consulte o [README](../README.md).
 
 ```bash
 # Criar e ativar ambiente virtual
@@ -358,7 +371,7 @@ Acesse: http://localhost:8000/docs
 ### 4. Rodar com Docker
 
 ```bash
-docker-compose up --build -d
+docker compose up --build -d
 ```
 
 O container irá:
@@ -373,26 +386,16 @@ Acesse: http://localhost:8000/docs
 
 ### 5. Executar os testes
 
-```bash
-make test        # roda todos os testes (unitários, integração, funcionais)
-make coverage    # gera relatório de cobertura
-```
-
-Ou individualmente:
+> Para a lista completa de comandos de teste, consulte o [README](../README.md).
 
 ```bash
-pytest src/tests/unit_tests/        -q --tb=short
-pytest src/tests/integration_tests/ -q --tb=short
-pytest src/tests/functional_tests/  -q --tb=short
-```
+# Rodar todos os testes com relatório de cobertura
+make test-all
 
-Ou Makefile:
-```
+# Ou rodar cada suite individualmente
 make test-unit
 make test-integration
 make test-functional
-make test-all
-
 ```
 
 ---
@@ -404,13 +407,13 @@ O pipeline executa automaticamente a cada push ou pull request para a branch `ma
 #### Estágios do pipeline
 
 ```
-SOURCE                          BUILD                  DEPLOY
-──────────────────────────      ───────────────────    ──────────────────────
-[lint]          ─┐
-[test-unit]      ├─→  [build-image]  →  [publish-image]  →  [deploy-vps]
-[test-integration] ┤        │                  │                   │
-[test-functional] ─┘   (PR: valida       (só na main:        (só na main:
-                         sem push)        push pro GHCR)      deploy no VPS)
+SOURCE                            BUILD                  DEPLOY
+────────────────────────────      ───────────────────    ──────────────────────
+[lint]            ─┐
+[test-unit]        ├─→  [build-image]  →  [publish-image]  →  [deploy-vps]
+[test-integration] ┤         │                  │                   │
+[test-functional]  ─┘   (PR: valida       (só na main:        (só na main:
+                           sem push)        push pro GHCR)      deploy no VPS)
 ```
 
 #### Detalhes por estágio
@@ -484,32 +487,17 @@ Destaques de segurança:
 
 ---
 
-### 9. Migração futura para AWS
-
-O pipeline foi desenhado pensando em AWS. Caminho de migração:
-
-| Atual | Equivalente AWS |
-|-------|----------------|
-| GHCR | Amazon ECR |
-| `deploy-vps` (SSH) | `aws ecs update-service` |
-| GitHub Secrets | AWS Secrets Manager / Parameter Store |
-| GHCR_PAT | IAM Role (sem token necessário) |
-
-Os estágios `lint`, `test-*` e `build-image` permanecem idênticos.
-
----
-
 ### Troubleshooting
 
 **Container não sobe**
 ```bash
-docker-compose logs app
+docker compose logs app
 ```
 
 **Erros de migração**
 ```bash
-docker-compose exec app alembic upgrade head
-docker-compose exec app alembic history
+docker compose exec app alembic upgrade head
+docker compose exec app alembic history
 ```
 
 **Health check falhando**
@@ -522,5 +510,3 @@ docker inspect orderflow_app | grep -A 10 Health
 ```bash
 lsof -i :8000
 ```
-
-
