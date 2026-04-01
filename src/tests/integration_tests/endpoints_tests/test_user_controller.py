@@ -10,7 +10,7 @@ def test_list_users_with_filters(client, admin_auth_token, valid_user_data):
     client.post("/api/v1/users/", json=valid_user_data)
 
     response = client.get(
-        "/api/v1/users/",
+        "/api/v1/admin/users",
         params={"email": valid_user_data["email"]},
         headers={"Authorization": f"Bearer {admin_auth_token}"}
     )
@@ -22,7 +22,7 @@ def test_list_users_with_filters(client, admin_auth_token, valid_user_data):
 
 def test_list_users_with_name_filter(client, admin_auth_token, fake_user, fake_account):
     response = client.get(
-        "/api/v1/users/",
+        "/api/v1/admin/users",
         params={"name": fake_user.first_name},
         headers={"Authorization": f"Bearer {admin_auth_token}"}
     )
@@ -33,7 +33,7 @@ def test_list_users_with_name_filter(client, admin_auth_token, fake_user, fake_a
 
 def test_list_users_with_active_filter(client, admin_auth_token, fake_user, fake_account):
     response = client.get(
-        "/api/v1/users/",
+        "/api/v1/admin/users",
         params={"active": True},
         headers={"Authorization": f"Bearer {admin_auth_token}"}
     )
@@ -45,7 +45,7 @@ def test_list_users_with_active_filter(client, admin_auth_token, fake_user, fake
 def test_list_users_without_filters(client, admin_auth_token, valid_user_data):
     client.post("/api/v1/users/", json=valid_user_data)
 
-    response = client.get("/api/v1/users/", headers={"Authorization": f"Bearer {admin_auth_token}"})
+    response = client.get("/api/v1/admin/users", headers={"Authorization": f"Bearer {admin_auth_token}"})
     assert response.status_code == 200
     data = response.json()
     assert len(data) >= 1
@@ -192,7 +192,7 @@ def test_delete_user(client, admin_auth_token, valid_user_data):
 
 def test_owner_promotes_user_to_admin(client, owner_auth_token, fake_user, fake_account):
     response = client.patch(
-        f"/api/v1/users/{fake_user.id}/role",
+        f"/api/v1/admin/users/{fake_user.id}/role",
         json={"role": "admin"},
         headers={"Authorization": f"Bearer {owner_auth_token}"}
     )
@@ -202,7 +202,7 @@ def test_owner_promotes_user_to_admin(client, owner_auth_token, fake_user, fake_
 
 def test_owner_demotes_admin_to_user(client, owner_auth_token, fake_admin_user, fake_admin_account):
     response = client.patch(
-        f"/api/v1/users/{fake_admin_user.id}/role",
+        f"/api/v1/admin/users/{fake_admin_user.id}/role",
         json={"role": "user"},
         headers={"Authorization": f"Bearer {owner_auth_token}"}
     )
@@ -212,7 +212,7 @@ def test_owner_demotes_admin_to_user(client, owner_auth_token, fake_admin_user, 
 
 def test_owner_cannot_assign_owner_role(client, owner_auth_token, fake_user, fake_account):
     response = client.patch(
-        f"/api/v1/users/{fake_user.id}/role",
+        f"/api/v1/admin/users/{fake_user.id}/role",
         json={"role": "owner"},
         headers={"Authorization": f"Bearer {owner_auth_token}"}
     )
@@ -221,7 +221,7 @@ def test_owner_cannot_assign_owner_role(client, owner_auth_token, fake_user, fak
 
 def test_admin_cannot_change_roles(client, admin_auth_token, fake_user, fake_account):
     response = client.patch(
-        f"/api/v1/users/{fake_user.id}/role",
+        f"/api/v1/admin/users/{fake_user.id}/role",
         json={"role": "admin"},
         headers={"Authorization": f"Bearer {admin_auth_token}"}
     )
@@ -230,7 +230,7 @@ def test_admin_cannot_change_roles(client, admin_auth_token, fake_user, fake_acc
 
 def test_user_cannot_change_roles(client, auth_token, fake_user, fake_account):
     response = client.patch(
-        f"/api/v1/users/{fake_user.id}/role",
+        f"/api/v1/admin/users/{fake_user.id}/role",
         json={"role": "admin"},
         headers={"Authorization": f"Bearer {auth_token}"}
     )
@@ -239,7 +239,7 @@ def test_user_cannot_change_roles(client, auth_token, fake_user, fake_account):
 
 def test_unauthenticated_cannot_change_roles(client, fake_user):
     response = client.patch(
-        f"/api/v1/users/{fake_user.id}/role",
+        f"/api/v1/admin/users/{fake_user.id}/role",
         json={"role": "admin"}
     )
     assert response.status_code == 401
@@ -247,7 +247,7 @@ def test_unauthenticated_cannot_change_roles(client, fake_user):
 
 def test_owner_change_role_user_not_found(client, owner_auth_token):
     response = client.patch(
-        "/api/v1/users/99999/role",
+        "/api/v1/admin/users/99999/role",
         json={"role": "admin"},
         headers={"Authorization": f"Bearer {owner_auth_token}"}
     )

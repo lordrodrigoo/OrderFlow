@@ -52,7 +52,7 @@ def test_owner_promotes_user_to_admin(client, fake_user, fake_account, owner_aut
     owner_headers = {"Authorization": f"Bearer {owner_auth_token}"}
 
     resp = client.patch(
-        f"/api/v1/users/{fake_user.id}/role",
+        f"/api/v1/admin/users/{fake_user.id}/role",
         json={"role": "admin"},
         headers=owner_headers,
     )
@@ -70,7 +70,7 @@ def test_promoted_user_can_access_admin_endpoints(client, owner_auth_token):
     # Create a fresh user and promote them
     user = _register_user(client, "promote1")
     client.patch(
-        f"/api/v1/users/{user['id']}/role",
+        f"/api/v1/admin/users/{user['id']}/role",
         json={"role": "admin"},
         headers=owner_headers,
     )
@@ -93,7 +93,7 @@ def test_owner_demotes_admin_to_user(client, fake_admin_user, fake_admin_account
     owner_headers = {"Authorization": f"Bearer {owner_auth_token}"}
 
     resp = client.patch(
-        f"/api/v1/users/{fake_admin_user.id}/role",
+        f"/api/v1/admin/users/{fake_admin_user.id}/role",
         json={"role": "user"},
         headers=owner_headers,
     )
@@ -110,7 +110,7 @@ def test_demoted_admin_loses_admin_access(client, owner_auth_token):
     # Register a user and promote to admin
     user = _register_user(client, "demote1")
     client.patch(
-        f"/api/v1/users/{user['id']}/role",
+        f"/api/v1/admin/users/{user['id']}/role",
         json={"role": "admin"},
         headers=owner_headers,
     )
@@ -122,7 +122,7 @@ def test_demoted_admin_loses_admin_access(client, owner_auth_token):
 
     # Demote back to user
     client.patch(
-        f"/api/v1/users/{user['id']}/role",
+        f"/api/v1/admin/users/{user['id']}/role",
         json={"role": "user"},
         headers=owner_headers,
     )
@@ -145,7 +145,7 @@ def test_owner_cannot_assign_owner_role_to_another_user(client, fake_user, fake_
     owner_headers = {"Authorization": f"Bearer {owner_auth_token}"}
 
     resp = client.patch(
-        f"/api/v1/users/{fake_user.id}/role",
+        f"/api/v1/admin/users/{fake_user.id}/role",
         json={"role": "owner"},
         headers=owner_headers,
     )
@@ -165,7 +165,7 @@ def test_regular_user_cannot_change_another_users_role(client, fake_user, owner_
     attacker_headers = _login_token(client, "journey.attacker1")
 
     resp = client.patch(
-        f"/api/v1/users/{fake_user.id}/role",
+        f"/api/v1/admin/users/{fake_user.id}/role",
         json={"role": "admin"},
         headers=attacker_headers,
     )
@@ -180,7 +180,7 @@ def test_admin_cannot_change_another_users_role(client, fake_user, fake_account,
     admin_headers = {"Authorization": f"Bearer {admin_auth_token}"}
 
     resp = client.patch(
-        f"/api/v1/users/{fake_user.id}/role",
+        f"/api/v1/admin/users/{fake_user.id}/role",
         json={"role": "user"},
         headers=admin_headers,
     )
@@ -192,7 +192,7 @@ def test_unauthenticated_request_cannot_change_role(client, fake_user, fake_acco
     Requests without a token are rejected with 401.
     """
     resp = client.patch(
-        f"/api/v1/users/{fake_user.id}/role",
+        f"/api/v1/admin/users/{fake_user.id}/role",
         json={"role": "admin"},
     )
     assert resp.status_code == 401
