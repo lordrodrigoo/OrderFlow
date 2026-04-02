@@ -13,6 +13,7 @@ REST API for order and user management, built with FastAPI and Clean Architectur
 ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0%2B-D71F00?logo=sqlalchemy&logoColor=white)
 ![Alembic](https://img.shields.io/badge/Alembic-migrations-6BA81E)
 ![Pytest](https://img.shields.io/badge/pytest-tested-0A9EDC?logo=pytest&logoColor=white)
+![Testcontainers](https://img.shields.io/badge/Testcontainers-integration--tests-2496ED?logo=docker&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-compose-2496ED?logo=docker&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15%2B-4169E1?logo=postgresql&logoColor=white)
 ![Pydantic](https://img.shields.io/badge/Pydantic-v2-E92063?logo=pydantic&logoColor=white)
@@ -47,6 +48,7 @@ REST API for order and user management, built with FastAPI and Clean Architectur
 - SQLAlchemy 2.0+
 - Alembic
 - Pytest + Coverage.py
+- Testcontainers
 - Docker & Docker Compose
 - PostgreSQL 15+
 - Pydantic v2
@@ -578,6 +580,7 @@ API REST para gestão de pedidos e usuários, construída com FastAPI e Clean Ar
 - SQLAlchemy 2.0+
 - Alembic
 - Pytest + Coverage.py
+- Testcontainers
 - Docker & Docker Compose
 - PostgreSQL 15+
 - Pydantic v2
