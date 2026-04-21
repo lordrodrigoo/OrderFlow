@@ -2,6 +2,7 @@
 #pylint: disable=unused-argument
 #pylint: disable=unused-import
 from datetime import datetime
+from unittest.mock import patch
 import pytest
 from fastapi.testclient import TestClient
 from testcontainers.postgres import PostgresContainer
@@ -26,8 +27,9 @@ def reset_rate_limiter():
 def client(db_session):
     fake_db = FakeDBConnectionHandler(db_session)
     app.dependency_overrides[get_db] = lambda: fake_db
-    with TestClient(app, base_url="http://localhost") as test_client:
-        yield test_client
+    with patch("src.main.seed_owner"):
+        with TestClient(app, base_url="http://localhost") as test_client:
+            yield test_client
     app.dependency_overrides.clear()
 
 
