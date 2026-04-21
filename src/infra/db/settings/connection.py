@@ -61,4 +61,3 @@ class DBConnectionHandler:
         self.session.close()
 
 engine = DBConnectionHandler().get_engine()
-Base.metadata.create_all(bind=engine)

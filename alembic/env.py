@@ -18,7 +18,7 @@ from dotenv import load_dotenv # pylint: disable=wrong-import-order
 load_dotenv()
 
 # CONFIG DATABASE TO ALEMBIC WITH ENV VARIABLE
-ALEMBIC_DB_URL = os.getenv("ALEMBIC_DB_URL")
+ALEMBIC_DB_URL = os.getenv("DB_URL") or os.getenv("ALEMBIC_DB_URL")
 if ALEMBIC_DB_URL:
     context.config.set_main_option("sqlalchemy.url", ALEMBIC_DB_URL) # pylint: disable=no-member.
 
