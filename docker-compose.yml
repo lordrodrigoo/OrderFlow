@@ -3,6 +3,7 @@ services:
   database:
     image: postgres:16-alpine
     container_name: orderflow_database
+    env_file: .env
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}

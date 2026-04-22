@@ -172,31 +172,31 @@ revision:
 
 migrate-docker:
 	@echo -e "$(YELLOW)Running migrations inside app container...$(NC)"
-	@docker compose exec app $(ALEMBIC) upgrade head
+	@docker-compose exec app $(ALEMBIC) upgrade head
 	@echo -e "$(GREEN)✓ Migrations applied!$(NC)"
 
 # ── Docker: Full Stack ────────────────────────────────────────────────────────
 
 up:
 	@echo -e "$(YELLOW)Starting all containers...$(NC)"
-	@docker compose up -d --build
+	@docker-compose up -d --build
 	@echo -e "$(GREEN)✓ All containers started!$(NC)"
 	@echo -e "$(BLUE)→ Application: http://localhost:8000$(NC)"
 	@echo -e "$(BLUE)→ Docs: http://localhost:8000/docs$(NC)"
 
 down:
 	@echo -e "$(YELLOW)Stopping all containers...$(NC)"
-	@docker compose down
+	@docker-compose down
 	@echo -e "$(GREEN)✓ All containers stopped!$(NC)"
 
 down-v:
 	@echo -e "$(YELLOW)Stopping all containers and removing volumes...$(NC)"
-	@docker compose down -v
+	@docker-compose down -v
 	@echo -e "$(GREEN)✓ All containers and volumes removed!$(NC)"
 
 ps:
 	@echo -e "$(BLUE)Running containers:$(NC)"
-	@docker compose ps
+	@docker-compose ps
 
 prune:
 	@echo -e "$(YELLOW)Removing stopped containers and unused images...$(NC)"
@@ -218,31 +218,31 @@ prune-all:
 
 up-app:
 	@echo -e "$(YELLOW)Starting app container...$(NC)"
-	@docker compose up -d app
+	@docker-compose up -d app
 	@echo -e "$(GREEN)✓ App container started!$(NC)"
 	@echo -e "$(BLUE)→ Application: http://localhost:8000$(NC)"
 
 down-app:
 	@echo -e "$(YELLOW)Stopping app container...$(NC)"
-	@docker compose stop app
+	@docker-compose stop app
 	@echo -e "$(GREEN)✓ App container stopped!$(NC)"
 
 restart:
 	@echo -e "$(YELLOW)Restarting app container...$(NC)"
-	@docker compose restart app
+	@docker-compose restart app
 	@echo -e "$(GREEN)✓ App container restarted!$(NC)"
 
 logs:
 	@echo -e "$(BLUE)Showing app logs (Ctrl+C to exit)...$(NC)"
-	@docker compose logs -f app
+	@docker-compose logs -f app
 
 shell:
 	@echo -e "$(BLUE)Opening shell in app container...$(NC)"
-	@docker compose exec app sh
+	@docker-compose exec app sh
 
 remove-app:
 	@echo -e "$(YELLOW)Removing app container and image...$(NC)"
-	@docker compose rm -f app
+	@docker-compose rm -f app
 	@docker rmi $$(docker images -q orderflow_app) 2>/dev/null || true
 	@echo -e "$(GREEN)✓ App container and image removed!$(NC)"
 
@@ -250,33 +250,33 @@ remove-app:
 
 up-database:
 	@echo -e "$(YELLOW)Starting database container...$(NC)"
-	@docker compose up -d database
+	@docker-compose up -d database
 	@echo -e "$(GREEN)✓ Database container started!$(NC)"
 
 down-database:
 	@echo -e "$(YELLOW)Stopping database container...$(NC)"
-	@docker compose stop database
+	@docker-compose stop database
 	@echo -e "$(GREEN)✓ Database container stopped!$(NC)"
 
 restart-database:
 	@echo -e "$(YELLOW)Restarting database container...$(NC)"
-	@docker compose restart database
+	@docker-compose restart database
 	@echo -e "$(GREEN)✓ Database container restarted!$(NC)"
 
 logs-database:
 	@echo -e "$(BLUE)Showing database logs (Ctrl+C to exit)...$(NC)"
-	@docker compose logs -f database
+	@docker-compose logs -f database
 
 shell-database:
 	@echo -e "$(BLUE)Opening psql shell in database container...$(NC)"
-	@docker compose exec database psql -U $${DB_USER} -d $${DB_NAME}
+	@docker-compose exec database psql -U $${DB_USER} -d $${DB_NAME}
 
 remove-database:
 	@echo -e "$(RED)⚠ This will delete ALL database data!$(NC)"
 	@read -p "Are you sure? [y/N] " -n 1 -r; \
 	echo; \
 	if [[ $$REPLY =~ ^[Yy]$$ ]]; then \
-		docker compose rm -f database; \
+		docker-compose rm -f database; \
 		docker volume rm $$(docker volume ls -q | grep postgres_data) 2>/dev/null || true; \
 		echo -e "$(GREEN)✓ Database container and volume removed!$(NC)"; \
 	else \
